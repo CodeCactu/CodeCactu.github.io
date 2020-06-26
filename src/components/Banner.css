@@ -75,32 +75,39 @@
 
 @media only screen and (min-width: 900px) {
   .banner-logo-wrapper {
-    left: 25%;
+    display: flex;
+    left: 50%;
   }
+
   .banner-logotype {
-    font-size: 100px;
-    left: 100%;
-    top: calc( 50% + 20px );
+    position: relative;
+    left: unset;
+    top: unset;
+    padding-top: 194px;
     transform: unset;
+    font-size: 100px;
   }
 
   .banner-floating_face.is-1 {
     top: 70px;
-    left: calc( 100% + 55px );
+    left: 349px;
   }
   .banner-floating_face.is-2 {
     top: 70px;
-    left: calc( 100% + 204px );
+    left: 498px;
+  }
+
+  .banner-no_sign {
+    display: block;
+    top: 220px;
+    left: 100%;
+    width: 70px;
   }
 }
 
 
 
 @media only screen and (min-width: 1200px) {
-  .banner-logo-wrapper {
-    display: flex;
-    left: 50%;
-  }
   .banner-logotype {
     position: relative;
     font-size: 190px;
@@ -122,6 +129,10 @@
   .banner-floating_face.is-2 {
     top: 70px;
     left: 693px;
+  }
+
+  .banner-no_sign {
+    display: none;
   }
 }
 
