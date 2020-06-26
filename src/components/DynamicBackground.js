@@ -1,5 +1,7 @@
 import React from "react"
 
+import "./DynamicBackground.css"
+
 export class DynamicBackground extends React.Component {
   /** @type {React.RefObject<HTMLCanvasElement>} */
   ref = React.createRef()
@@ -33,7 +35,7 @@ export class DynamicBackground extends React.Component {
 
 export default class BackgroundLines extends DynamicBackground {
   static Line = class Line {
-    constructor( x, y, width, length, showingSpeed, speed ) {
+    constructor( x, y, width, length, showingSpeed, speed, opacity=0 ) {
       this.x = x
       this.y = y
       this.width = width
@@ -43,7 +45,7 @@ export default class BackgroundLines extends DynamicBackground {
       this.speed = speed
 
       this.showing = true
-      this.opacity = 0
+      this.opacity = opacity
     }
   }
 
@@ -82,8 +84,9 @@ export default class BackgroundLines extends DynamicBackground {
     const y = random( 0, windowHeight )
     const width = random( 1, 3 )
     const length = random( 10, 50 )
-    const showingSpeed = random( 2, 5 )
-    const speed = random( 1, 10 ) / 10
+    const showingSpeed = random( 1, 3 )
+    const speed = random( 2, 10 ) / 10
+    const opacity = random( 0, 255 )
 
     if (line) {
       line.x = x
@@ -92,7 +95,7 @@ export default class BackgroundLines extends DynamicBackground {
       line.length = length
       line.showingSpeed = showingSpeed
       line.speed = speed
-    } else return new BackgroundLines.Line( x, y, width, length, showingSpeed, speed )
+    } else return new BackgroundLines.Line( x, y, width, length, showingSpeed, speed, opacity )
   }
 
   animate = () => {
