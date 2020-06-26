@@ -9,8 +9,10 @@ import "./index.css"
 
 ReactDOM.render(
   <React.StrictMode>
-    <Background />
-    <Banner />
+    <header className="header">
+      <Background />
+      <Banner />
+    </header>
   </React.StrictMode>,
   document.getElementById( `content` )
 )

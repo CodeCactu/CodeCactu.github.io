@@ -9,17 +9,30 @@ export class DynamicBackground extends React.Component {
   /** @type {CanvasRenderingContext2D} */
   ctx = null
 
+  onResize = () => {
+    const { canvas } = this.ctx
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+    this.generateObjects()
+  }
   componentDidMount() {
     const canvas = this.ref.current
     const ctx = canvas.getContext( `2d` )
 
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = canvas.clientWidth
+    canvas.height = canvas.clientHeight
+    window.addEventListener( `resize`, this.onResize )
 
     this.ctx = ctx
     this.generateObjects()
 
     requestAnimationFrame( this.animate )
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener( `resize`, this.onResize )
   }
 
   generateObjects() {
