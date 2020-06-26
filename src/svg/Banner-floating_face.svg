@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55 45">
-  <g fill="#444" font-family="monospace" font-size="20" font-weight="bold">
+  <!-- <g fill="#444" font-family="monospace" font-size="20" font-weight="bold">
     <text x="20" y="14">//</text>
     <text x="0" y="40" font-weight="normal">┣ ━ ┫</text>
     <text x="11" y="38.5">o o</text>
+  </g> -->
+  <g fill="#444">
+    <polygon points="20.7,16.1 27.5,0.2 29.8,0.2 23,16.1" /> /
+    <polygon points="31.7,16.1 38.5,0.2 40.8,0.2 34,16.1" /> /
+    <polygon points="4,45 4,21.6 7,21.6 7,31.8 11,31.8 11,34.8 7,34.8 7,45" /> ┣
+    <polygon points="51,45 51,21.6 48,21.6 48,31.8 44,31.8 44,34.8 48,34.8 48,45" /> ┫
+    <polygon points="22,31.8 33,31.8 33,34.8 22,34.8" /> ━
+    <ellipse cx="16.5" cy="33.5" rx="3.7" ry="4.1" fill="none" stroke="#444" stroke-width="2.3"/> o
+    <ellipse cx="38.5" cy="33.5" rx="3.7" ry="4.1" fill="none" stroke="#444" stroke-width="2.3"/> o
   </g>
 </svg>
