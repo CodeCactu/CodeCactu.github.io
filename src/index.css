@@ -1,4 +1,16 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  background-color: #112;
+  width: 100vw;
+  height: 100vh;
+  background-color: #212526;
+}
+
+.cell_background,
+.background {
+  width: 100vw;
+  height: 100vh;
 }
