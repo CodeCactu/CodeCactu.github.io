@@ -6,9 +6,7 @@
 
 
 .banner {
-  background-color: #212226;
-  background: radial-gradient( #212226, #202125 );
-  min-width: 100vw;
+  min-width: 100%;
   min-height: 100vh;
 }
 .banner-no_sign,
