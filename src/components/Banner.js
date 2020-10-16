@@ -7,9 +7,8 @@ import noSign from "../svg/Banner-no_sign.svg"
 
 import "./Banner.css"
 
-export default class Banner extends React.Component {
-  render = () => <section className="banner">
-
+export default () =>
+  <section className="banner">
     <div className="banner-logo-wrapper">
       <img className="banner-signet" src={logo} alt="Cactu signet" />
 
@@ -25,4 +24,3 @@ export default class Banner extends React.Component {
       <span className="banner-logotype">cacTu</span>
     </div>
   </section>
-}

@@ -1,12 +1,9 @@
 import React from "react"
 
-import Background from "../components/DynamicBackground"
+import Layout from "../components/layout"
 import Banner from "../components/Banner"
 
-import styles from "./index.module.css"
-
 export default () =>
-  <header className={styles.header}>
-    <Background />
+  <Layout>
     <Banner />
-  </header>
+  </Layout>
