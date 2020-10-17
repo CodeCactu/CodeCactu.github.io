@@ -22,7 +22,7 @@ module.exports = {
         background_color: `#212526`,
         theme_color: `#5da234`,
         display: `minimal-ui`,
-        icon: `src/images/cactu-logo.png`,
+        icon: `src/images/logo-cactu.png`,
       },
     },
     `gatsby-plugin-offline`,

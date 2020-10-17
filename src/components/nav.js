@@ -4,9 +4,9 @@ import { Link } from "gatsby"
 import styles from "./nav.module.css"
 
 const items = [
-  { name:`GitHub`, address:`` },
-  { name:`Discord bot framework`, address:`` },
-  { name:`CactuJams`, address:`` },
+  { name:`GitHub`, address:`https://github.com/CodeCactu` },
+  { name:`Discord bot framework`, address:`/bot` },
+  { name:`CactuJams`, address:`/jams` },
 ]
 
 export default () =>
