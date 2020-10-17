@@ -8,6 +8,9 @@
   margin-left: 45px;
   transition: margin-left 0.1s;
 }
-.action-field:hover {
+.action-field:not( .is-disabled ):hover {
   margin-left: 50px;
+}
+.action-field.is-disabled {
+  cursor: no-drop;
 }

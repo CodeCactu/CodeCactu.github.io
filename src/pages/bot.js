@@ -1,4 +1,5 @@
 import React from "react"
+import { graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import FlatTile from "../components/flatTile"
@@ -34,14 +35,16 @@ export default ({ data }) =>
       className={styles.actionField}
       title="Invite me"
       color="#f47fff"
+      linkAddress="https://discord.com/api/oauth2/authorize?client_id=379234773408677888&permissions=8&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&scope=bot"
     />
     <FlatTile
       className={styles.actionField}
       title="Configure me"
       color="cornflowerblue"
+      linkAddress="/bot-config"
     />
     <FlatTile
-      className={styles.actionField}
+      className={`${styles.actionField} ${styles.isDisabled}`}
       title="Run me on your own"
       color="coral"
       description="Coming soon..."
