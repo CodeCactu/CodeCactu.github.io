@@ -32,13 +32,19 @@ export default ({ data }) =>
     />
     <FlatTile
       className={styles.actionField}
-      title="Invite"
+      title="Invite me"
       color="#f47fff"
     />
     <FlatTile
       className={styles.actionField}
-      title="Configure"
+      title="Configure me"
       color="cornflowerblue"
+    />
+    <FlatTile
+      className={styles.actionField}
+      title="Run me on your own"
+      color="coral"
+      description="Coming soon..."
     />
   </Layout>
 
