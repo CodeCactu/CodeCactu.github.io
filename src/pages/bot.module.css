@@ -1,16 +1,32 @@
 .content {
-  padding: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 1700px;
+  min-height: 100vh;
 }
-.highlightedActivity {
-  color: var( --white );
+
+.navigation {
+  padding: 100px 0;
+  width: 400px;
 }
-.action-field {
-  margin-left: 45px;
-  transition: margin-left 0.1s;
-}
-.action-field:not( .is-disabled ):hover {
-  margin-left: 50px;
-}
-.action-field.is-disabled {
-  cursor: no-drop;
+  .highlightedActivity {
+    color: var( --white );
+  }
+  .action-field {
+    margin-left: 45px;
+    transition: margin-left 0.1s;
+  }
+  .action-field:not( .is-disabled ):hover {
+    margin-left: 50px;
+  }
+  .action-field.is-disabled {
+    cursor: no-drop;
+  }
+
+.description {
+  padding: 10px;
+  max-width: 600px;
 }
