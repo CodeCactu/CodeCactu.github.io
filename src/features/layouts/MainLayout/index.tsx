@@ -1,6 +1,7 @@
 import { ReactNode } from "react"
 import { createStylesHook } from "@fet/theming"
 import BlinkingLinesBgr from "@fet/dynamicBackground/BlinkingLinesBgr"
+import Nav from "./Nav"
 import AppConfig from "./AppConfig"
 
 export type MainLayoutProps = {
@@ -13,7 +14,12 @@ function RealMainLayout({ children }:MainLayoutProps) {
   return (
     <div className={classes.mainLayout}>
       <BlinkingLinesBgr />
-      {children}
+
+      <Nav />
+
+      <div className={classes.content}>
+        {children}
+      </div>
     </div>
   )
 }
@@ -28,7 +34,7 @@ export default function MainLayout({ children }:MainLayoutProps) {
   )
 }
 
-const useStyles = createStylesHook({
+const useStyles = createStylesHook( ({ atoms }) => ({
   "@global": {
     '@font-face': {
       fontFamily: `Coconut`,
@@ -36,11 +42,17 @@ const useStyles = createStylesHook({
     },
 
     body: {
-      backgroundColor: `#212226`,
       margin: 0,
+      backgroundColor: atoms.colors.background.main,
+      backgroundImage: `linear-gradient( 135deg, ${atoms.colors.background.dark}, ${atoms.colors.background.light} )`,
+      fontFamily: `sans-serif`,
     },
   },
   mainLayout: {
+    display: `flex`,
     minHeight: `100vh`,
   },
-})
+  content: {
+    flexGrow: 1,
+  },
+}) )

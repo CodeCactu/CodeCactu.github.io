@@ -13,6 +13,7 @@ const config:GatsbyConfig = {
   plugins: [
     `gatsby-plugin-image`,
     `gatsby-plugin-sharp`,
+    `gatsby-plugin-jss`,
     `gatsby-transformer-sharp`,
     {
       resolve: `gatsby-plugin-manifest`,
@@ -32,6 +33,7 @@ const config:GatsbyConfig = {
       resolve: `gatsby-plugin-alias-imports`,
       options: {
         alias: {
+          "@img": path.resolve( __dirname, `src/images` ),
           "@fet": path.resolve( __dirname, `src/features` ),
           "@lib": path.resolve( __dirname, `src/lib` ),
         },

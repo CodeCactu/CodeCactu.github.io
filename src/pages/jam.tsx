@@ -1,9 +1,9 @@
 import MainLayout from "@fet/layouts/MainLayout"
 
-export default function NotFoundPage() {
+export default function JamPage() {
   return (
     <MainLayout>
-      404
+      123
     </MainLayout>
   )
 }
