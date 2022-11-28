@@ -1,8 +1,10 @@
 export function createClassName( ...classes ) {
-  return classes.reduce(
+  const classNameString = classes.reduce(
     (str, name) => name && typeof name === `string` ? `${str} ${name.trim()}` : str
     , ``,
   ).trim()
+
+  return classNameString.length ? classNameString : undefined
 }
 
 export default function cn( ...classes ) {

@@ -33,5 +33,6 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     width: 75,
     backgroundColor: atoms.colors.surface.main,
     backdropFilter: `blur( 2px )`,
+    zIndex: 10,
   },
 }) )

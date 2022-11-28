@@ -18,4 +18,11 @@ export const { createStylesHook, themeConfig } = createTheming({
       },
     },
   }),
+  mixins: ({ atoms }) => ({
+    surface: {
+      padding: 10,
+      backgroundColor: atoms.colors.surface.main,
+      color: atoms.colors.surface.text,
+    },
+  }),
 })

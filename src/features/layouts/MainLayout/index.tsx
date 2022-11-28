@@ -2,14 +2,17 @@ import { ReactNode } from "react"
 import { createStylesHook } from "@fet/theming"
 import BlinkingLinesBgr from "@fet/dynamicBackground/BlinkingLinesBgr"
 import Nav from "./Nav"
+import MainLayoutContent, { MainLayoutProtection } from "./MainLayoutContent"
 import AppConfig from "./AppConfig"
 
 export type MainLayoutProps = {
   children: ReactNode
+  protection?: MainLayoutProtection
 }
 
-function RealMainLayout({ children }:MainLayoutProps) {
+function RealMainLayout({ children, protection }:MainLayoutProps) {
   const [ classes ] = useStyles()
+
 
   return (
     <div className={classes.mainLayout}>
@@ -18,16 +21,16 @@ function RealMainLayout({ children }:MainLayoutProps) {
       <Nav />
 
       <div className={classes.content}>
-        {children}
+        <MainLayoutContent body={children} protection={protection} />
       </div>
     </div>
   )
 }
 
-export default function MainLayout({ children }:MainLayoutProps) {
+export default function MainLayout({ children, protection }:MainLayoutProps) {
   return (
     <AppConfig>
-      <RealMainLayout>
+      <RealMainLayout protection={protection}>
         {children}
       </RealMainLayout>
     </AppConfig>
@@ -53,6 +56,10 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     minHeight: `100vh`,
   },
   content: {
+    position: `relative`,
+    display: `flex`,
+    justifyContent: `center`,
+    alignItems: `center`,
     flexGrow: 1,
   },
 }) )
