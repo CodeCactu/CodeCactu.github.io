@@ -7,6 +7,7 @@ export type UseArrayStateActions<TValue = unknown> = {
   unshift: (...items:TValue[]) => void
   pop: (count?:number) => void
   shift: (count:number) => void
+  clear: () => void
   remove: (...items:TValue[]) => void
   removeFound: (predicate:(item:TValue) => boolean) => void
   replaceFound: (item:TValue, predicate:(item:TValue) => boolean) => void
@@ -22,6 +23,7 @@ export default function useArrayState<TValue = unknown>( initialValues:TValue[] 
   const pop = (count = 1) => setItems( i => [ ...i.slice( 0, -count ) ] )
   const shift = (count = 1) => setItems( i => [ ...i.slice( count ) ] )
 
+  const clear = () => setItems([])
   const remove = (...items:TValue[]) => setItems( i => i.filter( j => !items.includes( j ) ) )
   const removeFound = (predicate:(item:TValue) => boolean) =>
     setItems( items => {
@@ -45,7 +47,7 @@ export default function useArrayState<TValue = unknown>( initialValues:TValue[] 
       return items
     } )
 
-  return [ items, { push, unshift, pop, shift, remove, removeFound, replaceFound } ]
+  return [ items, { push, unshift, pop, shift, remove, removeFound, replaceFound, clear } ]
 }
 
 // function Test() {

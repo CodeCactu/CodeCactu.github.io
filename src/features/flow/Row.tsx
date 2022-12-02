@@ -13,7 +13,7 @@ export type RowProps = {
 }
 
 export default function Row({ className, children, justify, spaced, wrapping }:RowProps) {
-  const [ classes ] = useStyles()
+  const [ classes ] = useRowStyles()
   const justifyClassName = select( justify, {
     left: classes.isJustifiedLeft,
     center: classes.isJustifiedCenter,
@@ -36,7 +36,7 @@ export default function Row({ className, children, justify, spaced, wrapping }:R
   )
 }
 
-const useStyles = createStylesHook( ({ atoms }) => ({
+export const useRowStyles = createStylesHook( ({ atoms }) => ({
   row: {
     display: `flex`,
     flexDirection: `row`,

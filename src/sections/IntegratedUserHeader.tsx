@@ -7,6 +7,7 @@ import Column from "@fet/flow/Column"
 import { discordIntegrationStorageSessionKey, discordIntegrationStorageUserKey } from "@fet/discordIntegration/isIntegrated"
 import getSessionToken from "@fet/discordIntegration/getSessionToken"
 import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
+import DiscordAvatar from "@fet/discordIntegration/DiscordAvatar"
 import Surface from "@fet/contentContainers/Surface"
 import Text from "@fet/Text"
 import CardLink from "@fet/CardLinks"
@@ -61,7 +62,7 @@ export default function IntegratedUserHeader() {
 
   return (
     <Surface className={classes.integrationUserHeader}>
-      <img className={classes.avatar} src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp?size=${100}`} alt={`${user.username}'s avatar`} />
+      <DiscordAvatar className={classes.avatar} userId={user.id} avatarId={user.avatar} username={user.username} />
 
       <Column>
         <Text>{`${user.username}#${user.discriminator}`}</Text>
@@ -81,6 +82,7 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     display: `flex`,
     gap: atoms.spacing.main,
     alignItems: `center`,
+    width: 600,
   },
   avatar: {
     borderRadius: `50%`,
