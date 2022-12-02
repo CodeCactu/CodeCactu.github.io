@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 import isIntegrated from "@fet/discordIntegration/isIntegrated"
+import { IntegratedUserContextProvider } from "@fet/discordIntegration/IntegratedUserContext"
 import DiscordLinking from "@fet/discordIntegration/DiscordLinking"
 
 export type MainLayoutProtection = `discord`
@@ -12,7 +13,7 @@ export default function MainLayoutContent({ body, protection }:MainLayoutContent
   if (protection) switch (protection) {
     case `discord`: {
       if (!isIntegrated()) return <DiscordLinking />
-      break
+      return <IntegratedUserContextProvider children={body} />
     }
   }
 

@@ -1,10 +1,12 @@
 import MainLayout from "@fet/layouts/MainLayout"
-import Surface from "@fet/contentContainers/Surface"
+import JamProductionList from "../sections/JamProductionsList"
+import IntegratedUserHeader from "../sections/IntegratedUserHeader"
 
 export default function JamPage() {
   return (
-    <MainLayout protection="discord">
-      <Surface>View after integration</Surface>
+    <MainLayout flow="column" protection="discord">
+      <IntegratedUserHeader />
+      <JamProductionList />
     </MainLayout>
   )
 }

@@ -5,6 +5,7 @@ export const { createStylesHook, themeConfig } = createTheming({
     colors: {
       rest: {
         green: `#5da234`,
+        red: `tomato`,
       },
       background: {
         dark: `#202022`,
@@ -16,6 +17,10 @@ export const { createStylesHook, themeConfig } = createTheming({
         main: `#05051055`,
         text: `#eaeaea`,
       },
+    },
+
+    spacing: {
+      main: 20,
     },
   }),
   mixins: ({ atoms }) => ({
