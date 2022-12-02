@@ -1,8 +1,13 @@
 import getWindow from "@lib/core/functions/getWindow"
 
-export const discordIntegrationStorageKey = `user` as const
-export type DiscordIntegrationStorageKey = typeof discordIntegrationStorageKey
+export const discordIntegrationStorageUserKey = `user` as const
+export const discordIntegrationStorageSessionKey = `integrationSessionToken` as const
+export type DiscordIntegrationStorageKey = typeof discordIntegrationStorageUserKey
 
 export default function isIntegrated() {
-  return !!getWindow()?.localStorage.getItem( discordIntegrationStorageKey )
+  const storage = getWindow()?.localStorage
+
+  if (!storage) return false
+
+  return !!storage.getItem( discordIntegrationStorageUserKey ) && !!storage.getItem( discordIntegrationStorageSessionKey )
 }

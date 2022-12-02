@@ -13,7 +13,8 @@ export type TextElement = typeof textElements[keyof typeof textElements]
 
 export type TextJustification = `left` | `center` | `right`
 export type TextProps = {
-  children: ReactNode
+  children?: ReactNode
+  body?: ReactNode
   className?: string
   as?: TextElement
   looksLike?: TextElement
@@ -21,7 +22,9 @@ export type TextProps = {
   minLines?: number
 }
 
-export default function Text({ children, className, as = `p`, looksLike = as, justify, minLines }:TextProps) {
+export default function Text({ children, body, className, as = `p`, looksLike = as, justify, minLines }:TextProps) {
+  children ||= body
+
   const [ classes ] = useStyles()
 
   const baseClassName = looksLike in classes ? classes[ looksLike ] : classes.p

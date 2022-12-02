@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from "react"
 import getWindow from "@lib/core/functions/getWindow"
-import { discordIntegrationStorageKey } from "./isIntegrated"
+import { discordIntegrationStorageUserKey } from "./isIntegrated"
 import { User } from "./DiscordLinking"
 
 export type IntegratedUserContextValue = {
@@ -15,7 +15,7 @@ export const IntegratedUserContext = createContext<IntegratedUserContextValue | 
 export default IntegratedUserContext
 
 export function IntegratedUserContextProvider({ children }:IntegratedUserContextProviderProps) {
-  const storedUser = getWindow()?.localStorage.getItem( discordIntegrationStorageKey )
+  const storedUser = getWindow()?.localStorage.getItem( discordIntegrationStorageUserKey )
 
   if (!storedUser) throw new Error( `No integrated user stored in the browser` )
 

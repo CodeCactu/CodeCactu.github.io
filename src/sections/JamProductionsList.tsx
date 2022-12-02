@@ -8,7 +8,7 @@ export default function JamProductionList() {
   const [ list ] = useArrayState()
 
   useEffect( () => {
-    http.get( `${getServerApiUrl()}/discord/integrate` ).then( ([ data ]) => {
+    http.get( `${getServerApiUrl()}/cactujam/games` ).then( ([ data ]) => {
       console.log( data )
     } )
   }, [] )

@@ -7,14 +7,14 @@ import { createStylesHook } from "@fet/theming"
 import Text from "@fet/Text"
 import CardLink from '@fet/CardLinks'
 import { getServerApiUrl } from '../../config'
-import { discordIntegrationStorageKey } from './isIntegrated'
+import { discordIntegrationStorageSessionKey, discordIntegrationStorageUserKey } from './isIntegrated'
 
 export type DiscordLinkingProps = {
 }
 
 export type User = typeof mockedUser
 
-const MOCK = true
+const MOCK = false
 
 export default function DiscordLinking() {
   const [ classes, { atoms } ] = useStyles()
@@ -26,18 +26,19 @@ export default function DiscordLinking() {
   useEffect( () => {
     if (!code) return
 
-    const storeUser = user => {
-      getWindow()?.localStorage.setItem( discordIntegrationStorageKey, JSON.stringify( user ) )
+    const storeUser = (user:User, sessionToken:string) => {
+      getWindow()?.localStorage.setItem( discordIntegrationStorageUserKey, JSON.stringify( user ) )
+      getWindow()?.localStorage.setItem( discordIntegrationStorageSessionKey, sessionToken )
       navigate( `?` )
     }
 
-    if (MOCK) return storeUser( mockedUser )
+    if (MOCK) return storeUser( mockedUser, `MOCK` )
 
     let mounted = true
 
-    http.post<{user: User}>( `${getServerApiUrl()}/discord/integrate`, { code, redirect:(url.origin + url.pathname).match( /(.*)\/$/ )?.[ 1 ] } ).then( ([ data ]) => {
+    http.post<{user: User; sessionToken: string}>( `${getServerApiUrl()}/discord/integrate`, { code, redirect:(url.origin + url.pathname).match( /(.*)\/$/ )?.[ 1 ] } ).then( ([ data ]) => {
       if (!mounted || !data || !(`user` in data)) return
-      storeUser( data.user )
+      storeUser( data.user, data.sessionToken )
     } )
 
     return () => { mounted = false }
