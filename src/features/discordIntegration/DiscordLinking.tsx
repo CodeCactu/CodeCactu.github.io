@@ -6,6 +6,7 @@ import getWindow from "@lib/core/functions/getWindow"
 import { createStylesHook } from "@fet/theming"
 import Text from "@fet/Text"
 import CardLink from '@fet/CardLinks'
+import { getServerApiUrl } from '../../config'
 import { discordIntegrationStorageKey } from './isIntegrated'
 
 export type DiscordLinkingProps = {
@@ -34,7 +35,7 @@ export default function DiscordLinking() {
 
     let mounted = true
 
-    http.post<{user: User}>( `${process.env.GATSBY_API_SERVER_URL}`, { code, redirect:(url.origin + url.pathname).match( /(.*)\/$/ )?.[ 1 ] } ).then( ([ data ]) => {
+    http.post<{user: User}>( `${getServerApiUrl()}/discord/integrate`, { code, redirect:(url.origin + url.pathname).match( /(.*)\/$/ )?.[ 1 ] } ).then( ([ data ]) => {
       if (!mounted || !data || !(`user` in data)) return
       storeUser( data.user )
     } )
@@ -55,7 +56,7 @@ export default function DiscordLinking() {
     return (
       <article className={classes.discordLinking}>
         <Text as="h1" body="Integracja z Discordem" />
-        <CardLink to={authLinkHref} icon={MdArrowForward} color={atoms.colors.rest.green} body="Autoryzuj" />
+        <CardLink href={authLinkHref} icon={MdArrowForward} color={atoms.colors.rest.green} body="Autoryzuj" />
       </article>
     )
   }
