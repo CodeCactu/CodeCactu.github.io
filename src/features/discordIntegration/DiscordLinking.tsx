@@ -74,8 +74,9 @@ export default function DiscordLinking() {
   )
 }
 
-const useStyles = createStylesHook( ({ mixins }) => ({
+const useStyles = createStylesHook( ({ atoms, mixins }) => ({
   discordLinking: {
+    width: atoms.sizes.columnWidth,
     ...mixins.surface,
   },
 }) )

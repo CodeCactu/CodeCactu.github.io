@@ -51,6 +51,10 @@ const useStyles = createStylesHook( ({ atoms }) => ({
       src: `url( /fonts/Coconut.ttf )`,
     },
 
+    "*": {
+      boxSizing: `border-box`,
+    },
+
     body: {
       margin: 0,
       backgroundColor: atoms.colors.background.main,

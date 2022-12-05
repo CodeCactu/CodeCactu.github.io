@@ -3,7 +3,8 @@ import cn from "@lib/theming/createClassName"
 import http from "@lib/http"
 import useArrayState from "@lib/core/hooks/useArrayState"
 import { createStylesHook } from "@fet/theming"
-import { useRowStyles } from "@fet/flow/Row"
+import Row, { useRowStyles } from "@fet/flow/Row"
+import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
 import { User } from "@fet/discordIntegration/DiscordLinking"
 import DiscordAvatar from "@fet/discordIntegration/DiscordAvatar"
 import Button from "@fet/controls/Button"
@@ -20,6 +21,7 @@ export default function JamProductionList() {
   const [ list, { push, clear } ] = useArrayState<GameItem>()
   const [ classes ] = useStyles()
   const [ rowClasses ] = useRowStyles()
+  const { user } = useIntegratedUserContext()
 
   const download = filename => {
     const anchor = document.createElement( `a` )
@@ -49,6 +51,14 @@ export default function JamProductionList() {
             <Text>Praca użytkownika {g.user.username}</Text>
 
             <Button variant="contained" onClick={() => download( g.filename )}>Pobierz</Button>
+
+            {
+              !user ? <Text>Zaloguj się aby ocenić</Text> : (
+                <Row>
+                  a b c d e
+                </Row>
+              )
+            }
           </article>
         ) )
       }
@@ -58,7 +68,7 @@ export default function JamProductionList() {
 
 const useStyles = createStylesHook( ({ atoms }) => ({
   jamProductionsList: {
-    width: 600,
+    width: atoms.sizes.columnWidth,
     marginTop: atoms.spacing.main,
   },
   avatar: {

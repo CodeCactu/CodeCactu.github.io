@@ -25,6 +25,7 @@ export const { createStylesHook, themeConfig } = createTheming({
 
     sizes: {
       borderWidth: 2,
+      columnWidth: 1000,
       font: {
         regular: 14,
         high: 18,

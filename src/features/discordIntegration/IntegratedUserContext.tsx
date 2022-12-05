@@ -4,7 +4,7 @@ import { discordIntegrationStorageUserKey } from "./isIntegrated"
 import { User } from "./DiscordLinking"
 
 export type IntegratedUserContextValue = {
-  user: User
+  user: null | User
 }
 
 export type IntegratedUserContextProviderProps = {
@@ -16,10 +16,7 @@ export default IntegratedUserContext
 
 export function IntegratedUserContextProvider({ children }:IntegratedUserContextProviderProps) {
   const storedUser = getWindow()?.localStorage.getItem( discordIntegrationStorageUserKey )
-
-  if (!storedUser) throw new Error( `No integrated user stored in the browser` )
-
-  const user = JSON.parse( storedUser )
+  const user = !storedUser ? null : JSON.parse( storedUser )
 
   return (
     <IntegratedUserContext.Provider value={{ user }}>

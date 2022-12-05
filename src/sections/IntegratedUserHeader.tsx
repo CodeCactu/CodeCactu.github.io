@@ -60,7 +60,7 @@ export default function IntegratedUserHeader() {
     console.log( res )
   }
 
-  return (
+  return !user ? null : (
     <Surface className={classes.integrationUserHeader}>
       <DiscordAvatar className={classes.avatar} userId={user.id} avatarId={user.avatar} username={user.username} />
 
@@ -82,7 +82,7 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     display: `flex`,
     gap: atoms.spacing.main,
     alignItems: `center`,
-    width: 600,
+    width: atoms.sizes.columnWidth,
   },
   avatar: {
     borderRadius: `50%`,
