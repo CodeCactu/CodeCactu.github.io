@@ -31,6 +31,10 @@ export const { createStylesHook, themeConfig } = createTheming({
       },
     },
 
+    transitions: {
+      main: 0.2,
+    },
+
     breakpoints: {
       mobile: {
         stop: 511,

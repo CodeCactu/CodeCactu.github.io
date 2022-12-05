@@ -65,13 +65,13 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     backgroundImage: `
       linear-gradient(
         45deg,
-        rgb(255,143,77) 0%,
-        rgb(255,184,65) 51%,
-        rgb(255,143,77) 100%
+        #719f46 0%,
+        #81cb3c 51%,
+        #719f46 100%
       )`,
     // color: atoms.colors.primary.text,
     textShadow: `0 0 20px black`,
-    // transition: atoms.transitions.text + `s`,
+    transition: atoms.transitions.main + `s`,
     transitionProperty: `color, background-position`,
 
     '&:hover': {
@@ -82,9 +82,9 @@ const useStyles = createStylesHook( ({ atoms }) => ({
       backgroundImage: `
         linear-gradient(
           45deg,
-          rgb(255,184,65) 0%,
-          rgb(255,143,77) 51%,
-          rgb(255,143,77) 100%
+          #81cb3c 0%,
+          #719f46 51%,
+          #719f46 100%
         )`,
     },
   },
