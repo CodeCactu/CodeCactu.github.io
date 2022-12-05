@@ -1,67 +1,51 @@
 import { useEffect } from "react"
-import cn from "@lib/theming/createClassName"
 import http from "@lib/http"
 import useArrayState from "@lib/core/hooks/useArrayState"
 import { createStylesHook } from "@fet/theming"
-import Row, { useRowStyles } from "@fet/flow/Row"
-import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
+import GamesListRow from "@fet/gameJam/GamesListRow"
+import { GameItemWithVotes, GameVote } from "@fet/gameJam/GameJamVoting"
 import { User } from "@fet/discordIntegration/DiscordLinking"
-import DiscordAvatar from "@fet/discordIntegration/DiscordAvatar"
-import Button from "@fet/controls/Button"
 import Surface from "@fet/contentContainers/Surface"
-import Text from "@fet/Text"
-import { getServerApiUrl, getServerUrl } from "../config"
+import backendHttp from "@fet/backendHttp"
+import { getServerApiUrl  } from "../config"
 
 export type GameItem = {
+  id: number
   filename: string
   user: User
 }
 
 export default function JamProductionList() {
-  const [ list, { push, clear } ] = useArrayState<GameItem>()
+  const [ list, { push, clear } ] = useArrayState<GameItemWithVotes>()
   const [ classes ] = useStyles()
-  const [ rowClasses ] = useRowStyles()
-  const { user } = useIntegratedUserContext()
-
-  const download = filename => {
-    const anchor = document.createElement( `a` )
-    anchor.href = `${getServerUrl()}/cactujam/games/${filename}`
-    anchor.download = ``
-    anchor.click()
-  }
 
   useEffect( () => {
-    http.get( `${getServerApiUrl()}/cactujam/games` ).then( ([ data ]:any) => {
-      if (!data?.games) return
+    Promise.all([
+      backendHttp.get<{games: GameItem[]}>( `/cactujam/games` ),
+      backendHttp.get<{votes: GameVote[]}>( `/cactujam/games/votes` ),
+    ]).then( ([ itemsReqRes, votesReqRes ]) => {
+      const [ itemsRes, votesRes ] = [ itemsReqRes[ 0 ], votesReqRes[ 0 ] ]
 
-      console.log( data )
+      if (!itemsRes?.games || !votesRes?.votes) return
+
+      const gamesWithVotes = itemsRes.games.map( g => ({
+        ...g,
+        votes: votesRes.votes.find( v => v.gameId === g.id ) ?? {
+          impressions: null,
+          readability: null,
+          realisation: null,
+          subject: null,
+        },
+      }) )
 
       clear()
-      push( ...data.games )
+      push( ...gamesWithVotes )
     } )
   }, [] )
 
   return (
     <Surface className={classes.jamProductionsList}>
-      {
-        list.map( g => (
-          <article key={g.filename} className={cn( rowClasses.row, rowClasses.isSpaced, rowClasses.isJustifiedSpaceBetween )}>
-            <DiscordAvatar className={classes.avatar} userId={g.user.id} avatarId={g.user.avatar} username={g.user.username} />
-
-            <Text>Praca użytkownika {g.user.username}</Text>
-
-            <Button variant="contained" onClick={() => download( g.filename )}>Pobierz</Button>
-
-            {
-              !user ? <Text>Zaloguj się aby ocenić</Text> : (
-                <Row>
-                  a b c d e
-                </Row>
-              )
-            }
-          </article>
-        ) )
-      }
+      {list.map( g => <GamesListRow key={g.filename} game={g} /> )}
     </Surface>
   )
 }

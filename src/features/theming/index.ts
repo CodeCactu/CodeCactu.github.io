@@ -7,6 +7,10 @@ export const { createStylesHook, themeConfig } = createTheming({
         green: `#5da234`,
         red: `tomato`,
       },
+      primary: {
+        main: `#5da234`,
+        text: `#fff`,
+      },
       background: {
         dark: `#202022`,
         light: `#22232a`,

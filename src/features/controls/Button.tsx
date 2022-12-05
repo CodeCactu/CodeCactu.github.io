@@ -44,7 +44,7 @@ export default function Button({ children, body, className, style, type, disable
 
 const useStyles = createStylesHook( ({ atoms }) => ({
   button: {
-    display: `block`,
+    display: `flex`,
     width: `max-content`,
     height: `max-content`,
     padding: `0.5em 1em`,
@@ -90,13 +90,13 @@ const useStyles = createStylesHook( ({ atoms }) => ({
   },
 
   isOutlined: {
-    // borderColor: atoms.colors.primary.main,
+    borderColor: atoms.colors.rest.green,
     color: atoms.colors.background.text,
-    // transition: atoms.transitions.text + `s`,
+    transition: atoms.transitions.main + `s`,
     transitionProperty: `color, background-image`,
 
     "&:hover": {
-      // color: atoms.colors.primary.main,
+      color: atoms.colors.rest.green,
     },
   },
 

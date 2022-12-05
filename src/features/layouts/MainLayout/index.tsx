@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 import cn from "@lib/theming/createClassName"
+import PopupsRoot from "@lib/Popup/components/PopupsRoot"
 import { createStylesHook } from "@fet/theming"
 import BlinkingLinesBgr from "@fet/dynamicBackground/BlinkingLinesBgr"
 import Nav from "./Nav"
@@ -37,9 +38,11 @@ function RealMainLayout({ children, protection, flow }:MainLayoutProps) {
 export default function MainLayout({ children, protection, flow }:MainLayoutProps) {
   return (
     <AppConfig>
-      <RealMainLayout protection={protection} flow={flow}>
-        {children}
-      </RealMainLayout>
+      <PopupsRoot>
+        <RealMainLayout protection={protection} flow={flow}>
+          {children}
+        </RealMainLayout>
+      </PopupsRoot>
     </AppConfig>
   )
 }
