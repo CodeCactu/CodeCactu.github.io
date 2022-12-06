@@ -1,3 +1,4 @@
+import { useEffect, useState, useRef } from "react"
 import cn from "@lib/theming/createClassName"
 import download from "@lib/core/functions/download"
 import { usePopupsContext } from "@lib/Popup/PopupsContext"
@@ -12,14 +13,37 @@ import DescriptionPopup from "./DescriptionPopup"
 
 export type GamesListRowProps = {
   game: GameItemWithVotes
+  onUpdate?: (game) => void
 }
 
-export default function GamesListRow({ game:{ user, filename, votes } }:GamesListRowProps) {
+export default function GamesListRow({ game:orginalGame, onUpdate }:GamesListRowProps) {
   const [ rowClasses ] = useRowStyles()
   const [ classes ] = useStyles()
+  const [ game, setGame ] = useState<GameItemWithVotes>( orginalGame )
   const { createPopup } = usePopupsContext()
+  const firstRenderRef = useRef( true )
 
+  const { filename, user, votes } = game
+  const votesIsNotConsideredColor = Object.values( votes ).includes( null )
   const showDescription = () => createPopup( <DescriptionPopup /> )
+  const updateVote = (categoryName:string, score:number) => {
+    setGame( g => ({
+      ...g,
+      votes: {
+        ...g.votes,
+        [ categoryName ]: score,
+      },
+    }) )
+  }
+
+  useEffect( () => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false
+      return
+    }
+
+    onUpdate?.( game )
+  }, [ game ] )
 
   return (
     <div className={cn( rowClasses.row, rowClasses.isSpaced, rowClasses.isJustifiedSpaceBetween )}>
@@ -29,7 +53,7 @@ export default function GamesListRow({ game:{ user, filename, votes } }:GamesLis
         <div>Praca użytkownika {user.username}</div>
 
         <Row spaced justify="center">
-          {categories.map( c => <VoteTile key={c.name} category={c} score={votes?.[ c.name ] ?? `-`} /> )}
+          {categories.map( c => <VoteTile key={c.name} notConsidered={votesIsNotConsideredColor} category={c} score={votes?.[ c.name ] ?? `-`} onUpdateVote={updateVote} /> )}
         </Row>
       </div>
 

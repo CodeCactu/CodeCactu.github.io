@@ -17,33 +17,39 @@ export default function JamProductionList() {
   const [ list, { push, clear } ] = useArrayState<GameItemWithVotes>()
   const [ classes ] = useStyles()
 
-  useEffect( () => {
-    Promise.all([
+  const fetchGames = async() => {
+    const [ itemsReqRes, votesReqRes ] = await Promise.all([
       backendHttp.get<{games: GameItem[]}>( `/cactujam/games` ),
       backendHttp.get<{votes: GameVote[]}>( `/cactujam/games/votes` ),
-    ]).then( ([ itemsReqRes, votesReqRes ]) => {
-      const [ itemsRes, votesRes ] = [ itemsReqRes[ 0 ], votesReqRes[ 0 ] ]
+    ])
 
-      if (!itemsRes?.games || !votesRes?.votes) return
+    const [ itemsRes, votesRes ] = [ itemsReqRes[ 0 ], votesReqRes[ 0 ] ]
 
-      const gamesWithVotes = itemsRes.games.map( g => ({
-        ...g,
-        votes: votesRes.votes.find( v => v.gameId === g.id ) ?? {
-          impressions: null,
-          readability: null,
-          realisation: null,
-          subject: null,
-        },
-      }) )
+    if (!itemsRes?.games || !votesRes?.votes) return
 
-      clear()
-      push( ...gamesWithVotes )
-    } )
-  }, [] )
+    const gamesWithVotes = itemsRes.games.map( g => ({
+      ...g,
+      votes: votesRes.votes.find( v => v.gameId === g.id ) ?? {
+        impressions: null,
+        readability: null,
+        realisation: null,
+        subject: null,
+      },
+    }) )
+
+    clear()
+    push( ...gamesWithVotes )
+  }
+  const onUpdate = async(game:GameItemWithVotes) => {
+    await backendHttp.put( `/cactujam/games/votes`, { gameId:game.id, votes:game.votes } )
+    fetchGames()
+  }
+
+  useEffect( () => { fetchGames() }, [] )
 
   return (
     <Surface className={classes.jamProductionsList}>
-      {list.map( g => <GamesListRow key={g.filename} game={g} /> )}
+      {list.map( g => <GamesListRow key={g.filename} game={g} onUpdate={onUpdate} /> )}
     </Surface>
   )
 }
