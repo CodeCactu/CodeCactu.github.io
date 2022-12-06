@@ -1,12 +1,13 @@
 import { Promiseable } from "@lib/types/enhancedTypes"
 import ElementChildren from "@lib/types/ElementChildren"
+import Button, { ButtonProps } from "@fet/controls/Button"
 import { usePopupContext } from "../PopupContext"
 
-export type PopupCloseButtonProps = ElementChildren & {
+export type PopupCloseButtonProps = ElementChildren & ButtonProps & {
   onClick?: () => Promiseable<unknown>
 }
 
-export default function PopupCloseButton({ children, body, onClick }:PopupCloseButtonProps) {
+export default function PopupCloseButton({ children, body, onClick, ...props }:PopupCloseButtonProps) {
   children ||= body
 
   const ctx = usePopupContext()
@@ -18,8 +19,8 @@ export default function PopupCloseButton({ children, body, onClick }:PopupCloseB
   }
 
   return (
-    <button onClick={handleOnClick}>
+    <Button {...props} onClick={handleOnClick}>
       {children}
-    </button>
+    </Button>
   )
 }

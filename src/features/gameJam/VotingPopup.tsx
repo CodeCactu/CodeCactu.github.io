@@ -18,9 +18,9 @@ export default function VotingPopup({ category:{ title, scale } }:VotingPopupPro
   return (
     <Surface className={classes.popup}>
       <Column>
-        <Text as="h3" body={title} />
+        <Text as="h3" justify="center" body={title} />
 
-        <Row spaced>
+        <Row spaced justify="center">
           {
             Array.from( { length:scale }, (_, i) => (
               <label key={i}>
@@ -36,7 +36,7 @@ export default function VotingPopup({ category:{ title, scale } }:VotingPopupPro
   )
 }
 
-const useStyles = createStylesHook( ({ atoms }) => ({
+const useStyles = createStylesHook(({
   popup: {
     display: `flex`,
     alignItems: `center`,
@@ -45,5 +45,10 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     height: `100vh`,
     zIndex: 1000,
     backdropFilter: `blur( 3px )`,
+  },
+
+  closeButton: {
+    justifyContent: `center`,
+    width: `100%`,
   },
 }) )

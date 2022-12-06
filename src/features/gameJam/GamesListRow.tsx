@@ -69,10 +69,10 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     display: `grid`,
     gridTemplate: `"avatar data desc down" / 50px 1fr max-content`,
     alignItems: `center`,
+    gap: atoms.spacing.main,
 
     [ atoms.breakpoints.bigMobile.mediaQueryMax ]: {
       gridTemplate: `"avatar desc" "data data" / 1fr max-content`,
-      gap: atoms.spacing.main,
     },
   },
 
