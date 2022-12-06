@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from "react"
-import cn from "@lib/theming/createClassName"
 import download from "@lib/core/functions/download"
 import { usePopupsContext } from "@lib/Popup/PopupsContext"
 import { createStylesHook } from "@fet/theming"
-import Row, { useRowStyles } from "@fet/flow/Row"
+import Row from "@fet/flow/Row"
 import DiscordAvatar from "@fet/discordIntegration/DiscordAvatar"
 import Button from "@fet/controls/Button"
 import { getServerUrl } from "../../config"
@@ -17,7 +16,6 @@ export type GamesListRowProps = {
 }
 
 export default function GamesListRow({ game:orginalGame, onUpdate }:GamesListRowProps) {
-  const [ rowClasses ] = useRowStyles()
   const [ classes ] = useStyles()
   const [ game, setGame ] = useState<GameItemWithVotes>( orginalGame )
   const { createPopup } = usePopupsContext()
@@ -46,22 +44,20 @@ export default function GamesListRow({ game:orginalGame, onUpdate }:GamesListRow
   }, [ game ] )
 
   return (
-    <div className={cn( rowClasses.row, rowClasses.isSpaced, rowClasses.isJustifiedSpaceBetween )}>
+    <div className={classes.row}>
       <DiscordAvatar className={classes.avatar} userId={user.id} avatarId={user.avatar} username={user.username} />
 
       <div className={classes.userData}>
         <div>Praca użytkownika {user.username}</div>
 
-        <Row spaced justify="center">
+        <Row spaced justify="center" className={classes.votes}>
           {categories.map( c => <VoteTile key={c.name} notConsidered={votesIsNotConsideredColor} category={c} score={votes?.[ c.name ] ?? `-`} onUpdateVote={updateVote} /> )}
         </Row>
       </div>
 
-      <Row spaced>
-        <Button variant="outlined" onClick={() => showDescription()} body="Opis kategorii" />
+      <Button className={classes.description} variant="outlined" onClick={() => showDescription()} body="Opis kategorii" />
 
-        <Button variant="outlined" onClick={() => download( filename, `${getServerUrl()}/cactujam/games/${filename}` )} body="Pobierz" />
-      </Row>
+      <Button className={classes.download} variant="outlined" onClick={() => download( filename, `${getServerUrl()}/cactujam/games/${filename}` )} body="Pobierz" />
     </div>
   )
 }
@@ -69,19 +65,50 @@ export default function GamesListRow({ game:orginalGame, onUpdate }:GamesListRow
 
 
 const useStyles = createStylesHook( ({ atoms }) => ({
+  row: {
+    display: `grid`,
+    gridTemplate: `"avatar data desc down" / 50px 1fr max-content`,
+    alignItems: `center`,
+
+    [ atoms.breakpoints.bigMobile.mediaQueryMax ]: {
+      gridTemplate: `"avatar desc" "data data" / 1fr max-content`,
+      gap: atoms.spacing.main,
+    },
+  },
+
   jamProductionsList: {
     width: atoms.sizes.columnWidth,
     marginTop: atoms.spacing.main,
   },
   avatar: {
+    gridArea: `avatar`,
     width: 50,
     height: 50,
     borderRadius: `50%`,
   },
   userData: {
+    gridArea: `data`,
     display: `flex`,
     flexDirection: `column`,
     alignItems: `center`,
     gap: atoms.spacing.main,
+  },
+
+  votes: {
+    [ atoms.breakpoints.mobile.mediaQuery ]: {
+      gap: atoms.spacing.main / 2,
+    },
+  },
+
+  description: {
+    gridArea: `desc`,
+  },
+
+  download: {
+    gridArea: `down`,
+
+    [ atoms.breakpoints.bigMobile.mediaQueryMax ]: {
+      display: `none`,
+    },
   },
 }) )

@@ -29,7 +29,7 @@ export const { createStylesHook, themeConfig } = createTheming({
 
     sizes: {
       borderWidth: 2,
-      columnWidth: 1000,
+      columnWidth: `min( calc( 100% - 20px ), 1000px )`,
       font: {
         regular: 14,
         high: 18,
@@ -72,6 +72,10 @@ export const { createStylesHook, themeConfig } = createTheming({
         get mediaQueryMin() {
           const start = this.start as number
           return `@media (min-width:${start}px)`
+        },
+        get mediaQueryMax() {
+          const stop = this.stop as number
+          return `@media (max-width:${stop}px)`
         },
       },
       desktop: {

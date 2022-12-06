@@ -29,5 +29,9 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     padding: 10,
     backgroundColor: atoms.colors.surface.main,
     color: atoms.colors.surface.text,
+
+    [ atoms.breakpoints.tablet.mediaQueryMax ]: {
+      display: `none`,
+    },
   },
 }) )

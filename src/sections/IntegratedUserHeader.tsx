@@ -69,7 +69,7 @@ export default function IntegratedUserHeader() {
         <CardLink onClick={logout} color={atoms.colors.rest.red} icon={MdLogout} body="Wyloguj się" />
       </Column>
 
-      <Column>
+      <Column className={classes.upload}>
         <Text>Załaduj plik ze swoją produkcją (zip)</Text>
         <CardLink onClick={uploadFile} color={atoms.colors.rest.green} icon={AiOutlineCloudUpload} body="Załaduj plik" />
       </Column>
@@ -83,10 +83,20 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     gap: atoms.spacing.main,
     alignItems: `center`,
     width: atoms.sizes.columnWidth,
+
+    [ atoms.breakpoints.bigMobile.mediaQueryMax ]: {
+      flexDirection: `column`,
+      textAlign: `center`,
+    },
   },
   avatar: {
     borderRadius: `50%`,
     border: `2px solid ${atoms.colors.rest.green}`,
     padding: 2,
+  },
+  upload: {
+    [ atoms.breakpoints.bigMobile.mediaQueryMax ]: {
+      display: `none`,
+    },
   },
 }) )

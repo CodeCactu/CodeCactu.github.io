@@ -37,7 +37,11 @@ export default function DiscordLinking() {
     let mounted = true
 
     http.post<{user: User; sessionToken: string}>( `${getServerApiUrl()}/discord/integrate`, { code, redirect:(url.origin + url.pathname).match( /(.*)\/$/ )?.[ 1 ] } ).then( ([ data ]) => {
-      if (!mounted || !data || !(`user` in data)) return
+      if (!mounted || !data || !(`user` in data)) {
+        navigate( `/jam` )
+        return
+      }
+
       storeUser( data.user, data.sessionToken )
     } )
 
