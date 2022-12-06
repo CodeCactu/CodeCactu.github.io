@@ -1,5 +1,4 @@
 import { useEffect } from "react"
-import http from "@lib/http"
 import useArrayState from "@lib/core/hooks/useArrayState"
 import { createStylesHook } from "@fet/theming"
 import GamesListRow from "@fet/gameJam/GamesListRow"
@@ -7,7 +6,6 @@ import { GameItemWithVotes, GameVote } from "@fet/gameJam/GameJamVoting"
 import { User } from "@fet/discordIntegration/DiscordLinking"
 import Surface from "@fet/contentContainers/Surface"
 import backendHttp from "@fet/backendHttp"
-import { getServerApiUrl  } from "../config"
 
 export type GameItem = {
   id: number

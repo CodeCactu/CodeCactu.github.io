@@ -8,6 +8,7 @@ import Button from "@fet/controls/Button"
 import { getServerUrl } from "../../config"
 import VoteTile from "./VoteTile"
 import { categories, GameItemWithVotes } from "./GameJamVoting"
+import DescriptionPopup from "./DescriptionPopup"
 
 export type GamesListRowProps = {
   game: GameItemWithVotes
@@ -18,6 +19,8 @@ export default function GamesListRow({ game:{ user, filename, votes } }:GamesLis
   const [ classes ] = useStyles()
   const { createPopup } = usePopupsContext()
 
+  const showDescription = () => createPopup( <DescriptionPopup /> )
+
   return (
     <div className={cn( rowClasses.row, rowClasses.isSpaced, rowClasses.isJustifiedSpaceBetween )}>
       <DiscordAvatar className={classes.avatar} userId={user.id} avatarId={user.avatar} username={user.username} />
@@ -26,12 +29,12 @@ export default function GamesListRow({ game:{ user, filename, votes } }:GamesLis
         <div>Praca użytkownika {user.username}</div>
 
         <Row spaced justify="center">
-          {categories.map( c => <VoteTile key={c.name} title={c.title} score={votes?.[ c.name ] ?? `-`} /> )}
+          {categories.map( c => <VoteTile key={c.name} category={c} score={votes?.[ c.name ] ?? `-`} /> )}
         </Row>
       </div>
 
       <Row spaced>
-        <Button variant="outlined" onClick={() => {}} body="Opis kategorii" />
+        <Button variant="outlined" onClick={() => showDescription()} body="Opis kategorii" />
 
         <Button variant="outlined" onClick={() => download( filename, `${getServerUrl()}/cactujam/games/${filename}` )} body="Pobierz" />
       </Row>
