@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkcode_cactu_website=self.webpackChunkcode_cactu_website||[]).push([[218],{2513:function(e,c,t){t.r(c),t.d(c,{default:function(){return r}});var u=t(3614),n=t(5893);function r(){return(0,n.jsx)(u.Z,{children:"404"})}}}]);
+//# sourceMappingURL=component---src-pages-404-tsx-ee1b71a77351d180cec2.js.map
