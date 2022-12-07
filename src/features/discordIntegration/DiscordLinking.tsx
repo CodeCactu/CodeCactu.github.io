@@ -1,5 +1,5 @@
 import { MdArrowForward } from 'react-icons/md'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { navigate } from 'gatsby'
 import http from '@lib/http'
 import getWindow from "@lib/core/functions/getWindow"
@@ -18,45 +18,59 @@ const MOCK = false
 
 export default function DiscordLinking() {
   const [ classes, { atoms } ] = useStyles()
+  const [ redirect, setRedirect ] = useState( `` )
   const href = getWindow()?.location.href ?? ``
-  const url = new URL( href )
-  const code = url.searchParams.get( `code` )
-
+  const code = href.match( /.*code=(\w+)/ )?.[ 1 ]
 
   useEffect( () => {
     if (!code) return
 
+    const window = getWindow()
+
+    if (!window) return
+
     const storeUser = (user:User, sessionToken:string) => {
-      getWindow()?.localStorage.setItem( discordIntegrationStorageUserKey, JSON.stringify( user ) )
-      getWindow()?.localStorage.setItem( discordIntegrationStorageSessionKey, sessionToken )
+      window.localStorage.setItem( discordIntegrationStorageUserKey, JSON.stringify( user ) )
+      window.localStorage.setItem( discordIntegrationStorageSessionKey, sessionToken )
       navigate( `?` )
     }
 
     if (MOCK) return storeUser( mockedUser, `MOCK` )
 
     let mounted = true
+    const body = { code, redirect:window.location.origin + `/jam` }
+    console.log({ body })
 
-    http.post<{user: User; sessionToken: string}>( `${getServerApiUrl()}/discord/integrate`, { code, redirect:(url.origin + url.pathname).match( /(.*)\/$/ )?.[ 1 ] } ).then( ([ data ]) => {
+    http.post<{user: User; sessionToken: string}>( `${getServerApiUrl()}/discord/integrate`, body ).then( ([ data ]) => {
       if (!mounted || !data || !(`user` in data)) {
         navigate( `/jam` )
         return
       }
 
       storeUser( data.user, data.sessionToken )
+      window.location.reload()
     } )
 
     return () => { mounted = false }
   }, [ code ] )
 
+  useEffect( () => {
+    setRedirect( encodeURIComponent( getWindow()?.location.origin ?? `` ) + `/jam` )
+  }, [] )
+
+
+  // https://discord.com/oauth2/authorize?client_id=379234773408677888&redirect_uri=http%3A%2F%2Flocalhost%3A8000/jam/jam&response_type=code&scope=identify
 
   if (!code) {
     const authLinkHref = MOCK
       ? `?code=mock`
       : `https://discord.com/oauth2/authorize`
         + `?client_id=379234773408677888`
-        + `&redirect_uri=${encodeURIComponent( getWindow()?.location.origin ?? `` )}/jam`
+        + `&redirect_uri=${redirect}`
         + `&response_type=code`
         + `&scope=identify`
+
+    console.log()
 
     return (
       <article className={classes.discordLinking}>

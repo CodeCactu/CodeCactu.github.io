@@ -57,7 +57,7 @@ export default function IntegratedUserHeader() {
       body: form,
     } ).then( r => r.json() )
 
-    console.log( res )
+    if (res.success) getWindow()?.location.reload()
   }
 
   return !user ? null : (
