@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from "react"
-import getWindow from "@lib/core/functions/getWindow"
-import { discordIntegrationStorageUserKey } from "./isIntegrated"
+import useStorage from "@lib/storage/useStorage"
+import { discordStorage } from "./discordStorage"
 import { User } from "./DiscordLinking"
 
 export type IntegratedUserContextValue = {
@@ -15,11 +15,10 @@ export const IntegratedUserContext = createContext<IntegratedUserContextValue | 
 export default IntegratedUserContext
 
 export function IntegratedUserContextProvider({ children }:IntegratedUserContextProviderProps) {
-  const storedUser = getWindow()?.localStorage.getItem( discordIntegrationStorageUserKey )
-  const user = !storedUser ? null : JSON.parse( storedUser )
+  const [ storage ] = useStorage( discordStorage ) as any as [{ discordSession: IntegratedUserContextValue }, any]
 
   return (
-    <IntegratedUserContext.Provider value={{ user }}>
+    <IntegratedUserContext.Provider value={{ user:storage?.discordSession?.user }}>
       {children}
     </IntegratedUserContext.Provider>
   )

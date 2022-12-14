@@ -1,13 +1,12 @@
 import { MdArrowForward } from 'react-icons/md'
 import { useEffect, useState } from 'react'
-import { navigate } from 'gatsby'
-import http from '@lib/http'
 import getWindow from "@lib/core/functions/getWindow"
 import { createStylesHook } from "@fet/theming"
+import Button from '@fet/controls/Button'
+import backendHttp from '@fet/backendHttp'
 import Text from "@fet/Text"
 import CardLink from '@fet/CardLinks'
-import { getServerApiUrl } from '../../config'
-import { discordIntegrationStorageSessionKey, discordIntegrationStorageUserKey } from './isIntegrated'
+import { discordIntegrationStorageUserKey, discordStorage } from './discordStorage'
 
 export type DiscordLinkingProps = {
 }
@@ -21,45 +20,38 @@ export default function DiscordLinking() {
   const [ redirect, setRedirect ] = useState( `` )
   const href = getWindow()?.location.href ?? ``
   const code = href.match( /.*code=(\w+)/ )?.[ 1 ]
+  const [ failure, setFailure ] = useState( false )
+  const window = getWindow()
+
+  const clearLocationQuery = () => window && (window.history.replaceState( {}, ``, location.href.match( /^(.*)\?/ )?.[ 1 ] ?? location.href ))
 
   useEffect( () => {
-    if (!code) return
+    if (!code || !window) return
 
-    const window = getWindow()
-
-    if (!window) return
+    const { location } = window
 
     const storeUser = (user:User, sessionToken:string) => {
-      window.localStorage.setItem( discordIntegrationStorageUserKey, JSON.stringify( user ) )
-      window.localStorage.setItem( discordIntegrationStorageSessionKey, sessionToken )
-      navigate( `?` )
+      discordStorage.set( discordIntegrationStorageUserKey, { sessionToken, user } )
+      clearLocationQuery()
     }
 
     if (MOCK) return storeUser( mockedUser, `MOCK` )
 
     let mounted = true
-    const body = { code, redirect:window.location.origin + `/jam` }
-    console.log({ body })
+    const body = { code, redirect:location.origin + `/jam` }
 
-    http.post<{user: User; sessionToken: string}>( `${getServerApiUrl()}/discord/integrate`, body ).then( ([ data ]) => {
-      if (!mounted || !data || !(`user` in data)) {
-        navigate( `/jam` )
-        return
-      }
+    backendHttp.post<{user: User; sessionToken: string}>( `/discord/integrate`, body ).then( ([ data ]) => {
+      if (!mounted) return
+      if (!data || !(`user` in data)) return setFailure( true )
 
+      clearLocationQuery()
       storeUser( data.user, data.sessionToken )
-      window.location.reload()
     } )
 
     return () => { mounted = false }
   }, [ code ] )
 
-  useEffect( () => {
-    setRedirect( encodeURIComponent( getWindow()?.location.origin ?? `` ) + `/jam` )
-  }, [] )
-
-
-  // https://discord.com/oauth2/authorize?client_id=379234773408677888&redirect_uri=http%3A%2F%2Flocalhost%3A8000/jam/jam&response_type=code&scope=identify
+  useEffect( () => { setRedirect( encodeURIComponent( window?.location.origin ?? `` ) + `/jam` ) }, [] )
 
   if (!code) {
     const authLinkHref = MOCK
@@ -70,8 +62,6 @@ export default function DiscordLinking() {
         + `&response_type=code`
         + `&scope=identify`
 
-    console.log()
-
     return (
       <article className={classes.discordLinking}>
         <Text as="h1" body="Integracja z Discordem" />
@@ -80,11 +70,23 @@ export default function DiscordLinking() {
     )
   }
 
+  if (failure) return (
+    <article className={classes.discordLinking}>
+      <Text as="h1" body="Niepowodzenie" />
+
+      <Text>
+        Możesz spróbować ponownie lub skontaktuj się z właściciwle serwisu,
+        który najpewniej skopał temat
+      </Text>
+
+      <Button onClick={() => clearLocationQuery()} body="Odśwież stronę" />
+    </article>
+  )
 
   return (
     <article className={classes.discordLinking}>
       <Text as="h1" body="Przetwarzanie kodu zwrotnego" />
-      <Text as="p">
+      <Text>
         Kod Twej integracji jest teraz przetwarzany po stronie serwera.
         W ciągu chwili powinieneś otrzymać informację o wyniku integracji
       </Text>

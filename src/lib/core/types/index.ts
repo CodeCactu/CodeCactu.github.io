@@ -19,3 +19,26 @@ export type StyledElementWithChildren = ElementChildren & {
   className?: string
   style?: CSSProperties
 }
+
+export type JSONValue =
+  | null
+  | string
+  | number
+  | boolean
+  | Date
+  | { [x:string]: JSONValue }
+  | Array<JSONValue>;
+
+export type ExtendedJSONValue<T> =
+  | T
+  | null
+  | string
+  | number
+  | boolean
+  | Date
+  | { [x:string]: ExtendedJSONValue<T> }
+  | Array<ExtendedJSONValue<T>>;
+
+export type ObjectJSONValue = Record<string, JSONValue>
+
+export default JSONValue

@@ -4,17 +4,15 @@ import PopupsRoot from "@lib/Popup/components/PopupsRoot"
 import { createStylesHook } from "@fet/theming"
 import BlinkingLinesBgr from "@fet/dynamicBackground/BlinkingLinesBgr"
 import Nav from "./Nav"
-import MainLayoutContent, { MainLayoutProtection } from "./MainLayoutContent"
 import AppConfig from "./AppConfig"
 
 export type MainLayoutFlow = `row` | `column`
 export type MainLayoutProps = {
   children: ReactNode
-  protection?: MainLayoutProtection
   flow?: MainLayoutFlow
 }
 
-function RealMainLayout({ children, protection, flow }:MainLayoutProps) {
+function RealMainLayout({ children, flow }:MainLayoutProps) {
   const [ classes ] = useStyles()
 
   const contentFullClassName = cn(
@@ -29,17 +27,17 @@ function RealMainLayout({ children, protection, flow }:MainLayoutProps) {
       <Nav />
 
       <div className={contentFullClassName}>
-        <MainLayoutContent body={children} protection={protection} />
+        {children}
       </div>
     </div>
   )
 }
 
-export default function MainLayout({ children, protection, flow }:MainLayoutProps) {
+export default function MainLayout({ children, flow }:MainLayoutProps) {
   return (
     <AppConfig>
       <PopupsRoot>
-        <RealMainLayout protection={protection} flow={flow}>
+        <RealMainLayout flow={flow}>
           {children}
         </RealMainLayout>
       </PopupsRoot>

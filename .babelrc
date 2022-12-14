@@ -1,4 +1,8 @@
 {
+  "plugins": [
+    ["@babel/plugin-proposal-private-methods", { "loose": true } ],
+    // "@babel/plugin-proposal-class-static-block"
+  ],
   "presets": [
     [
       "babel-preset-gatsby",

@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import isIntegrated from "./isIntegrated"
+import { useIntegratedUserContext } from "./IntegratedUserContext"
 
 export type DiscordIntegrationProtectionProps = {
   children: ReactNode
@@ -7,5 +7,7 @@ export type DiscordIntegrationProtectionProps = {
 }
 
 export default function DiscordIntegrationProtection({ children, fallback }:DiscordIntegrationProtectionProps) {
-  return <>{isIntegrated() ? children : fallback}</>
+  const ctx = useIntegratedUserContext()
+
+  return <>{ctx.user ? children : fallback}</>
 }

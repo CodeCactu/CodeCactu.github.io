@@ -28,6 +28,10 @@ export type GameVote = Votes & {
   gameId: number
 }
 
+export type GameItemWithNullableVotes = GameItem & {
+  votes: null | Votes
+}
+
 export type GameItemWithVotes = GameItem & {
   votes: Votes
 }
@@ -39,8 +43,8 @@ export type GameJamVotingProps = {
 
 export const categories = [
   { name:`subject`, scale:3, title:`Temat` },
-  { name:`impressions`, scale:3, title:`Wrażenia` },
-  { name:`realisation`, scale:4, title:`Realizacja` },
+  { name:`impressions`, scale:5, title:`Wrażenia` },
+  { name:`realisation`, scale:5, title:`Realizacja` },
   { name:`readability`, scale:3, title:`Czytelność` },
 ]
 

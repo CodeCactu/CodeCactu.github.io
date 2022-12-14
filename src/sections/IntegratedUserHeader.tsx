@@ -1,11 +1,10 @@
 import { MdLogout } from "react-icons/md"
 import { AiOutlineCloudUpload } from "react-icons/ai"
-import { navigate } from "gatsby"
-import getWindow from "@lib/core/functions/getWindow"
+import { useState } from "react"
 import { createStylesHook } from "@fet/theming"
 import Column from "@fet/flow/Column"
-import { discordIntegrationStorageSessionKey, discordIntegrationStorageUserKey } from "@fet/discordIntegration/isIntegrated"
 import getSessionToken from "@fet/discordIntegration/getSessionToken"
+import { discordStorage } from "@fet/discordIntegration/discordStorage"
 import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
 import DiscordAvatar from "@fet/discordIntegration/DiscordAvatar"
 import Surface from "@fet/contentContainers/Surface"
@@ -16,15 +15,12 @@ import { getServerApiUrl } from "../config"
 export default function IntegratedUserHeader() {
   const [ classes, { atoms } ] = useStyles()
   const { user } = useIntegratedUserContext()
+  const [ uploading, setUploading ] = useState( false )
 
   const logout = async() => {
-    const storage = getWindow()?.localStorage
     const sessionToken = getSessionToken()
 
-    if (!storage || !sessionToken) return
-
-    storage.removeItem( discordIntegrationStorageUserKey )
-    storage.removeItem( discordIntegrationStorageSessionKey )
+    if (!sessionToken) return
 
     await fetch( `${getServerApiUrl()}/discord/integrate`, {
       method: `DELETE`,
@@ -33,7 +29,7 @@ export default function IntegratedUserHeader() {
       },
     } )
 
-    navigate( `/jam` )
+    discordStorage.clear()
   }
 
   const uploadFile = async() => {
@@ -52,12 +48,12 @@ export default function IntegratedUserHeader() {
     if (files) form.append( `gameZip`, files[ 0 ] )
     if (sessionToken) form.append( `sessionToken`, sessionToken )
 
-    const res = await fetch( `${getServerApiUrl()}/cactujam/games`, {
+    setUploading( true )
+    await fetch( `${getServerApiUrl()}/cactujam/games`, {
       method: `POST`,
       body: form,
     } ).then( r => r.json() )
-
-    if (res.success) getWindow()?.location.reload()
+    setUploading( false )
   }
 
   return !user ? null : (
@@ -71,7 +67,9 @@ export default function IntegratedUserHeader() {
 
       <Column className={classes.upload}>
         <Text>Załaduj plik ze swoją produkcją (zip)</Text>
-        <CardLink onClick={uploadFile} color={atoms.colors.rest.green} icon={AiOutlineCloudUpload} body="Załaduj plik" />
+        <CardLink disabled={uploading} onClick={uploadFile} color={atoms.colors.rest.green} icon={AiOutlineCloudUpload}>
+          {uploading ? `Wysyłanie` : `Wyślij grę`}
+        </CardLink>
       </Column>
     </Surface>
   )

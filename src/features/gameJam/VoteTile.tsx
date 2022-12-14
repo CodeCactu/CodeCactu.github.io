@@ -16,7 +16,6 @@ export default function VoteTile({ category, score, notConsidered, onUpdateVote 
   const [ classes ] = useStyles()
   const { createPopup } = usePopupsContext()
 
-  console.log({ notConsidered })
   const fullClassName = cn( classes.voteTile, notConsidered && classes.notConsidered )
   const showVoteOptions = () => createPopup( <VotingPopup category={category} /> )
     .then( score => onUpdateVote( category.name, score ) )

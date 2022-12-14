@@ -12,31 +12,38 @@ export type CardLinkProps = {
   icon?: IconType
   children?: ReactNode
   body?: ReactNode
+  disabled?: boolean
   color?: string
   onClick?: () => void
 }
 
-export default function CardLink({ children, body, className, icon:Icon, color, href, onClick }:CardLinkProps) {
+export default function CardLink({ children, body, className, icon:Icon, color, disabled, href, onClick }:CardLinkProps) {
   children ||= body
 
   const [ classes ] = useStyles()
 
+  const fullClassname = cn(
+    disabled && classes.isDisabled,
+    classes.linkCard,
+    className,
+  )
+
   if (onClick) return (
-    <Button variant="clean" className={cn( classes.linkCard, className )} style={{ "--color":color } as CSSProperties} onClick={onClick}>
+    <Button variant="clean" className={fullClassname} style={{ "--color":color } as CSSProperties} onClick={onClick}>
       {Icon && <Icon className={classes.icon} color={color} />}
       {children}
     </Button>
   )
 
   if (href) return (
-    <Link className={cn( classes.linkCard, className )} style={{ "--color":color } as CSSProperties} to={href}>
+    <Link className={fullClassname} style={{ "--color":color } as CSSProperties} to={href}>
       {Icon && <Icon className={classes.icon} color={color} />}
       {children}
     </Link>
   )
 
   return (
-    <div className={cn( classes.linkCard, className )} style={{ "--color":color } as CSSProperties}>
+    <div className={fullClassname} style={{ "--color":color } as CSSProperties}>
       {Icon && <Icon className={classes.icon} color={color} />}
       {children}
     </div>
@@ -67,5 +74,9 @@ const useStyles = createStylesHook(({
     width: 30,
     height: 30,
     transition: `scale 0.2s`,
+  },
+
+  isDisabled: {
+    opacity: 0.2,
   },
 }) )

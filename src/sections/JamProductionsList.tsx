@@ -2,7 +2,8 @@ import { useEffect } from "react"
 import useArrayState from "@lib/core/hooks/useArrayState"
 import { createStylesHook } from "@fet/theming"
 import GamesListRow from "@fet/gameJam/GamesListRow"
-import { GameItemWithVotes, GameVote } from "@fet/gameJam/GameJamVoting"
+import { GameItemWithNullableVotes, GameItemWithVotes, GameVote } from "@fet/gameJam/GameJamVoting"
+import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
 import { User } from "@fet/discordIntegration/DiscordLinking"
 import Surface from "@fet/contentContainers/Surface"
 import backendHttp from "@fet/backendHttp"
@@ -14,40 +15,46 @@ export type GameItem = {
 }
 
 export default function JamProductionList() {
-  const [ list, { push, clear } ] = useArrayState<GameItemWithVotes>()
+  const [ list, { push, clear } ] = useArrayState<GameItemWithNullableVotes>()
   const [ classes ] = useStyles()
+  const { user } = useIntegratedUserContext()
 
   const fetchGames = async() => {
     const [ itemsReqRes, votesReqRes ] = await Promise.all([
       backendHttp.get<{games: GameItem[]}>( `/cactujam/games` ),
-      backendHttp.get<{votes: GameVote[]}>( `/cactujam/games/votes` ),
+      user && backendHttp.get<{votes: GameVote[]}>( `/cactujam/games/votes` ),
     ])
 
-    const [ itemsRes, votesRes ] = [ itemsReqRes[ 0 ], votesReqRes[ 0 ] ]
+    const [ itemsRes, votesRes ] = [ itemsReqRes[ 0 ], votesReqRes?.[ 0 ] ]
 
-    if (!itemsRes?.games || !votesRes?.votes) return
+    if (!itemsRes?.games) return
 
-    const gamesWithVotes = itemsRes.games.map( g => ({
-      ...g,
-      votes: votesRes.votes.find( v => v.gameId === g.id ) ?? {
-        impressions: null,
-        readability: null,
-        realisation: null,
-        subject: null,
-      },
-    }) )
+    const gamesWithVotes = itemsRes.games.map( g => {
+      const votes = !votesRes ? undefined : (votesRes.votes.find( v => v.gameId === g.id ) ?? null)
+
+      return {
+        ...g,
+        votes: votes === undefined ? null : {
+          impressions: votes?.impressions ?? null,
+          readability: votes?.readability ?? null,
+          realisation: votes?.realisation ?? null,
+          subject: votes?.subject ?? null,
+        },
+      }
+    } )
 
     clear()
     push( ...gamesWithVotes )
   }
+
   const onUpdate = async(game:GameItemWithVotes) => {
     await backendHttp.put( `/cactujam/games/votes`, { gameId:game.id, votes:game.votes } )
     fetchGames()
   }
 
-  useEffect( () => { fetchGames() }, [] )
+  useEffect( () => { fetchGames() }, [ user ] )
 
-  return (
+  return !list.length ? null : (
     <Surface className={classes.jamProductionsList}>
       {list.map( g => <GamesListRow key={g.filename} game={g} onUpdate={onUpdate} /> )}
     </Surface>
@@ -56,6 +63,9 @@ export default function JamProductionList() {
 
 const useStyles = createStylesHook( ({ atoms }) => ({
   jamProductionsList: {
+    display: `flex`,
+    flexDirection: `column`,
+    gap: atoms.spacing.main * 2,
     width: atoms.sizes.columnWidth,
     marginTop: atoms.spacing.main,
   },

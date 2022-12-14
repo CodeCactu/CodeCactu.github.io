@@ -1,6 +1,6 @@
-import getWindow from "@lib/core/functions/getWindow"
-import { discordIntegrationStorageSessionKey } from "./isIntegrated"
+import { discordIntegrationStorageUserKey, discordStorage } from "./discordStorage"
 
 export default function getSessionToken() {
-  return getWindow()?.localStorage.getItem( discordIntegrationStorageSessionKey )
+  const storedSession = discordStorage.get( discordIntegrationStorageUserKey ) as any
+  return storedSession?.sessionToken as string
 }
