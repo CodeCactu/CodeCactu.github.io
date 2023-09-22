@@ -3,10 +3,9 @@ import { createStylesHook } from "@fet/theming"
 
 export type MainLayoutProps = {
   children: ReactNode
-  className?: string
 }
 
-export default function MainLayout({ children, className }:MainLayoutProps) {
+export default function MainLayout({ children }:MainLayoutProps) {
   const [ classes ] = useStyles()
 
   return (
@@ -25,7 +24,7 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     "#__next": {
       display: `grid`,
       minHeight: `100vh`,
-      background: `#333`,
+      background: atoms.colors.background.main,
 
       "& > *": {
         minHeight: `auto`,

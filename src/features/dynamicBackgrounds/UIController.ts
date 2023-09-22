@@ -88,7 +88,10 @@ export default abstract class UIController {
   abstract logic(): void
 }
 
-export function useUIControllerHandler<Ele extends HTMLElement, Ctrl extends UIController>( handler:(ref:Ele) => Ctrl ): [(ref:Ele) => void, null | Ctrl] {
+export function useUIControllerHandler<
+  Ctrl extends UIController,
+  Ele extends HTMLElement = HTMLDivElement,
+>( handler:(ref:Ele) => Ctrl ): [(ref:Ele) => void, null | Ctrl] {
   const controllerRef = useRef<null | Ctrl>(null)
 
   const handleRef = (ref:Ele) => {

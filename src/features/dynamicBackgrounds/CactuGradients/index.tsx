@@ -9,7 +9,7 @@ export type CactuGradientsProps = {
 
 export default function CactuGradients({ className }:CactuGradientsProps) {
   const [ classes ] = useStyles()
-  const [ handleRef ] = useUIControllerHandler<HTMLCanvasElement, CactuGradientsController>(
+  const [ handleRef ] = useUIControllerHandler<CactuGradientsController, HTMLCanvasElement>(
     canvas => new CactuGradientsController( canvas ),
   )
 

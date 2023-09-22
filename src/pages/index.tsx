@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import CactuGradients from '@fet/dynamicBackgrounds/CactuGradients'
+import CactuBlob from '@fet/cactuDecorations/CactuBlob'
 import MainLayout from '@fet/MainLayout'
 
 export default function Home() {
@@ -13,7 +13,10 @@ export default function Home() {
       </Head>
 
       <main>
-        <CactuGradients />
+        <CactuBlob>
+          CactuJam
+        </CactuBlob>
+        {/* <CactuGradients /> */}
       </main>
     </MainLayout>
   )
