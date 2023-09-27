@@ -1,10 +1,11 @@
 import { MdLogout } from "react-icons/md"
 import { AiOutlineCloudUpload } from "react-icons/ai"
 import { useState } from "react"
+import getWindow from "@lib/core/functions/getWindow"
 import { createStylesHook } from "@fet/theming"
 import Column from "@fet/flow/Column"
+import logout from "@fet/discordIntegration/logout"
 import getSessionToken from "@fet/discordIntegration/getSessionToken"
-import { discordStorage } from "@fet/discordIntegration/discordStorage"
 import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
 import DiscordAvatar from "@fet/discordIntegration/DiscordAvatar"
 import Surface from "@fet/contentContainers/Surface"
@@ -16,21 +17,6 @@ export default function IntegratedUserHeader() {
   const [ classes, { atoms } ] = useStyles()
   const { user } = useIntegratedUserContext()
   const [ uploading, setUploading ] = useState( false )
-
-  const logout = async() => {
-    const sessionToken = getSessionToken()
-
-    if (!sessionToken) return
-
-    await fetch( `${getServerApiUrl()}/discord/integrate`, {
-      method: `DELETE`,
-      headers: {
-        Authorization: `Bearer ${sessionToken}`,
-      },
-    } )
-
-    discordStorage.clear()
-  }
 
   const uploadFile = async() => {
     const files:null | FileList = await new Promise( r => {
@@ -54,6 +40,7 @@ export default function IntegratedUserHeader() {
       body: form,
     } ).then( r => r.json() )
     setUploading( false )
+    getWindow()?.location.reload()
   }
 
   return !user ? null : (

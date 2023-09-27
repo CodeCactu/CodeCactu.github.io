@@ -3,6 +3,7 @@ import useArrayState from "@lib/core/hooks/useArrayState"
 import { createStylesHook } from "@fet/theming"
 import GamesListRow from "@fet/gameJam/GamesListRow"
 import { GameItemWithNullableVotes, GameItemWithVotes, GameVote } from "@fet/gameJam/GameJamVoting"
+import logout from "@fet/discordIntegration/logout"
 import { useIntegratedUserContext } from "@fet/discordIntegration/IntegratedUserContext"
 import { User } from "@fet/discordIntegration/DiscordLinking"
 import Surface from "@fet/contentContainers/Surface"
@@ -20,17 +21,22 @@ export default function JamProductionList() {
   const { user } = useIntegratedUserContext()
 
   const fetchGames = async() => {
+    type VoteRes = { votes: GameVote[] } | { code: 4030 }
+
     const [ itemsReqRes, votesReqRes ] = await Promise.all([
       backendHttp.get<{games: GameItem[]}>( `/cactujam/games` ),
-      user && backendHttp.get<{votes: GameVote[]}>( `/cactujam/games/votes` ),
+      user && backendHttp.get<VoteRes>( `/cactujam/games/votes` ),
     ])
 
     const [ itemsRes, votesRes ] = [ itemsReqRes[ 0 ], votesReqRes?.[ 0 ] ]
 
     if (!itemsRes?.games) return
+    if (votesRes && `code` in votesRes) {
+      if (votesRes.code === 4030) return logout()
+    }
 
     const gamesWithVotes = itemsRes.games.map( g => {
-      const votes = !votesRes ? undefined : (votesRes.votes.find( v => v.gameId === g.id ) ?? null)
+      const votes = !votesRes || !(`votes` in votesRes) ? undefined : (votesRes.votes.find( v => v.gameId === g.id ) ?? null)
 
       return {
         ...g,
@@ -38,6 +44,7 @@ export default function JamProductionList() {
           impressions: votes?.impressions ?? null,
           readability: votes?.readability ?? null,
           realisation: votes?.realisation ?? null,
+          trait: votes?.trait ?? null,
           subject: votes?.subject ?? null,
         },
       }

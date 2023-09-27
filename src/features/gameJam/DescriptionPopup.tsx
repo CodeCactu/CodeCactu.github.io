@@ -22,6 +22,17 @@ export default function DescriptionPopup() {
           </ol>
         </dd>
 
+        <dt className={classes.listTitle}><Span highlight>Cecha</Span></dt>
+        <dd className={classes.listValue}>
+          <p>Zgodność z cechą</p>
+
+          <ol className={classes.list}>
+            <li className={classes.listItem}><Span highlight>0</Span> - Cecha jest niedostrzegalna, lub jest zaimplementowana niedbale</li>
+            <li className={classes.listItem}><Span highlight>1</Span> - Cecha co do zasady została zachowana, być może pojawiły się drobne wątpliwości ale można uznać ze jest w porzadku</li>
+            <li className={classes.listItem}><Span highlight>2</Span> - Cecha została uwzględniona w pełni, autor zauważalnie przyłożył uwagę do jej uwzględnienia</li>
+          </ol>
+        </dd>
+
         <dt className={classes.listTitle}><Span highlight>Wrażenia</Span></dt>
         <dd className={classes.listValue}>
           <p>Ogólne wrażenia. Wywołana ciekawość, chęć zobaczenia kontynuacji, element zaskoczenia, chęć powtarzania gry</p>
@@ -71,7 +82,7 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     height: `100vh`,
     overflow: `auto`,
     zIndex: 1000,
-    backdropFilter: `blur( 10px )`,
+    backdropFilter: `blur( 30px )`,
   },
 
   defList: {

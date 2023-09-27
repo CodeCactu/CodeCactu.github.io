@@ -17,6 +17,7 @@ export type GameItem = {
 
 export type Votes = {
   subject: null | number
+  trait: null | number
   impressions: null | number
   realisation: null | number
   readability: null | number
@@ -43,6 +44,7 @@ export type GameJamVotingProps = {
 
 export const categories = [
   { name:`subject`, scale:3, title:`Temat` },
+  { name:`trait`, scale:3, title:`Cecha` },
   { name:`impressions`, scale:5, title:`Wrażenia` },
   { name:`realisation`, scale:5, title:`Realizacja` },
   { name:`readability`, scale:3, title:`Czytelność` },
