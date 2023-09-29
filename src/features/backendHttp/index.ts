@@ -1,4 +1,5 @@
 import http from "@lib/http"
+import getWindow from "@lib/core/functions/getWindow"
 import getSessionToken from "@fet/discordIntegration/getSessionToken"
 import { getServerApiUrl } from "../../config"
 
@@ -15,4 +16,5 @@ const backendHttp = http.createMiddlewaredHttp( req => {
   return req
 } )
 
+if (getWindow()) (getWindow() as any ).backendHttp = backendHttp
 export default backendHttp
