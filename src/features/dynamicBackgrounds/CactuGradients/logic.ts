@@ -1,11 +1,22 @@
-import UIController from "../UIController"
+import { UiManager, UiManagerHolder } from "@lib/dynamicUi"
 
 let i = 0
 
-export default class CactuGradientsController extends UIController {
-  constructor( canvas:HTMLCanvasElement ) {
-    super( canvas )
-    this.registerCtx( `main`, canvas )
+export default class CactuGradientsController implements UiManagerHolder {
+  uiManager: UiManager<HTMLDivElement>
+  ctx: CanvasRenderingContext2D
+  uiData = {
+    test: true,
+  }
+
+
+  constructor( root:HTMLDivElement ) {
+    this.uiManager = new UiManager( root )
+    this.ctx = this.uiManager.registerCtx( `main`, `canvas` )
+
+    this.uiManager.startLoop( () => {
+      this.draw()
+    } )
   }
 
   logic() {
@@ -13,14 +24,16 @@ export default class CactuGradientsController extends UIController {
   }
 
   draw() {
-    const { ctxs, wrapperShape } = this
-    const ctx = ctxs.get( `main` )!
+    const { ctx } = this
 
     ctx.strokeStyle = `red`
 
-    ctx.arc( wrapperShape.center.x, wrapperShape.center.y, 5, 0, Math.PI * 2 )
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height )
+
+    ctx.beginPath()
+    ctx.arc( i % ctx.canvas.width, ctx.canvas.height / 2, 5, 0, Math.PI * 2 )
     ctx.stroke()
 
-    console.log( i++, wrapperShape )
+    i++
   }
 }
