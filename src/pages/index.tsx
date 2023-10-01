@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import CactuGradients from '@fet/dynamicBackgrounds/CactuGradients'
+import CactuBlinkingLines from '@fet/dynamicBackgrounds/CactuBlinkingLines'
 import MainLayout from '@fet/MainLayout'
 
 export default function Home() {
@@ -16,7 +17,8 @@ export default function Home() {
         {/* <CactuBlob>
           CactuJam
         </CactuBlob> */}
-        <CactuGradients />
+        {/* <CactuGradients /> */}
+        <CactuBlinkingLines />
       </main>
     </MainLayout>
   )

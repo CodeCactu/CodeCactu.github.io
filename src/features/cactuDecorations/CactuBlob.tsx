@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-import { cn } from "@lib/theming"
 import { createStylesHook } from "@fet/theming"
 
 export type CactuBlobProps = {

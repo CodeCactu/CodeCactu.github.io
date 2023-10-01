@@ -15,13 +15,13 @@ export default function CactuGradients({ className }:CactuGradientsProps) {
 
   return (
     <div ref={handleRef}>
-      <canvas className={cn( classes.cactuGradients, className )} />
+      <canvas className={cn( classes.canvas, className )} />
     </div>
   )
 }
 
 const useStyles = createStylesHook({
-  cactuGradients: {
+  canvas: {
     display: `block`,
     width: `100%`,
     height: `100dvh`,
