@@ -18,7 +18,7 @@ export default function Home() {
           CactuJam
         </CactuBlob> */}
         {/* <CactuGradients /> */}
-        <CactuBlinkingLines />
+        {/* <CactuBlinkingLines /> */}
       </main>
     </MainLayout>
   )

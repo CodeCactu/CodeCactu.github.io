@@ -1,5 +1,7 @@
 import { ReactNode } from "react"
 import { createStylesHook } from "@fet/theming"
+import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines"
+import MainNav from "./MainNav"
 
 export type MainLayoutProps = {
   children: ReactNode
@@ -10,6 +12,10 @@ export default function MainLayout({ children }:MainLayoutProps) {
 
   return (
     <>
+      <CactuBlinkingLines className={classes.background} />
+
+      <MainNav />
+
       {children}
     </>
   )
@@ -24,7 +30,6 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     "#__next": {
       display: `grid`,
       minHeight: `100vh`,
-      background: atoms.colors.background.main,
 
       "& > *": {
         minHeight: `auto`,
@@ -34,5 +39,15 @@ const useStyles = createStylesHook( ({ atoms }) => ({
     body: {
       margin: 0,
     },
+  },
+
+  background: {
+    position: `absolute`,
+    top: 0,
+    left: 0,
+    width: `100%`,
+    height: `100dvh`,
+    background: atoms.colors.background.main,
+    zIndex: -1,
   },
 }) )
