@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useCallback, useEffect, useState } from "react"
 
 export default function usePromise<T extends Promise<any>>( promise:T, dependencies:unknown[] = [] ): [ boolean, undefined | Awaited<T>, undefined | Error ] {

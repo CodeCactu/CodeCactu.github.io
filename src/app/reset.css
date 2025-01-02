@@ -1,0 +1,42 @@
+@layer reset {
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    line-height: 1em;
+  }
+
+  ol, ul {
+    list-style-type: none;
+  }
+
+  img {
+    max-width: 100%;
+    vertical-align: top;
+  }
+
+  fieldset {
+    border: none;
+  }
+
+  /* *:focus:not( :focus-visible ) {
+    outline: none;
+  } */
+
+  a {
+    font: inherit;
+    color: inherit
+  }
+
+  input:not( [type="radio"], [type="checkbox"], [hidden] ) {
+    display: block;
+    padding: 0;
+    border: none;
+    background-color: unset;
+  }
+
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useRef } from "react"
 
 export default function useTimeout( delay:number, callback:() => void ) {

@@ -1,0 +1,14 @@
+:root {
+  --color-background: #212225;
+  --color-red: #b66141;
+  --color-green: #566d38;
+  --color-blue: #5574ac;
+  --color-yellow: #e6bf4b;
+  --color-purple: #6c52ec;
+  --color-white: #fefefe;
+}
+
+body {
+  padding: 1px;
+  color: var( --color-white );
+}

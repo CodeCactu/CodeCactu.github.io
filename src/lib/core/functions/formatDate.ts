@@ -8,7 +8,14 @@ type DateParts = {
   milis: string
 }
 
-export type DateString = `${number}-${number}-${number}T${number}:${number}:${number}`
+export const SECOND = 1000
+export const MINUTE = SECOND * 60
+export const HOUR = MINUTE * 60
+export const DAY = HOUR * 24
+
+export type DateString =
+  | `${number}-${number}-${number}T${number}:${number}:${number}`
+  | `${number}-${number}-${number}T${number}:${number}:${number}Z`
 
 export default function formatDate( date:Date | string | number = new Date(), format = `YYYY.MM.DD hh:mm` ) {
   const dateParts = getDateparts( date )

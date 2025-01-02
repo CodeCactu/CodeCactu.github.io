@@ -1,5 +1,7 @@
+"use client"
+
+import { Primitive } from "@lib/core/types"
 import { useRef } from "react"
-import { Primitive } from "../theming/types"
 
 export type UiData = Record<string, Primitive>
 export type UiUpdater<T extends UiData = UiData> = (data:T) => void
@@ -92,8 +94,8 @@ export interface UiManagerHolder {
   uiData: UiData
 }
 
-export function useUiManager<TRoot extends HTMLElement, THolder extends UiManagerHolder>( handler:(ref:TRoot) => THolder ): [(ref:null | TRoot) => void, undefined | THolder["uiData"]] {
-  const managerHolderRef = useRef<THolder>()
+export function useUiManager<TRoot extends HTMLElement, THolder extends UiManagerHolder>( handler:(ref:TRoot) => THolder ): [(ref:null | TRoot) => void, undefined | THolder[`uiData`]] {
+  const managerHolderRef = useRef<THolder>( null )
 
   const handleRef = (ref:null | TRoot) => {
     if (ref) managerHolderRef.current = handler( ref )

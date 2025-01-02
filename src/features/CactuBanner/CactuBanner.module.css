@@ -1,0 +1,67 @@
+.banner {
+  position: relative;
+  display: flex;
+  margin: 50px;
+  /* aspect-ratio: 1; */
+  justify-content: center;
+  align-items: center;
+}
+
+.singleSign {
+  position: absolute;
+  width: 100px;
+}
+
+.signet {
+  z-index: 10;
+}
+
+.logotype {
+  position: relative;
+  font-size: 190px;
+  left: unset;
+  top: unset;
+  transform: unset;
+  align-self: flex-end;
+  line-height: 118px;
+  letter-spacing: 20px;
+  font-family: Coconut;
+  color: #5da234;
+}
+
+.floatingFace {
+  width: 170px;
+}
+
+.floatingFace.is1 {
+  top: 70px;
+  left: 410px;
+}
+
+.floatingFace.is2 {
+  top: 70px;
+  left: 693px;
+}
+
+.grass.is1 {
+  top: calc(100% - 120px);
+  left: 150px;
+}
+
+.grass.is2 {
+  top: calc(100% - 35px);
+  left: 14px;
+  z-index: 100;
+}
+
+.grass.is3 {
+  top: calc(100% + 20px);
+  left: 183px;
+}
+
+.noSign {
+  display: block;
+  top: 250px;
+  left: 100%;
+  width: 100px;
+}

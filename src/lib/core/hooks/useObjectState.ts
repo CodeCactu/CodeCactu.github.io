@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState } from "react"
 
 export type Objectkey = string | number | symbol
@@ -19,7 +21,7 @@ type RetFromGeneric<T> = T extends Record<infer K, infer V>
     ? RetType<string, any, Record<string, unknown>>
     : RetType<string, T, Record<string, T>>
 
-type RetFromInit<Init extends InitialValue<any, any>> = [Init] extends [((...params) => infer R)]
+type RetFromInit<Init extends InitialValue<any, any>> = [Init] extends [((...params:any[]) => infer R)]
   ? [R] extends [InitialValue<infer K, infer V>]
     ? [R] extends [null]
       ? RetType<K, V, null | Record<string, unknown>>

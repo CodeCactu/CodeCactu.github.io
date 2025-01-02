@@ -1,0 +1,18 @@
+.tilesCactuLogo {
+  position: relative;
+  padding-left: 200px;
+}
+
+.tiles {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var( --tileSize );
+  height: var( --tileSize );
+}
+
+.tiles img {
+  position: absolute;
+  image-rendering: pixelated;
+  width: var( --tileSize )
+}

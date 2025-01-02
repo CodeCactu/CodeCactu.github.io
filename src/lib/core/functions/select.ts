@@ -13,9 +13,8 @@ type SelectReturnType<K extends Key, V extends SelectType<K>> =
 
 export default function select<K extends Key, V extends SelectType<K>>( key:K, values:V ): SelectReturnType<K, V>  {
   if (key) {
-    const selectedValue = values[ key as string ]
-
-    if (selectedValue) return selectedValue as SelectReturnType<K, V>
+    const selectedValue = values[ key ] as undefined | SelectReturnType<K, V>
+    if (selectedValue) return selectedValue
   }
 
   return (`default` in values ? values.default : undefined) as SelectReturnType<K, V>
