@@ -10,6 +10,7 @@ import "@lib/core/flow/ResponsiveAreaNames"
 
 export const spacing = {
   "normal": 5,
+  "large": 20,
 }
 
 declare module "@lib/core/flow/ResponsiveAreaNames" {

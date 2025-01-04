@@ -11,6 +11,7 @@
 body {
   padding: 1px;
   color: var( --color-white );
+  font-family: monospace;
 }
 
 @layer globals {

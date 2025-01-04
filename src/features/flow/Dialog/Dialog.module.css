@@ -1,0 +1,11 @@
+.dialog {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background-color: #0005;
+}
+.dialogBackground {
+  background-color: var( --color-white );
+  padding: var( --space-large );
+}

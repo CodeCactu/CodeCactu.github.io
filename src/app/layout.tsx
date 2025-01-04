@@ -10,6 +10,7 @@ import logoMiniImg from "./cactu-logo-mini.png"
 import classes from "./layout.module.css"
 import Link from "@lib/core/controls/Link"
 import UserMenu from "@fet/auth/UserMenu"
+import { PopupsRoot } from "@lib/popups"
 
 export const metadata: Metadata = {
   title: `Create Next App`,
@@ -71,7 +72,9 @@ export default function RootLayout({ children }:RootLayoutProps) {
           <UserMenu />
         </nav>
 
-        {children}
+        <PopupsRoot>
+          {children}
+        </PopupsRoot>
 
         <CactuBlinkingLines className={classes.background} />
       </body>

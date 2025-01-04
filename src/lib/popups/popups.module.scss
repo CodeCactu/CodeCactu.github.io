@@ -1,0 +1,11 @@
+.popupsRoot {
+  & > * {
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 0;
+    border: unset;
+    background: unset;
+    z-index: 100;
+  }
+}
