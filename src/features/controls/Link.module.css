@@ -1,0 +1,19 @@
+.link {
+  --_color: var( --color, var( --color-green ) );
+
+  display: inline-block;
+  padding: 1em;
+  background-color: #0005;
+  border-left: var( --border-width ) solid var( --_color );
+  font-size: 30px;
+  font-family: var( --font-cactu );
+  letter-spacing: 0.19em;
+  transition-property: color padding border-left-width;
+  transition-duration: var( --duration-fast );
+}
+
+.link:hover {
+  color: var( --_color );
+  /* padding-left: 0.5em;
+  border-left-width: calc( 0.5em + var( --border-width ) ); */
+}

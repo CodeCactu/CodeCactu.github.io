@@ -16,11 +16,7 @@ export const geistMonoFont = Geist_Mono({
 export const cactuFont = localFont({
   // src: "./font/icomoon.ttf",
   // src: "./font/Glyphter.woff",
-  src: "./font/fontello.woff2",
+  // src: "./font/fontello.ttf",
   variable: "--font-cactu",
-  // src: [
-  //   { path:"./font/icomoon.ttf" },
-  //   { path:"./font/icomoon.woff" },
-  //   { path:"./font/icomoon.svg" },
-  // ],
+  src: [ { path:"./font/cactu.woff" } ],
 })

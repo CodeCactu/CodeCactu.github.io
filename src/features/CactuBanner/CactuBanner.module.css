@@ -1,10 +1,13 @@
 .banner {
   position: relative;
   display: flex;
-  margin: 50px;
-  /* aspect-ratio: 1; */
-  justify-content: center;
+  width: 1130px;
+  height: 405px;
+  padding-bottom: 60px;
   align-items: center;
+  font-family: var( --font-cactu );
+  font-size: 210px;
+  letter-spacing: 0.19em;
 }
 
 .singleSign {
@@ -17,51 +20,47 @@
 }
 
 .logotype {
-  position: relative;
-  font-size: 190px;
-  left: unset;
+  position: absolute;
+  left: 295px;
   top: unset;
   transform: unset;
   align-self: flex-end;
-  line-height: 118px;
-  letter-spacing: 20px;
-  font-family: Coconut;
-  color: #5da234;
+  color: var( --color-green );
+  line-height: 95px;
 }
 
 .floatingFace {
-  width: 170px;
+  width: 0.8em;
+  top: 50px;
 }
 
 .floatingFace.is1 {
-  top: 70px;
-  left: 410px;
+  left: 404px;
 }
 
 .floatingFace.is2 {
-  top: 70px;
-  left: 693px;
+  left: 694px;
 }
 
 .grass.is1 {
-  top: calc(100% - 120px);
+  bottom: 120px;
   left: 150px;
 }
 
 .grass.is2 {
-  top: calc(100% - 35px);
+  bottom: 45px;
   left: 14px;
   z-index: 100;
 }
 
 .grass.is3 {
-  top: calc(100% + 20px);
+  bottom: 0;
   left: 183px;
 }
 
 .noSign {
   display: block;
   top: 250px;
-  left: 100%;
+  right: 0;
   width: 100px;
 }

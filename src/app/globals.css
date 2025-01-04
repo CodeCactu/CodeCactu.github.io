@@ -1,7 +1,7 @@
 :root {
   --color-background: #212225;
   --color-red: #b66141;
-  --color-green: #566d38;
+  --color-green: #5da234;
   --color-blue: #5574ac;
   --color-yellow: #e6bf4b;
   --color-purple: #6c52ec;
@@ -11,4 +11,19 @@
 body {
   padding: 1px;
   color: var( --color-white );
+}
+
+@layer globals {
+  h1, h2, h3 {
+    color: var( --color, var( --color-green ) );
+    font-family: var( --font-cactu );
+    letter-spacing: 0.19em;
+    font-weight: normal;
+  }
+  h1 {
+    font-size: 75px;
+  }
+  h2 {
+    font-size: 50px;
+  }
 }

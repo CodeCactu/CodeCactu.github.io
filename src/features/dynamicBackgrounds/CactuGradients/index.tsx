@@ -1,6 +1,6 @@
 import { cn } from "@lib/theming"
 import { useUiManager } from "@lib/dynamicUi"
-import { createStylesHook } from "@fet/theming"
+import { createStylesHook } from "@fet/theme"
 import CactuGradientsController from "./logic"
 
 export type CactuGradientsProps = {

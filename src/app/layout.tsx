@@ -1,9 +1,15 @@
-import type { Metadata } from "next"
-import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines"
 import "./reset.css"
 import "./globals.css"
+import "./layout.css"
+import type { Metadata } from "next"
+import Image from "@lib/core/flow/Image"
+import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines"
+import { cactuFont } from "@fet/theme/fonts"
+import * as theme from "@fet/theme"
+import logoMiniImg from "./cactu-logo-mini.png"
 import classes from "./layout.module.css"
-import { cactuFont, geistMonoFont, geistSansFont } from "@fet/theme/fonts"
+import Link from "@lib/core/controls/Link"
+import UserMenu from "@fet/auth/UserMenu"
 
 export const metadata: Metadata = {
   title: `Create Next App`,
@@ -15,11 +21,59 @@ export type RootLayoutProps = Readonly<{
 }>
 
 export default function RootLayout({ children }:RootLayoutProps) {
+  const parseCssValue = (val:number | string) => typeof val === `string` ? val : `${val}px`
+
+  const rootColors = Object.entries( theme.colors )
+    .map( ([ name, value ]) => `  --color-${name}: ${parseCssValue( value )};` )
+    .join( `\n` )
+
+  const rootSpacing = Object.entries( theme.spacing )
+    .map( ([ name, value ]) => `  --space-${name}: ${parseCssValue( value )};` )
+    .join( `\n` )
+
+  const rootTypography = Object.entries( theme.fonts )
+    .flatMap( ([ name, value ]) => [
+      `  --typography-${name}-family: ${parseCssValue( value.fontFamily )};`,
+      `  --typography-${name}-weight: ${parseCssValue( value.fontWeight )};`,
+      `  --typography-${name}-size: ${parseCssValue( value.fontSize )};`,
+      `  --typography-${name}-lineHeight: ${parseCssValue( value.lineHeight )};`,
+      `letterSpacing` in value && `  --typography-${name}-letterSpacing: ${parseCssValue( value.letterSpacing )};`,
+    ] ).filter( Boolean ).join( `\n` )
+
+  const rootBorder = Object.entries( theme.border )
+    .map( ([ name, value ]) => `  --border-${name}: ${parseCssValue( value )};` )
+    .join( `\n` )
+
+  const rootDurations = Object.entries( theme.durations )
+    .map( ([ name, value ]) => `  --duration-${name}: ${value}s;` )
+    .join( `\n` )
+
+  const rootStyle = `:root {\n`
+    + `${rootColors}\n`
+    + `${rootSpacing}\n`
+    + `${rootTypography}\n`
+    + `${rootBorder}\n`
+    + `${rootDurations}\n`
+    + `}`
+
   return (
-    <html lang="pl">
-      <body className={`${geistSansFont.variable} ${geistMonoFont.variable} ${cactuFont.variable}`}>
-        <CactuBlinkingLines className={classes.background} />
+    <html lang="pl" className={cactuFont.variable}>
+      <head>
+        <style dangerouslySetInnerHTML={{ __html:rootStyle }} />
+      </head>
+
+      <body>
+        <nav>
+          <Link href="/">
+            <Image {...logoMiniImg} width={50} height={50} alt="Cactu" />
+          </Link>
+
+          <UserMenu />
+        </nav>
+
         {children}
+
+        <CactuBlinkingLines className={classes.background} />
       </body>
     </html>
   )
