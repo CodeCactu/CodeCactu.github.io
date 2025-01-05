@@ -1,8 +1,7 @@
 import getWindow from "@lib/core/functions/getWindow"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-
-const BACKEND_ORIGIN = `http://localhost:3001`
+import { BACKEND_ORIGIN } from "../../config"
 
 const sessionKey = `sessionToken`
 
@@ -13,21 +12,32 @@ export type User = {
   avatarHref: string
 }
 
+let loadeduser:null | User = null
 export default function useDiscordLinking() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [ integrationLink, setIntegrationLink ] = useState( `` )
   const [ discordUser, setDiscordUser ] = useState<null | false | User>( null )
   const code = searchParams.get( `code` )
 
   useEffect( () => {
-    const savedSessionToken = localStorage.getItem( sessionKey )
+    const savedSessionToken = getSessionToken()
+    const handleUser = (user:false | User) => {
+      setDiscordUser( user )
+      if (user) loadeduser = user
+      else logout()
+
+    }
 
     setIntegrationLink( getDiscordIntegrationLink() )
 
     if (savedSessionToken) {
-      loadSession( savedSessionToken ).then( setDiscordUser )
+      loadSession( savedSessionToken ).then( handleUser )
     } else if (code) {
-      loadDiscordUser( code ).then( setDiscordUser )
+      loadDiscordUser( code ).then( user => {
+        handleUser( user )
+        router.push( `/` )
+      } )
     } else setDiscordUser( false )
   }, [] )
 
@@ -78,6 +88,22 @@ function loadSession( token:string ) {
         return false
       }
 
-      return data.user
+      return data.user as User
     } )
+}
+
+export function getSessionToken() {
+  return localStorage.getItem( sessionKey )
+}
+
+export function logout() {
+  return localStorage.removeItem( sessionKey )
+}
+
+export function getCurrentUser() {
+  return loadeduser ? structuredClone( loadeduser ) : null
+}
+
+export function getAuthHeader() {
+  return { Authorization:`Bearer ${getSessionToken()}` }
 }

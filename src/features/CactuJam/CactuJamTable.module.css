@@ -26,7 +26,7 @@
   color: var( --color-green );
 }
 .vote:hover {
-  color: var( --color-purple );
+  color: var( --color-white );
 }
 .voteValue {
   font-weight: bold;
@@ -36,4 +36,27 @@
   font-size: 10;
   text-transform: lowercase;
   letter-spacing: 0.19em;
+}
+
+
+/* Dialog below */
+
+
+.dialogVote {
+  display: flex;
+  justify-content: left;
+  width: 100%;
+  gap: var( --space-large );
+  padding: var( --space-large );
+  font-size: 15px;
+}
+.dialogVote:hover {
+  background-color: var( --color-purple );
+}
+.dialogVoteValue {
+  font-size: 30px;
+  color: var( --color-purple );
+}
+.dialogVote:hover .dialogVoteValue {
+  color: var( --color-white );
 }
