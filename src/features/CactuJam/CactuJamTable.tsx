@@ -9,7 +9,7 @@ import cactuJamCategories, { CactuJamCategory } from "./cactuJamCategories"
 import { useDialogsRootContext } from "@fet/flow/Dialog"
 import classes from "./CactuJamTable.module.css"
 import CactuJamVotingDialog from "./CactuJamVotingDialog"
-import { getCurrentUserVotes, voteOnGame } from "./gameLoaders"
+import { getAllVotes, getCurrentUserVotes, getJamGames, UserVotes, voteOnGame } from "./gameLoaders"
 
 type DragData = {
   row: null | CactuJamRow
@@ -18,7 +18,7 @@ type DragData = {
 
 export type CactuJamRow = {
   user: User
-  votes: Record<string, number>
+  votes: null | UserVotes
 }
 
 export type CactuJamTableProps = {}
@@ -72,36 +72,44 @@ export default function CactuJamTable() {
     } )
   }
 
-  const handleVote = async(category:CactuJamCategory) => {
+  const handleVote = async(user:User, category:CactuJamCategory) => {
     if (!discordUser) return
 
     const value = await createPopup<number>( <CactuJamVotingDialog category={category} /> )
-    await voteOnGame( discordUser, category, value ).then( res => console.log( res ) )
+    const newVotesRes = await voteOnGame( user, category, value )
+    const newVotes = newVotesRes.votes
+
+    setSortedRows( rows => !rows ? null : rows.map( row => {
+      if (!(row.user.id in newVotes)) return row
+
+      const newRowVotes = newVotes[ row.user.id ]
+
+      return { user:row.user, votes:newRowVotes }
+    } ) )
   }
 
   useEffect( () => {
-    getCurrentUserVotes().then( votes => {
-      const mock:CactuJamRow[] = [
-        { user: { id:`1`, displayName:`One`, accentColor:`#aa0000`, avatarHref:`https://placehold.co/50x50/aa0000/ffffff.png` },
-          votes,
-        },
-        { user: { id:`2`, displayName:`Two`, accentColor:`#00aa00`, avatarHref:`https://placehold.co/50x50/00aa00/ffffff.png` },
-          votes: cactuJamCategories.reduce( (obj, c, i) => ({ ...obj, [ c.name ]:i }), {} ),
-        },
-        { user: { id:`3`, displayName:`Three`, accentColor:`#0000aa`, avatarHref:`https://placehold.co/50x50/0000aa/ffffff.png` },
-          votes: cactuJamCategories.reduce( (obj, c, i) => ({ ...obj, [ c.name ]:i }), {} ),
-        },
-        { user: { id:`4`, displayName:`Four`, accentColor:`#aa00aa`, avatarHref:`https://placehold.co/50x50/aa00aa/ffffff.png` },
-          votes: cactuJamCategories.reduce( (obj, c, i) => ({ ...obj, [ c.name ]:i }), {} ),
-        },
-      ]
+    Promise.all([
+      getJamGames(),
+      getCurrentUserVotes(),
+    ])
+      .then( ([ usersGamesRes, votesRes ]) => {
+        const votes = votesRes.success ? votesRes.votes : null
+        const userVotes:CactuJamRow[] = Object.values( usersGamesRes.usersGames ).map( userGames => ({
+          user: userGames.user,
+          votes: !votes ? null : votes[ userGames.user.id ] ?? {},
+        }) )
 
-      setSortedRows( mock )
-    } )
-  }, [ typeof discordUser ] )
+        setSortedRows( userVotes )
+      } )
+  }, [] )
+
+  useEffect( () => {
+    if (discordUser && discordUser.id === `263736841025355777`) getAllVotes().then( console.log )
+  }, [ !!discordUser ] )
 
   return (
-    <table className={classes.cactuJamTable}>
+    <table className={cn( classes.cactuJamTable, discordUser === false && classes.isWithoutUser )}>
       <tbody>
         {
           !sortedRows ? (
@@ -109,17 +117,21 @@ export default function CactuJamTable() {
               <td>Ładowanie...</td>
             </tr>
           ) : sortedRows.map( row => (
-            <tr key={row.user.id} draggable onDragStart={() => handleDragStart( row )} onDragOver={e => handleDragOverEvent( e, row )}>
+            <tr key={row.user.id} draggable={!!discordUser} onDragStart={() => handleDragStart( row )} onDragOver={e => handleDragOverEvent( e, row )}>
               <td className={classes.competitor}>
-                <Image width={50} height={50} src={row.user.avatarHref} alt="" />
+                <Image width={50} height={50} src={`https://cdn.discordapp.com/avatars/${row.user.id}/${row.user.avatarHash}.png`} alt="" />
                 {row.user.displayName}
               </td>
 
               {
                 cactuJamCategories.map( category => (
                   <td key={category.name}>
-                    <Button disabled={!discordUser} className={cn( classes.vote, classes.isMissing )} onClick={() => handleVote( category )}>
-                      <span className={classes.voteValue}>{row.votes[ category.name ] ?? 0}</span>
+                    <Button
+                      disabled={!discordUser || !row.votes}
+                      className={cn( classes.vote, row.votes && (!(category.name in row.votes) ? classes.isMissing : classes.isVoted) )}
+                      onClick={() => handleVote( row.user, category )}
+                    >
+                      {row.votes && <span className={classes.voteValue}>{row.votes[ category.name ] ?? 0}</span>}
                       <span className={classes.voteCategory}>{category.label}</span>
                     </Button>
                   </td>

@@ -7,9 +7,9 @@ const sessionKey = `sessionToken`
 
 export type User = {
   id: string
-  accentColor: string
+  accentColor?: string
   displayName: string
-  avatarHref: string
+  avatarHash: string
 }
 
 let loadeduser:null | User = null

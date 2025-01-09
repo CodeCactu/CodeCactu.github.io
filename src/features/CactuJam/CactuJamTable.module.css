@@ -1,7 +1,13 @@
 .cactuJamTable {
   border-spacing: 0;
-  cursor: all-scroll;
   font-size: 30;
+}
+.cactuJamTable:not( .isWithoutUser ) {
+  cursor: all-scroll;
+}
+
+.cactuJamTable tr {
+  height: 80px;
 }
 
 .categoryColumn {
@@ -36,6 +42,9 @@
   font-size: 10;
   text-transform: lowercase;
   letter-spacing: 0.19em;
+}
+.cactuJamTable.isWithoutUser .voteCategory {
+  font-size: 15;
 }
 
 
