@@ -6,7 +6,9 @@
   color: var( --color-white );
   backdrop-filter: blur( 10px );
 }
-.dialogBackground {
+.dialogSurface {
   background-color: #0005;
   padding: var( --space-large );
+  max-height: calc( 100dvh - var( --space-normal ) );
+  overflow: auto;
 }

@@ -11,6 +11,12 @@ export type CactuJamVotingDialogProps = {
 export default function CactuJamVotingDialog({ category }:CactuJamVotingDialogProps) {
   return (
     <Dialog>
+      <h2>{category.label}</h2>
+
+      <div className={classes.categoryDescription}>
+        {category.description}
+      </div>
+
       <ol>
         {
           category.scale.map( note => (
@@ -24,7 +30,7 @@ export default function CactuJamVotingDialog({ category }:CactuJamVotingDialogPr
         }
       </ol>
 
-      <PopupResolveButton onKey="Escape" className={cn( classes.dialogCloseIcon )}>
+      <PopupResolveButton onKey="Escape" className={cn( classes.dialogCloseBtn )}>
         Anuluj
       </PopupResolveButton>
     </Dialog>

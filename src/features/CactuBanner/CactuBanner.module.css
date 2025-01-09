@@ -1,12 +1,14 @@
 .banner {
+  --_size-multiplier: 1;
+
   position: relative;
   display: flex;
-  width: 1130px;
-  height: 405px;
-  padding-bottom: 60px;
+  width: calc( 1130px * var( --_size-multiplier ) );
+  height: calc( 405px * var( --_size-multiplier ) );
+  padding-bottom: calc( 60px * var( --_size-multiplier ) );
   align-items: center;
   font-family: var( --font-cactu );
-  font-size: 210px;
+  font-size: calc( 210px * var( --_size-multiplier ) );
   letter-spacing: 0.19em;
 }
 
@@ -16,51 +18,73 @@
 }
 
 .signet {
+  height: 100%;
+  aspect-ratio: 294px / 345px;
   z-index: 10;
 }
 
 .logotype {
-  position: absolute;
-  left: 295px;
-  top: unset;
   transform: unset;
   align-self: flex-end;
   color: var( --color-green );
-  line-height: 95px;
+  line-height: calc( 95px * var( --_size-multiplier ) );
 }
 
 .floatingFace {
   width: 0.8em;
-  top: 50px;
+  top: calc( 50px * var( --_size-multiplier ) );
 }
 
 .floatingFace.is1 {
-  left: 404px;
+  left: calc( 404px * var( --_size-multiplier ) );
 }
 
 .floatingFace.is2 {
-  left: 694px;
+  left: calc( 694px * var( --_size-multiplier ) );
+}
+
+.grass {
+  width: calc( 100px * var( --_size-multiplier ) );
+  height: calc( 45.45px * var( --_size-multiplier ) );
 }
 
 .grass.is1 {
-  bottom: 120px;
-  left: 150px;
+  bottom: calc( 120px * var( --_size-multiplier ) );
+  left: calc( 150px * var( --_size-multiplier ) );
 }
 
 .grass.is2 {
-  bottom: 45px;
-  left: 14px;
+  bottom: calc( 45px * var( --_size-multiplier ) );
+  left: calc( 14px * var( --_size-multiplier ) );
   z-index: 100;
 }
 
 .grass.is3 {
   bottom: 0;
-  left: 183px;
+  left: calc( 183px * var( --_size-multiplier ) );
 }
 
 .noSign {
   display: block;
-  top: 250px;
+  bottom: 0.44em;
   right: 0;
-  width: 100px;
+  width: calc( 100px * var( --_size-multiplier ) );
+}
+
+@media screen and (max-width:1400px) {
+  .banner {
+    --_size-multiplier: 0.75;
+  }
+}
+
+@media screen and (max-width:1000px) {
+  .banner {
+    --_size-multiplier: 0.5;
+  }
+}
+
+@media screen and (max-width:600px) {
+  .banner {
+    --_size-multiplier: 0.25;
+  }
 }

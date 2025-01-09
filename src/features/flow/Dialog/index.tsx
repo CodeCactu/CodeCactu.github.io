@@ -9,7 +9,7 @@ export type DialogProps = {
 
 export default function Dialog({ children }:DialogProps) {
   return (
-    <div className={classes.dialogBackground}>
+    <div className={classes.dialogSurface}>
       {children}
     </div>
   )

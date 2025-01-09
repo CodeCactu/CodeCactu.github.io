@@ -1,0 +1,4 @@
+.content {
+  padding-block: 100px;
+  padding-inline: clamp( 10px, 5%, 100px );
+}

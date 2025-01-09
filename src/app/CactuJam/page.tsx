@@ -1,11 +1,15 @@
 import CactuJamTable from "@fet/CactuJam/CactuJamTable"
+import classes from "./page.module.css"
+import { Suspense } from "react"
 
 export default function CactuJamPage() {
   return (
-    <main style={{ padding:`100px 200px` }}>
+    <main className={classes.content}>
       <h1>cactujam</h1>
 
-      <CactuJamTable />
+      <Suspense>
+        <CactuJamTable />
+      </Suspense>
     </main>
   )
 }

@@ -34,7 +34,7 @@ const cactuJamCategories:CactuJamCategory[] = [
       { value:4, description:<>Chcesz więcej, nawet jeśli było coś nie tak to nie ma to zestawienia z plusami. Bardzo przyjemna gra</> },
     ],
     description: <>
-      <p>Ogólne wrażenia. Wywołana ciekawosć, chęć zobaczenia kontynuacji, element zaskoczenia, chęć powtarzania gry</p>
+      <p>Ogólne wrażenia. Wywołana ciekawość, chęć zobaczenia kontynuacji, element zaskoczenia, chęć powtarzania gry</p>
     </>,
   },
   {

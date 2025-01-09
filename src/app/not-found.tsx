@@ -1,6 +1,5 @@
 import CactuBanner from "@fet/CactuBanner"
 import classes from "./page.module.css"
-import "./page.css"
 
 export default function Home() {
   return (

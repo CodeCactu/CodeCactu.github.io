@@ -31,12 +31,12 @@ export default function CactuJamTable() {
 
   const handleDragStart = (row:CactuJamRow) => dragRef.current.row = row
 
-  const handleDragEvent = (e:React.DragEvent<HTMLTableRowElement>) => {
+  const handleDragEvent = (e:React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.dropEffect = `move`
     e.preventDefault()
   }
 
-  const handleDragOverEvent = (e:React.DragEvent<HTMLTableRowElement>, dragOverRow:CactuJamRow) => {
+  const handleDragOverEvent = (e:React.DragEvent<HTMLDivElement>, dragOverRow:CactuJamRow) => {
     handleDragEvent( e )
 
     const draggingRow = dragRef.current.row
@@ -109,38 +109,33 @@ export default function CactuJamTable() {
   }, [ !!discordUser ] )
 
   return (
-    <table className={cn( classes.cactuJamTable, discordUser === false && classes.isWithoutUser )}>
-      <tbody>
-        {
-          !sortedRows ? (
-            <tr>
-              <td>Ładowanie...</td>
-            </tr>
-          ) : sortedRows.map( row => (
-            <tr key={row.user.id} draggable={!!discordUser} onDragStart={() => handleDragStart( row )} onDragOver={e => handleDragOverEvent( e, row )}>
-              <td className={classes.competitor}>
-                <Image width={50} height={50} src={`https://cdn.discordapp.com/avatars/${row.user.id}/${row.user.avatarHash}.png`} alt="" />
-                {row.user.displayName}
-              </td>
+    <article className={cn( classes.cactuJamTable, discordUser === false && classes.isWithoutUser )}>
+      {
+        !sortedRows ? <p>Ładowanie...</p> : sortedRows.map( row => (
+          <div key={row.user.id} className={classes.row} draggable={!!discordUser} onDragStart={() => handleDragStart( row )} onDragOver={e => handleDragOverEvent( e, row )}>
+            <div className={classes.competitor}>
+              <Image width={50} height={50} src={`https://cdn.discordapp.com/avatars/${row.user.id}/${row.user.avatarHash}.png`} alt="" />
+              {row.user.displayName}
+            </div>
 
+            <div className={classes.votes}>
               {
                 cactuJamCategories.map( category => (
-                  <td key={category.name}>
-                    <Button
-                      disabled={!discordUser || !row.votes}
-                      className={cn( classes.vote, row.votes && (!(category.name in row.votes) ? classes.isMissing : classes.isVoted) )}
-                      onClick={() => handleVote( row.user, category )}
-                    >
-                      {row.votes && <span className={classes.voteValue}>{row.votes[ category.name ] ?? 0}</span>}
-                      <span className={classes.voteCategory}>{category.label}</span>
-                    </Button>
-                  </td>
+                  <Button
+                    key={category.name}
+                    disabled={!discordUser || !row.votes}
+                    className={cn( classes.vote, row.votes && (!(category.name in row.votes) ? classes.isMissing : classes.isVoted) )}
+                    onClick={() => handleVote( row.user, category )}
+                  >
+                    {row.votes && <span className={classes.voteValue}>{row.votes[ category.name ] ?? 0}</span>}
+                    <span className={classes.voteCategory}>{category.label}</span>
+                  </Button>
                 ) )
               }
-            </tr>
-          ) )
-        }
-      </tbody>
-    </table>
+            </div>
+          </div>
+        ) )
+      }
+    </article>
   )
 }
