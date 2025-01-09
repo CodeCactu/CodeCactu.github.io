@@ -1,14 +1,14 @@
 import { useRef, useState, RefObject, MutableRefObject, useCallback } from "react"
 
-export type ScrollFn = (jump:number, ends?:{ smooth?: boolean, toIndex?: boolean }) => void
-export type CarouselEnds = { left: boolean, right: boolean }
+export type ScrollFn = (jump:number, ends?:{ smooth?:boolean, toIndex?:boolean }) => void
+export type CarouselEnds = { left:boolean, right:boolean }
 export type CarouselDataHookReturnValue = {
   scroll: ScrollFn
   setReachedEnds: (ends:CarouselEnds) => void
   setScrollLeft: (scrollLeft:number) => void
   reachedEnds: CarouselEnds
   scrollLeft: null | number
-  scrollableAreaRef: RefObject<HTMLDivElement>
+  scrollableAreaRef: RefObject<null | HTMLDivElement>
   scrollableAreaGapRef: MutableRefObject<number>
   maxVisibleCount: number
   noloop: boolean

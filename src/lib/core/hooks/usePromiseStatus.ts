@@ -1,11 +1,11 @@
 import { useState } from "react"
-import makeEnum from "@lib/core/functions/makeEnum"
+import makeEnum from "../functions/makeEnum"
 
 export const Status = makeEnum( [ `IDLE`, `PENDING`, `FULFILLED`, `ERROR` ] as const )
 export type Status = keyof typeof Status
 
 export default function usePromiseStatus<T>( treeshold:number = 1000 * 4 ) {
-  const [ status, setStatus ] = useState<{status: Status, data: undefined | Error | T}>({
+  const [ status, setStatus ] = useState<{ status:Status, data:undefined | Error | T }>({
     status: Status.IDLE,
     data: undefined,
   } )

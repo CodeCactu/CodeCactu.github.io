@@ -3,7 +3,7 @@ import { useImperativeHandle, useRef, useState } from "react"
 export type InputEvent<T> = T & { value:string, setValue:(value:string) => void }
 export type InputFocusEvent = InputEvent<React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>>
 export type InputChangeEvent = InputEvent<React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>>
-export type InputOnChange = (eOrcheckOrVal:boolean | string | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void
+export type InputOnChange<TRef> = (eOrcheckOrVal:boolean | string | React.ChangeEvent<TRef>) => void
 
 export type InputProps<TRef> = {
   ref?: React.ForwardedRef<TRef | null>
@@ -12,22 +12,22 @@ export type InputProps<TRef> = {
   defaultValue?: string
   defaultChecked?: boolean
   internalState?: boolean
-  onChange?: InputOnChange
+  onChange?: InputOnChange<TRef>
   validate?: (value:string) => string
 }
 export type NativeInputProps<TRef extends HTMLElement> = {
-  ref?: React.RefObject<TRef>
+  ref?: React.RefObject<null | TRef>
   value?: string
   checked?: boolean
   defaultValue?: string
   defaultChecked?: boolean
-  onChange: InputOnChange
+  onChange: InputOnChange<TRef>
 }
 
-export default function useFormInputStateProps<TRef extends HTMLElement = HTMLInputElement>({ value:externalValue, checked:externalChecked, defaultValue, defaultChecked, ...props }:InputProps<TRef>) {
+export default function useFormInputStateProps<TRef extends HTMLTextAreaElement | HTMLInputElement = HTMLInputElement>({ value:externalValue, checked:externalChecked, defaultValue, defaultChecked, ...props }:InputProps<TRef>) {
   if (props.internalState && externalValue) throw new Error( `Hook useFormInputStateProps cannot have internal value and "value" property )external value) at the same time` )
 
-  const ref = useRef<TRef>( null )
+  const ref = useRef<null | TRef>( null )
 
   useImperativeHandle( props.ref, () => ref.current as TRef )
 
@@ -38,11 +38,11 @@ export default function useFormInputStateProps<TRef extends HTMLElement = HTMLIn
 
   const inputStateProps:NativeInputProps<TRef> = {
     ref,
-    onChange: (eOrcheckOrVal:boolean | string | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    onChange: (eOrcheckOrVal:boolean | string | React.ChangeEvent<TRef>) => {
       // eslint-disable-next-line prefer-const
       let [ newValue, newChecked ] = typeof eOrcheckOrVal === `boolean` ? [ externalValue, eOrcheckOrVal ]
         : typeof eOrcheckOrVal === `string` ? [ eOrcheckOrVal, externalChecked ]
-          : [ eOrcheckOrVal.target.value, eOrcheckOrVal.target.tagName === `input` ?  (eOrcheckOrVal.target as HTMLInputElement).checked : undefined ]
+          : [ eOrcheckOrVal.target.value, eOrcheckOrVal.target.tagName === `INPUT` ? (eOrcheckOrVal.target as HTMLInputElement).checked : undefined ]
 
       if (typeof newValue === `string` && props.validate) newValue = props.validate( newValue )
 

@@ -1,6 +1,4 @@
-import { cn } from "@lib/theming"
 import { useUiManager } from "@lib/dynamicUi"
-import { createStylesHook } from "@fet/theme"
 import CactuGradientsController from "./logic"
 
 export type CactuGradientsProps = {
@@ -8,22 +6,13 @@ export type CactuGradientsProps = {
 }
 
 export default function CactuGradients({ className }:CactuGradientsProps) {
-  const [ classes ] = useStyles()
   const [ handleRef ] = useUiManager<HTMLDivElement, CactuGradientsController>(
     rootElement => new CactuGradientsController( rootElement ),
   )
 
   return (
     <div ref={handleRef}>
-      <canvas className={cn( classes.canvas, className )} />
+      <canvas className={className} />
     </div>
   )
 }
-
-const useStyles = createStylesHook({
-  canvas: {
-    display: `block`,
-    width: `100%`,
-    height: `100dvh`,
-  },
-})

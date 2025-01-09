@@ -16,7 +16,7 @@ export type AbsolutePath = `/${string}`
 export type URLStrig = `http${`s` | ``}://${string}.${string}`
 export type Arrayable<T> = T | T[]
 export type Promiseable<T> = T | Promise<T>
-export type HTMLTagName = keyof JSX.IntrinsicElements
+export type HTMLTagName = keyof React.JSX.IntrinsicElements
 export type Override<What, With> = Omit<What, keyof With> & With
 
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react"
 
 export default function useTimeout( delay:number, callback:() => void ) {
-  const timeoutRef = useRef<number>()
+  const timeoutRef = useRef<number>( 0 )
 
   const clearInterval = () => clearTimeout( timeoutRef.current )
 
