@@ -6,12 +6,15 @@ export type UserVotes = Record<string, number>
 
 export function voteOnGame( user:User, category:CactuJamCategory, value:number ) {
   type Success = { success:true, votes:Record<string, UserVotes> }
+  type Failure = { success:false }
 
   return fetch( `${BACKEND_ORIGIN}/api/voteOnGame/${user.id}`, {
     method: `PUT`,
     headers: { "Content-Type":`application/json`, ...getAuthHeader() },
     body: JSON.stringify({ categories:{ [ category.name ]:value } }),
-  } ).then<Success>( res => res.json() )
+  } )
+    .then( rawRes => rawRes.json() )
+    .then<Success | Failure>( res => `votes` in res ? { ...res, success:true } : { success:false })
 }
 
 export function getCurrentUserVotes() {
@@ -41,9 +44,12 @@ export type UserJamGames = {
 
 export function getJamGames() {
   type Success = { success:true, usersGames:Record<string, UserJamGames> }
+  type Failure = { success:false }
 
   return fetch( `${BACKEND_ORIGIN}/api/fetchGames`, {
     method: `GET`,
     headers: { "Content-Type":`application/json`, ...getAuthHeader() },
-  } ).then<Success>( res => res.json() )
+  } )
+    .then<Success>( res => res.json() )
+    .then<Success | Failure>( res => `usersGames` in res ? { ...res, success:true } : { success:false })
 }
