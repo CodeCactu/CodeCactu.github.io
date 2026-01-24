@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Image from "@lib/core/flow/Image"
 import cn from "@lib/core/functions/createClassName"
 import Button from "@lib/core/controls/Button"
-import useDiscordLinking, { User } from "@fet/auth/useDiscordLinking"
+import useDiscordLinking, { logout, User } from "@fet/auth/useDiscordLinking"
 import cactuJamCategories, { CactuJamCategory } from "./cactuJamCategories"
 import { useDialogsRootContext } from "@fet/flow/Dialog"
 import classes from "./CactuJamTable.module.css"
@@ -77,6 +77,8 @@ export default function CactuJamTable() {
 
     const value = await createPopup<number>( <CactuJamVotingDialog category={category} /> )
     const newVotesRes = await voteOnGame( user, category, value )
+    if (!newVotesRes.success) return logout()
+
     const newVotes = newVotesRes.votes
 
     setSortedRows( rows => !rows ? null : rows.map( row => {
@@ -94,6 +96,8 @@ export default function CactuJamTable() {
       getCurrentUserVotes(),
     ])
       .then( ([ usersGamesRes, votesRes ]) => {
+        if (!usersGamesRes.success) return
+
         const votes = votesRes.success ? votesRes.votes : null
         const userVotes:CactuJamRow[] = Object.values( usersGamesRes.usersGames ).map( userGames => ({
           user: userGames.user,

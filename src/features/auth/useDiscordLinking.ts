@@ -21,12 +21,17 @@ export default function useDiscordLinking() {
   const code = searchParams.get( `code` )
 
   useEffect( () => {
+    if (!window.auth) {
+      window.auth = {
+        blockLogoutRedirect: false,
+      }
+    }
+
     const savedSessionToken = getSessionToken()
     const handleUser = (user:false | User) => {
       setDiscordUser( user )
       if (user) loadeduser = user
       else logout()
-
     }
 
     setIntegrationLink( getDiscordIntegrationLink() )
@@ -97,7 +102,8 @@ export function getSessionToken() {
 }
 
 export function logout() {
-  return localStorage.removeItem( sessionKey )
+  localStorage.removeItem( sessionKey )
+  if (!window.auth.blockLogoutRedirect) window.location.href = `/`
 }
 
 export function getCurrentUser() {
@@ -106,4 +112,12 @@ export function getCurrentUser() {
 
 export function getAuthHeader() {
   return { Authorization:`Bearer ${getSessionToken()}` }
+}
+
+declare global {
+  interface Window {
+    auth: {
+      blockLogoutRedirect: boolean
+    }
+  }
 }
