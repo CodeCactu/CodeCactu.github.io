@@ -25,6 +25,7 @@ export function useAuth() {
     const handleSessionData = (data:null | SessionData) => {
       if (!data) {
         logAuth( `Clearing incorrect session data` )
+        updateSessionStore( null )
         return Session.delete()
       }
 
