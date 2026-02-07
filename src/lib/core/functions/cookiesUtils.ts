@@ -15,7 +15,7 @@ export function getCookie( name:string ): undefined | string {
   return getCookies()[ name ]
 }
 
-export function setCookie( name:string, value:CookieValue, secondsToLive:number | Date ) {
+export function setCookie( name:string, value:CookieValue, secondsToLive:number | Date, visibleForSubpaths?:boolean ) {
   if (!getWindow()) return {}
   if (document.cookie.length) document.cookie += `; `
 
@@ -23,9 +23,14 @@ export function setCookie( name:string, value:CookieValue, secondsToLive:number 
 
   const date = typeof secondsToLive !== `number` ? secondsToLive : new Date( Date.now() + (secondsToLive ?? 0) * 1000 )
   const expires = `expires=${date.toUTCString()}`
-  document.cookie = `${name}=${value || ``}; ${expires}; path=/`
+  document.cookie = [
+    `${name}=${value || ``}`,
+    `${expires}`,
+    `path=/`,
+    visibleForSubpaths && `Domain=.${window.location.hostname.match( /[^.]+\.[^.]+$/ )?.[ 0 ] ?? window.location.hostname}`,
+  ].filter( Boolean ).join( `; ` )
 }
 
 export function deleteCookie( name:string ) {
-  setCookie( name, null, 0 )
+  document.cookie = `${name}=''; Max-Age=1; path=/`
 }

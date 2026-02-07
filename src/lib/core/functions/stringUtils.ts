@@ -13,6 +13,10 @@ export function putIntoStr( str:string, index:number, addition:string ) {
   return str.slice( 0, index ) + addition + str.slice( index )
 }
 
+export function capitalize( str:string ) {
+  return str.charAt( 0 ).toUpperCase() + str.slice( 1 )
+}
+
 export function createBinarySizedStr( number:number, bits:number ) {
   return number.toString( 2 ).padStart( bits, `0` )
 }
@@ -35,9 +39,24 @@ export function makeKebabCaseFromWords( str:string | undefined ) {
   return !trimmed ? `` : trimmed.replace( / +/g, `-` )
 }
 
-export type NumberStringParserConfig = {
-  max?: string | number
-  allowNegatives?: boolean
-  integerDigits?: number
-  fractionDigits?: number
+export default function createExcerpt( longExcerpt:string, length = 150 ) {
+  const excerptPhrases = longExcerpt
+    .replace( /\n|\r\n/g, `<br />` )
+    .split( /\.(?: |<br>|<br *?\/>|$|&nbsp;)+/g )
+
+  let newExcerpt = (excerptPhrases.shift() ?? ``).replace( /<br>|<br *?\/>/g, ` ` )
+
+  while (newExcerpt.length < length && excerptPhrases.length) {
+    newExcerpt += `. ` + (excerptPhrases.shift() ?? ``).replace( /<br>|<br *?\/>/g, ` ` )
+  }
+
+  if (newExcerpt.length > length) {
+    while (newExcerpt.length > length) {
+      newExcerpt = newExcerpt.match( /(.*) \w+/ )![ 1 ]
+    }
+
+    newExcerpt += `...`
+  }
+
+  return newExcerpt
 }

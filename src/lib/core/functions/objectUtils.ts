@@ -47,3 +47,11 @@ function mergeDeep( target:unknown, ...sources:unknown[] ): unknown {
 
   return mergeDeep( target, ...sources )
 }
+
+export function getObjectValueOrKey<T extends Record<string, unknown>>( obj:T, key:undefined | null | keyof T | (string & {}) ) {
+  return obj[ key as keyof T ] ?? key
+}
+
+export function modifyObjectEntries<TVal>( obj:Record<string, TVal>, cb:(entries:[ string, TVal ][]) => [string, TVal][] ) {
+  return Object.fromEntries( cb( Object.entries( obj ) ) )
+}

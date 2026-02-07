@@ -1,35 +1,44 @@
+/* eslint-disable sonarjs/no-commented-code */
+
 export type Tuple<T, L extends number, Arr extends unknown[] = []> =
-  | Arr["length"] extends L
+  | Arr[`length`] extends L
     ? Arr
     : Tuple<T, L, [...Arr, T]>;
 
-type TupleCounter<Tuple extends readonly unknown[], ToFind extends unknown, CountArr extends unknown[] = []> =
+type TupleCounter<Tuple extends readonly unknown[], ToFind, CountArr extends unknown[] = []> =
   | Tuple extends readonly [infer First, ...infer Tail]
     ? First extends ToFind
       ? TupleCounter<Tail, ToFind, [...CountArr, unknown]>
       : TupleCounter<Tail, ToFind, CountArr>
     : Tuple extends []
-      ? CountArr["length"]
+      ? CountArr[`length`]
       : never
 
-type NegativeTupleCounter<Tuple extends readonly unknown[], ToFind extends unknown, CountArr extends unknown[] = []> =
+type NegativeTupleCounter<Tuple extends readonly unknown[], ToFind, CountArr extends unknown[] = []> =
   | Tuple extends readonly [infer First, ...infer Tail]
     ? First extends ToFind
       ? NegativeTupleCounter<Tail, ToFind, CountArr>
       : NegativeTupleCounter<Tail, ToFind, [...CountArr, unknown]>
     : Tuple extends []
-      ? CountArr["length"]
+      ? CountArr[`length`]
       : never
 
-export type TupleCount<Tuple extends readonly unknown[], ToFind extends unknown> = TupleCounter<Tuple, ToFind>
-export type NegativeTupleCount<Tuple extends readonly unknown[], ToFind extends unknown> = NegativeTupleCounter<Tuple, ToFind>
+export type TupleCount<Tuple extends readonly unknown[], ToFind> = TupleCounter<Tuple, ToFind>
+export type NegativeTupleCount<Tuple extends readonly unknown[], ToFind> = NegativeTupleCounter<Tuple, ToFind>
+
+export type FilterTuple<T, Pred> =
+  | T extends [infer Head, ...infer Tail]
+    ? [Head] extends [Pred]
+      ? [ Head, ...FilterTuple<Tail, Pred> ]
+      : FilterTuple<Tail, Pred>
+    : []
 
 // Primitive tests below
 
 
-// type Opt = { opt: 1 }
-// type Obli = { obli: 1 }
-// type Full = { obli: 1; opt: 1 }
+// type Opt = { opt:1 }
+// type Obli = { obli:1 }
+// type Full = { obli:1, opt:1 }
 // type Obj = Obli & Partial<Opt>
 
 // const objs = [
@@ -64,8 +73,8 @@ export type NegativeTupleCount<Tuple extends readonly unknown[], ToFind extends 
 //   }
 // }
 
-// let arr = []
-// let temp = new Temp1( objs )
+// const arr = []
+// const temp = new Temp1( objs )
 
 // temp.run()
 // temp.negRun()

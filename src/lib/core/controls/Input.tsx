@@ -1,20 +1,19 @@
 "use client"
 
-import { ChangeEvent, FocusEvent, useRef, useState, useEffect, MutableRefObject } from "react"
+import { useRef, useState, useEffect } from "react"
 import select from "@lib/core/functions/select"
 import copy from "@lib/core/functions/copy"
+import { InputOnBlur, InputOnChange } from "../hooks/useFormInputStateProps"
 import cn from "../functions/createClassName"
 import { AutoComplete } from "./autocomplete"
 import classes from "./Input.module.css"
 
-export type InputEvent<T> = T & { value: string, setValue: (value:string) => void}
+export const inputIsHiddenClassName = classes.isHidden
 
-export type InputFocusEvent = InputEvent<FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>>
-export type InputChangeEvent = InputEvent<ChangeEvent<HTMLInputElement | HTMLTextAreaElement>>
 export type InputType = `text` | `multiline-text` | `password`
 
 export type InputProps = {
-  className?: string | {override: undefined | string }
+  className?: string | { override: undefined | string }
   value?: string
   initialValue?: string
   style?: React.CSSProperties
@@ -27,8 +26,8 @@ export type InputProps = {
   minLength?: number
   rows?: number
   placeholder?: string
-  onBlur?: (e:InputFocusEvent) => void
-  onChange?: (e:InputChangeEvent) => void
+  onBlur?: InputOnBlur<HTMLInputElement>
+  onChange?: InputOnChange<HTMLInputElement>
   onCopy?: (value:string) => void | null | string
   autoComplete?: AutoComplete
   validate?: (value:string) => string
@@ -59,23 +58,18 @@ export default function Input( props:InputProps ) {
     placeholder: props.placeholder,
     [ `data-copyable` ]: props.readOnly === `mode-copy` ? `` : undefined,
     value,
-    onBlur: (e:FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    onBlur: (e:React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       if (!props.onBlur) return
-
-      const enhancedEvent:InputFocusEvent = { ...e, value:e.target.value, setValue:setInternalValue }
-      props.onChange?.( enhancedEvent )
+      props.onBlur?.( e as React.FocusEvent<HTMLInputElement> )
     },
-    onChange: (e:ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    onChange: (e:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       let newValue = e.target.value
 
       if (props.validate) newValue = props.validate( newValue )
 
       if (newValue === value) return
       if (props.value === undefined) setInternalValue( newValue )
-      if (!props.onChange) return
-
-      const enhancedEvent:InputChangeEvent = { ...e, value:newValue, setValue:setInternalValue }
-      props.onChange?.( enhancedEvent )
+      props.onChange?.( e as React.FocusEvent<HTMLInputElement> )
     },
   }
 
@@ -115,19 +109,15 @@ export default function Input( props:InputProps ) {
 
   return props.type === `multiline-text` ? (
     <textarea
-      ref={inputRef as MutableRefObject<HTMLTextAreaElement>}
+      ref={inputRef as React.RefObject<HTMLTextAreaElement>}
       rows={props.rows}
       {...nativeInputProps}
     />
   ) : (
     <input
-      ref={inputRef as MutableRefObject<HTMLInputElement>}
+      ref={inputRef as React.RefObject<HTMLInputElement>}
       type={inputType}
       {...nativeInputProps}
     />
   )
-}
-
-function parseIntValue( val:string ) {
-  return val.replace( /[^\d]/g, `` )
 }

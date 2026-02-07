@@ -1,3 +1,5 @@
+/* eslint-disable sonarjs/no-commented-code */
+
 import { useState } from "react"
 
 type ArWithAtLeastOneItem<T> = [ T, ...T[] ]

@@ -1,7 +1,7 @@
 import NextLink from "next/link"
 import cn from "../functions/createClassName"
-import "./controls.css"
 
+export type LinkTarget = `_blank` | `_self` | `_parent` | `_top`
 export type LinkProps = {
   children?: React.ReactNode
   body?: React.ReactNode
@@ -12,7 +12,7 @@ export type LinkProps = {
   ariaLabel?: string
   ariaCurrent?: `page` | `step` | `location` | `date` | `time` | boolean
   disabled?: boolean
-  target?: `_blank` | `_self` | `_parent` | `_top`
+  target?: LinkTarget
   rel?: string
   onClick?: () => void
   formAction?: () => void

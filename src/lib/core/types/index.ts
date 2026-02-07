@@ -1,13 +1,11 @@
-import { CSSProperties, ReactNode } from "react"
-
 export * from "./CountTuple"
 export * from "./ObjectKeys"
 
-export { type CSSProperties }
+type ReactNode = React.ReactNode
 
 export type TODO<T> = T
 export type Primitive = string | number | boolean
-export type OnlyPrimitiveFields<T extends Record<string, unknown>> = { [K in keyof T]:T[K] extends Primitive ? T[K] : never}
+export type OnlyPrimitiveFields<T extends Record<string, unknown>> = { [K in keyof T]:T[K] extends Primitive ? T[K] : never }
 export type EmailString = `${string}@${string}.${string}`
 export type FullDateFormatString = `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`
 export type NumberString = `${number}` | `${number}.${number}`
@@ -25,7 +23,7 @@ export type OnlyBodyProp<T = ReactNode> = { children?: never, body: T }
 export type ElementChildren<T = ReactNode> = OnlyChildren<T> | OnlyBodyProp<T>
 export type StyledElementWithChildren = ElementChildren & {
   className?: string
-  style?: CSSProperties
+  style?: React.CSSProperties
 }
 
 export type OptionalExcess<Shape extends Record<string, unknown>, RequiredShape extends Record<string, unknown>> =

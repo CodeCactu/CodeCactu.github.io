@@ -1,9 +1,9 @@
-body > nav {
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  left: 0;
-  right: 0;
-  padding: var( --space-normal );
+body {
+  display: grid;
+  place-items: center;
+  background-color: #12131d;
+  background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
+  background-repeat: no-repeat;
+  font-family: sans-serif, arial, monospace;
+  color: #fefefe;
 }

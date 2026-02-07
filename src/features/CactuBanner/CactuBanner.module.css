@@ -26,7 +26,7 @@
 .logotype {
   transform: unset;
   align-self: flex-end;
-  color: var( --color-green );
+  color: #5da234;
   line-height: calc( 95px * var( --_size-multiplier ) );
 }
 

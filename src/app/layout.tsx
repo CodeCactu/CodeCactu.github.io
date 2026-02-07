@@ -1,88 +1,32 @@
-import "./reset.css"
-import "./globals.css"
+import "./normalize.css"
 import "./layout.css"
-import type { Metadata, Viewport } from "next"
-import Image from "@lib/core/flow/Image"
-import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines"
+import { StyleTheme } from "@fet/theme/themeCss"
 import { cactuFont } from "@fet/theme/fonts"
-import * as theme from "@fet/theme"
-import logoMiniImg from "./cactu-logo-mini.png"
+import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines"
+import UserPanel from "@fet/auth/UserPanel"
+import packageJson from "@/../package.json"
 import classes from "./layout.module.css"
-import Link from "@lib/core/controls/Link"
-import UserMenu from "@fet/auth/UserMenu"
-import { PopupsRoot } from "@lib/popups"
-import { Suspense } from "react"
+import AppMetaLogger from "./AppMetaLogger"
 
-export const metadata: Metadata = {
-  title: `Cactu`,
-  description: `A website of the Cactu community`,
-}
-
-export const viewport:Viewport = {
-  themeColor: theme.colors[ `background` ],
-}
-
-export type RootLayoutProps = Readonly<{
-  children: React.ReactNode
-}>
-
-export default function RootLayout({ children }:RootLayoutProps) {
-  const parseCssValue = (val:number | string) => typeof val === `string` ? val : `${val}px`
-
-  const rootColors = Object.entries( theme.colors )
-    .map( ([ name, value ]) => `  --color-${name}: ${parseCssValue( value )};` )
-    .join( `\n` )
-
-  const rootSpacing = Object.entries( theme.spacing )
-    .map( ([ name, value ]) => `  --space-${name}: ${parseCssValue( value )};` )
-    .join( `\n` )
-
-  const rootTypography = Object.entries( theme.fonts )
-    .flatMap( ([ name, value ]) => [
-      `  --typography-${name}-family: ${parseCssValue( value.fontFamily )};`,
-      `  --typography-${name}-weight: ${parseCssValue( value.fontWeight )};`,
-      `  --typography-${name}-size: ${parseCssValue( value.fontSize )};`,
-      `  --typography-${name}-lineHeight: ${parseCssValue( value.lineHeight )};`,
-      `letterSpacing` in value && `  --typography-${name}-letterSpacing: ${parseCssValue( value.letterSpacing )};`,
-    ] ).filter( Boolean ).join( `\n` )
-
-  const rootBorder = Object.entries( theme.border )
-    .map( ([ name, value ]) => `  --border-${name}: ${parseCssValue( value )};` )
-    .join( `\n` )
-
-  const rootDurations = Object.entries( theme.durations )
-    .map( ([ name, value ]) => `  --duration-${name}: ${value}s;` )
-    .join( `\n` )
-
-  const rootStyle = `:root {\n`
-    + `${rootColors}\n`
-    + `${rootSpacing}\n`
-    + `${rootTypography}\n`
-    + `${rootBorder}\n`
-    + `${rootDurations}\n`
-    + `}`
-
+export default function RootLayout( props:LayoutProps<`/`> ) {
   return (
     <html lang="pl" className={cactuFont.variable}>
       <head>
-        <style dangerouslySetInnerHTML={{ __html:rootStyle }} />
+        <StyleTheme />
       </head>
 
       <body>
-        <nav>
-          <Link href="/">
-            <Image {...logoMiniImg} width={50} height={50} alt="Cactu" />
-          </Link>
+        <AppMetaLogger
+          logEntries={
+            [
+              [ `App version`, packageJson.version ],
+            ]
+          }
+        />
 
-          <Suspense>
-            <UserMenu />
-          </Suspense>
-        </nav>
+        {props.children}
 
-        <PopupsRoot>
-          {children}
-        </PopupsRoot>
-
+        <UserPanel className={classes.userPanel} />
         <CactuBlinkingLines className={classes.background} />
       </body>
     </html>

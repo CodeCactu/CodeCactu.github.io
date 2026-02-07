@@ -5,6 +5,7 @@
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scroll-snap-stop: always;
+  scrollbar-width: none;
 }
 
 .carousel::-webkit-scrollbar {
@@ -15,18 +16,16 @@
   display: none;
 }
 
-.extraItems {
-  display: flex;
+.itemContainer {
+  gap: var( --carousel-gap );
 }
-
-.extraItems > *,
 .itemContainer > * {
   scroll-snap-align: start;
   flex-shrink: 0;
-  width: calc( 100% / var( --count ) );
+  min-width: var( --minCardWidth );
+  width: calc( 100% / var( --count ) - var( --carousel-gap ) * (var( --count ) - 1) / var( --count ) );
 }
 
-
-.extraItems > * {
-  flex-grow: 1;
+.extraItems {
+  display: flex;
 }

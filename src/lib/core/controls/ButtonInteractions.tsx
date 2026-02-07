@@ -1,8 +1,9 @@
 "use client"
 
-import { forwardRef, useEffect } from "react"
+import { useEffect } from "react"
 
 export type ButtonProps = {
+  ref?: React.Ref<HTMLButtonElement>
   className?: string
   style?: React.CSSProperties
   children?: React.ReactNode
@@ -14,34 +15,31 @@ export type ButtonProps = {
   ariaCurrent?: `page` | `step` | `location` | `date` | `time` | boolean
 }
 
-export default forwardRef<HTMLButtonElement, ButtonProps>( function ButtonInteractions( props:ButtonProps, ref ) {
+export default function ButtonInteractions({ onKey, onClick, ariaCurrent, ariaLabel, ...props }:ButtonProps) {
   useEffect( () => {
-    if (!props.onKey) return
+    if (!onKey) return
 
     const handler = (e:KeyboardEvent) => {
-      if (props.onKey !== e.key) return
+      if (onKey !== e.key) return
 
       e.preventDefault()
       e.stopPropagation()
-      props.onClick?.()
+      onClick?.()
     }
 
     window.addEventListener( `keydown`, handler )
     return () => window.removeEventListener( `keydown`, handler )
-  }, [ props.onKey, props.onClick ] ) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ onKey, onClick ] )
 
   return (
     <button
-      ref={ref}
-      type={props.type}
-      children={props.children}
-      className={props.className}
-      style={props.style}
-      disabled={props.disabled}
-      onClick={props.onClick || undefined}
+      {...props}
+      onClick={onClick || undefined}
       aria-disabled={props.disabled ? true : undefined}
-      aria-current={props.ariaCurrent}
-      aria-label={props.ariaLabel}
-    />
+      aria-current={ariaCurrent}
+      aria-label={ariaLabel}
+    >
+      {props.children}
+    </button>
   )
-} )
+}

@@ -1,10 +1,13 @@
 import type { NextConfig } from "next"
 
-const nextConfig: NextConfig = {
+const nextConfig:NextConfig = {
   output: `standalone`,
   /* config options here */
   images: {
-    remotePatterns: [ { hostname:`placehold.co` }, { hostname:`cdn.discordapp.com` } ],
+    remotePatterns: [
+      { hostname:`placehold.co` },
+      { hostname:`cdn.discordapp.com` },
+    ],
   },
 }
 

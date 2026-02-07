@@ -1,20 +1,20 @@
 type Key = undefined | string | number
 
-type SelectType<K extends Key> = {[key in NonNullable<K>]?:unknown} & {
+type SelectType<K extends Key> = { [key in NonNullable<K>]?:unknown } & {
   default?: unknown
 }
 
 type SelectReturnType<K extends Key, V extends SelectType<K>> =
   | K extends keyof V
     ? V[K]
-    : "default" extends keyof V
-      ? V["default"]
+    : `default` extends keyof V
+      ? V[`default`]
       : undefined
 
 export default function select<K extends Key, V extends SelectType<K>>( key:K, values:V ): SelectReturnType<K, V>  {
   if (key) {
     const selectedValue = values[ key ] as undefined | SelectReturnType<K, V>
-    if (selectedValue) return selectedValue
+    if (selectedValue !== undefined) return selectedValue
   }
 
   return (`default` in values ? values.default : undefined) as SelectReturnType<K, V>

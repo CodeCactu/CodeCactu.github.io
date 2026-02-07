@@ -1,7 +1,7 @@
 import cn from "../functions/createClassName"
 import { HorizontalAlign, VerticallAlign, checkIsTextHorizontalAlign } from "./utils"
-import classes from "./flow.module.css"
 import Row from "./Row"
+import classes from "./Column.module.css"
 
 export type ColumnProps = {
   children?: React.ReactNode

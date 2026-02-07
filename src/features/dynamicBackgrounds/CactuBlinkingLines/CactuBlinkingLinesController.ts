@@ -5,13 +5,41 @@ type Point = {
   y: number
 }
 
-type Color = {
-  r: number
-  g: number
-  b: number
+type Rect = {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
+class Color {
+  constructor(
+    public r:number,
+    public g:number,
+    public b:number,
+  ) {}
+
+  static fromCssColor( color:string ) {
+    const ctx = document.createElement( `canvas` ).getContext( `2d` )
+    if (!ctx) throw new Error()
+
+    ctx.fillStyle = color
+    ctx.fillRect( 0, 0, 1, 1 )
+
+    const [ r, g, b ] = ctx.getImageData( 0, 0, 1, 1 ).data
+    return new Color( r, g, b )
+  }
+}
+
+
+
 export class Line {
+  lastUpdateColorPair: [from:Color, to:Color] = [ { r:0, g:0, b:0 }, { r:0, g:0, b:0 } ]
+  initialColor: Color = { r:0, g:0, b:0 }
+  color: Color = { r:0, g:0, b:0 }
+  initialWidth: number
+
+  colorUpdateProgresss = 1
   showing = true
 
   constructor(
@@ -22,8 +50,42 @@ export class Line {
     public showingSpeed:number,
     public speed:number,
     public opacity:number,
-    public color:Color,
-  ) {}
+    color:Color,
+  ) {
+    this.initialWidth = width
+    this.resetColor( color )
+  }
+
+  update( newColor?:Color ) {
+    if (newColor) {
+      if (this.width < this.initialWidth + 10) this.width += 0.1
+    } else {
+      if (this.width > this.initialWidth) this.width -= 0.1
+    }
+
+    const color = newColor ?? this.initialColor
+
+    let [ from, to ] = this.lastUpdateColorPair
+    if (color.r !== to.r || color.g !== to.g || color.b !== to.b) {
+      this.colorUpdateProgresss = 0
+      this.lastUpdateColorPair = [ to, color ]
+
+      ;[ from, to ] = this.lastUpdateColorPair
+    }
+
+    if (this.colorUpdateProgresss >= 1) return
+
+    this.color.r = Math.round( from.r + (to.r - from.r) * this.colorUpdateProgresss )
+    this.color.g = Math.round( from.g + (to.g - from.g) * this.colorUpdateProgresss )
+    this.color.b = Math.round( from.b + (to.b - from.b) * this.colorUpdateProgresss )
+    this.colorUpdateProgresss += 0.01
+  }
+
+  resetColor( color:Color ) {
+    this.color = { ...color }
+    this.initialColor = { ...color }
+    this.lastUpdateColorPair = [ this.initialColor, this.initialColor ]
+  }
 
   draw( ctx:CanvasRenderingContext2D ) {
     const { x, y, length, width } = this
@@ -80,11 +142,41 @@ export default class CactuBlinkingLinesController implements UiManagerHolder {
     { r:229, g:190, b:75  },
   ]
 
+  effects = {
+    luminatingBoxes: [] as (Rect & { color: Color })[],
+  }
+
   constructor( divRef:HTMLDivElement ) {
     this.uiManager = new UiManager( divRef )
     this.ctx = this.uiManager.registerCtx( `main`, `canvas` )
     this.generateObjects()
     this.uiManager.startLoop( () => this.update() )
+
+    this.luminateDomElements()
+    window.addEventListener( `resize`, () => this.luminateDomElements() )
+  }
+
+  luminateDomElements() {
+    const offset = 50
+
+    this.effects = {
+      luminatingBoxes: [],
+    }
+
+    for (const element of document.querySelectorAll<HTMLElement>( `[data-bgr-effect^="luminate"]` )) {
+      const color = element.dataset[ `bgrEffect` ]!.match( /luminate (.+)/ )?.[ 1 ]
+      if (!color) continue
+
+      const { x, y, width, height } = element.getBoundingClientRect()
+
+      this.effects.luminatingBoxes.push({
+        x: x - offset,
+        y: y - offset,
+        width: width + offset * 2,
+        height: height + offset * 2,
+        color: Color.fromCssColor( color ),
+      })
+    }
   }
 
   generateObjects() {
@@ -133,37 +225,40 @@ export default class CactuBlinkingLinesController implements UiManagerHolder {
     line.length = length
     line.showingSpeed = showingSpeed
     line.speed = speed
-    line.color = color
+    line.resetColor( color )
 
     return line
   }
 
   update() {
-    const { ctx, lines } = this
+    const { ctx, lines, effects } = this
     const { width:canvasWidth, height:canvasHeight } = ctx.canvas
 
     ctx.clearRect( 0, 0, canvasWidth, canvasHeight )
 
     lines.forEach( line => {
-      const { x, showing, opacity, showingSpeed, speed, color } = line
+      const luminatingEffect = effects.luminatingBoxes.find( b =>
+        line.x + line.length > b.x && line.x < b.x + b.width &&
+        line.y > b.y && line.y < b.y + b.height,
+      )
 
-      ctx.fillStyle = `rgba( ${color.r}, ${color.g}, ${color.b}, ${opacity} )`
+      line.opacity += line.showingSpeed * (line.showing ? 0.003 : -0.003)
+
+      if (line.opacity < 0) line.opacity = 0
+      else if (line.opacity > 1) line.opacity = 1
+
+      if (luminatingEffect || line.opacity == 0) line.showing = true
+      else if (line.opacity >= 1) line.showing = false
+
+      line.update( luminatingEffect?.color )
+
+      if (line.x > canvasWidth) this.createLine( line, true )
+      else line.x += line.speed
+
+      ctx.fillStyle = `rgba( ${line.color.r}, ${line.color.g}, ${line.color.b}, ${line.opacity} )`
       ctx.beginPath()
       line.draw( ctx )
       ctx.fill()
-
-      line.opacity += showingSpeed * (showing ? 0.003 : -0.003)
-
-      if (line.opacity <= 0) {
-        line.opacity = 0
-        line.showing = true
-      } else if (line.opacity >= 1) {
-        line.opacity = 1
-        line.showing = false
-      }
-
-      if (x > canvasWidth) this.createLine( line, true )
-      else line.x += speed
     } )
   }
 }

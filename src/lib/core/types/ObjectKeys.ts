@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-commented-code */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* UTILS */
@@ -12,7 +13,7 @@ type UnionToIntersection<U> = (U extends any ? (k:U) => void : never) extends ((
 type Join<K, P> =
   | K extends string | number
     ? P extends string | number
-      ? `${K}${"" extends P ? "" : "."}${P}`
+      ? `${K}${`` extends P ? `` : `.`}${P}`
       : never
     : never;
 
@@ -24,22 +25,22 @@ type Paths<T, U = never, D extends number = 5> =
   | [D] extends [never]
     ? never
     : T extends U
-      ? ""
+      ? ``
       : T extends object
         ? { [Key in keyof T]-?:Key extends string | number  ?  (`${Key}` | Join<Key, Paths<T[Key], U, Prev[D]>>)  :  never }[keyof T]
-        : ""
+        : ``
 
-type Leaves<T, FilterVal = never, StrictFilter extends boolean = false, D extends number = 5> =
+type Leaves<T, FilterVal = never, StrictFilter extends boolean = false, D extends number = 6> =
   | [D] extends [never]
     ? never
     : T extends FilterVal
-      ? StrictFilter extends true ? never : ""
+      ? StrictFilter extends true ? never : ``
       : T extends object
         ? { [Key in keyof T]-?:T[Key] extends AnyFn
-          ? T[Key] extends FilterVal ? (StrictFilter extends true ? never : "") : Key
+          ? T[Key] extends FilterVal ? (StrictFilter extends true ? never : ``) : Key
           : Join<Key, Leaves<T[Key], FilterVal, StrictFilter, Prev[D]>>
         }[keyof T]
-        : "";
+        : ``;
 
 type LeavesValues<T, U = never, D extends number = 5> =
   | [D] extends [never]
@@ -51,7 +52,7 @@ type LeavesValues<T, U = never, D extends number = 5> =
           : LeavesValues<T[Key], U, Prev[D]> extends infer Obj ? { [K in keyof Obj as Join<Key, K>]:Obj[K] } : never
         : { [K in Key]:T[Key] }
       }[keyof T] extends infer Obj
-        ? UnionToIntersection<Obj> extends infer IntersectedObj ? { [k in keyof IntersectedObj]:IntersectedObj[k]} : never
+        ? UnionToIntersection<Obj> extends infer IntersectedObj ? { [k in keyof IntersectedObj]:IntersectedObj[k] } : never
         : never
       : T
 
@@ -83,15 +84,15 @@ type GetObjDifferentKeys<T, U> = Omit<T, keyof U> & Omit<U, keyof T>
 type GetObjSameKeys<T, U> = Omit<T | U, keyof GetObjDifferentKeys<T, U>>
 type MergeTwoObjects<T, U> = GetObjDifferentKeys<T, U> & { [K in keyof GetObjSameKeys<T, U>]:ObjectsDeepMerge<T[K], U[K]> }
 type DeepMergeTwoTypes<T, U> =
-  | [T, U] extends [{ [key:string]: unknown}, { [key:string]: unknown } ]
+  | [T, U] extends [{ [key:string]: unknown }, { [key:string]: unknown } ]
     ? MergeTwoObjects<T, U>
     : U
 
 type ObjectFilter<T extends Record<string, unknown>, Filter> = { [Key in keyof T]:T[Key] extends Filter ? T[Key] : never }
-type ObjectFilterPicker<T extends Record<string, unknown>, U> = ObjectFilter<T, U> extends infer V ? Pick<V, {[K in keyof V]:V[K] extends never ? never : K}[keyof V]> : never
+type ObjectFilterPicker<T extends Record<string, unknown>, U> = ObjectFilter<T, U> extends infer V ? Pick<V, { [K in keyof V]:V[K] extends never ? never : K }[keyof V]> : never
 
 type ObjectFilterByInclude<T extends Record<string, unknown>, Filter> = { [Key in keyof T]:Filter extends T[Key] ? T[Key] : never }
-type ObjectFilterPickerByInclude<T extends Record<string, unknown>, U> = ObjectFilterByInclude<T, U> extends infer V ? Pick<V, {[K in keyof V]:V[K] extends never ? never : K}[keyof V]> : never
+type ObjectFilterPickerByInclude<T extends Record<string, unknown>, U> = ObjectFilterByInclude<T, U> extends infer V ? Pick<V, { [K in keyof V]:V[K] extends never ? never : K }[keyof V]> : never
 
 
 

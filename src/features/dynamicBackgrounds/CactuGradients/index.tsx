@@ -1,3 +1,5 @@
+"use client"
+
 import { useUiManager } from "@lib/dynamicUi"
 import CactuGradientsController from "./logic"
 

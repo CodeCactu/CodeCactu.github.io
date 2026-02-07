@@ -1,73 +1,25 @@
-import "@lib/core/flow/ResponsiveAreaNames"
+export { default as fonts } from "./fonts"
+export * from "./fonts"
 
-
-
-/*\
- * Spacing
-\*/
-
-
-
-export const spacing = {
-  "normal": 5,
-  "large": 20,
-}
-
-declare module "@lib/core/flow/ResponsiveAreaNames" {
-  type _Spacings = { [K in keyof typeof spacing]:true }
-  export interface SpacingNames extends _Spacings { _:false }
-}
-
-
-
-/*\
- * Colors
-\*/
-
-
-
+export type ColorName = keyof typeof colors
 export const colors = {
-  "background": `#212225`,
-  "red": `#b66141`,
-  "green": "#5da234",
-  "blue": "#5574ac",
-  "yellow": "#e6bf4b",
-  "purple": "#6c52ec",
-  "white": "#fefefe",
-} as const
-
-
-
-/*\
- * Fonts
-\*/
-
-
-
-export const fonts = {
-  cactu: {
-    fontFamily: `var( --font-cactu )`,
-    fontWeight: 900,
-    fontSize: 58,
-    lineHeight: 68,
-    letterSpacing: `0.01em`,
-  },
-}
-
-
-
-/*\
- * Others
-\*/
-
+  "primary": `#5da234`,
+  "secondary": `#444`,
+  "surface": `#0001`,
+  "surface-e100": `#0004`,
+  "accent": `color-mix( in srgb, var( --color-secondary ), white 10% )`,
+} as const satisfies Record<string, string>
 
 
 export const border = {
-  radius: 8,
-  "radius-s": 6,
-  width: 2,
+  width: 1,
+  radius: 5,
 }
 
-export const durations = {
-  fast: 0.1
+export const custom = {
+  maxPageSectionWidth: `1166px`,
+  minPageSectionWidthPadding: `24px`,
+  rootHeaderheight: `60px`,
+  popupShadow: `0px 0px 8px #C3C3C380`,
+  "textContainer-margin": `16px`,
 }

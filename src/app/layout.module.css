@@ -6,3 +6,9 @@
   height: 100dvh;
   z-index: -1;
 }
+
+.userPanel {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+}

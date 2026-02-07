@@ -9,7 +9,7 @@ export type CheckboxProps = {
   radio?: boolean
   checked?: boolean
   value?: string
-  label?: string
+  label?: null | string
   readOnly?: boolean
   onChange?: (checked:boolean, value:string) => void
 }
@@ -26,7 +26,7 @@ export default function Checkbox({ className, name, readOnly, value = ``, radio,
     className: cn( className ),
     id,
     onChange: (e:ChangeEvent<HTMLInputElement>) => {
-      let newChecked = e.target.checked
+      const newChecked = e.target.checked
 
       if (externalChecked === undefined) setInternalChecked( newChecked )
       if (!onChange) return

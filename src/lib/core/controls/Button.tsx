@@ -1,15 +1,19 @@
 import { forwardRef } from "react"
 import Link from "next/link"
+import { ResponsivePropertyValue, updateResponsivePropertiesToStyle } from "@lib/core/flow/ResponsiveAreaNames"
 import cn from "../functions/createClassName"
 import { getGap } from "../flow/utils"
+import { makeSpacing, makeStyleSpacings, makeStyleSpacingsInline, SpacingsValue } from "../flow/makeStyleSpacings"
 import ButtonInteractions from "./ButtonInteractions"
 import classes from "./Button.module.css"
 
 export type ButtonProps = {
-  className?: string | { override:undefined | string }
+  className?: string | { override: undefined | string }
   style?: React.CSSProperties
   children?: React.ReactNode
   body?: React.ReactNode
+  margin?: ResponsivePropertyValue<SpacingsValue>
+  padding?: ResponsivePropertyValue<SpacingsValue>
   linkRel?: string
   for?: string
   onClick?: null | ((e?:React.MouseEvent<HTMLButtonElement | HTMLLabelElement, globalThis.MouseEvent>) => void)
@@ -22,7 +26,7 @@ export type ButtonProps = {
   wide?: boolean
   width?: number | string
   type?: `submit` | `button`
-  ariaLabel?: string
+  ariaLabel?: false | string
   gap?: string | boolean | number
   ariaCurrent?: `page` | `step` | `location` | `date` | `time` | boolean
 }
@@ -30,16 +34,21 @@ export type ButtonProps = {
 export default forwardRef<HTMLLabelElement | HTMLButtonElement | HTMLDivElement | HTMLAnchorElement, ButtonProps>( function Button( props, ref ) {
   const children = props.children || props.body
 
+
+  const finalStyle = { ...props.style }
+  updateResponsivePropertiesToStyle( finalStyle, `padding`, props.padding, makeStyleSpacingsInline, v => typeof v !== `object` && makeSpacing( v ) )
+  updateResponsivePropertiesToStyle( finalStyle, `margin`, props.margin, m => makeStyleSpacings( m, `margin` ), v => typeof v !== `object` && makeSpacing( v ) )
+
   const jsxAriaProps = {
     ariaDisabled: props.disabled ? true : undefined,
-    ariaCurrent: props.ariaCurrent,
-    ariaLabel: props.ariaLabel,
+    ariaCurrent: props.ariaCurrent || undefined,
+    ariaLabel: props.ariaLabel || undefined,
   }
 
   const commonProps = {
     children,
     className: typeof props.className === `object` ? props.className.override : cn( classes.button, props.className ),
-    style: props.style,
+    style: finalStyle,
   }
 
   if (props.wide || props.width) {

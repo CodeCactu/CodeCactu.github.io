@@ -23,7 +23,7 @@ export default class CactuGradientsController implements UiManagerHolder {
   constructor( root:HTMLDivElement ) {
     this.uiManager = new UiManager( root )
     this.ctx = this.uiManager.registerCtx( `main`, `canvas` )
-    this.uiManager.registerEvent( this.uiManager.rootElement, `mousemove`, e => this.handleMouseMove( e ) )
+    this.uiManager.registerEvent( window, `mousemove`, e => this.handleMouseMove( e ) )
     this.uiManager.startLoop( () => this.update() )
   }
 

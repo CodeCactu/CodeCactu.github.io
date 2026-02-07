@@ -1,0 +1,25 @@
+.verticallyAlignedColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.isAligningRight {
+  text-align: right;
+}
+.isAligningRight > * {
+  margin-left: auto;
+}
+
+.isAligningLeft {
+  text-align: left;
+}
+.isAligningLeft > * {
+  margin-right: auto;
+}
+
+.isAligningCenter {
+  text-align: center;
+}
+.isAligningCenter > * {
+  margin-inline: auto;
+}

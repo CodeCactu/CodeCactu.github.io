@@ -1,0 +1,13 @@
+.imgTile img {
+  position: absolute;
+  image-rendering: pixelated;
+  transition-property: opacity, scale;
+  transition-duration: 0.15s;
+  transform-origin: top;
+}
+.imgTileHolder:hover .imgTile img {
+  scale: 1.1;
+}
+.imgTileHolder:hover .imgTile :last-child {
+  opacity: 0;
+}

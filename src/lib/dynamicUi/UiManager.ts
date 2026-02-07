@@ -1,7 +1,7 @@
 "use client"
 
-import { Primitive } from "@lib/core/types"
 import { useRef } from "react"
+import { Primitive } from "@lib/core/types"
 
 export type UiData = Record<string, Primitive>
 export type UiUpdater<T extends UiData = UiData> = (data:T) => void
@@ -94,7 +94,7 @@ export interface UiManagerHolder {
   uiData: UiData
 }
 
-export function useUiManager<TRoot extends HTMLElement, THolder extends UiManagerHolder>( handler:(ref:TRoot) => THolder ): [(ref:null | TRoot) => void, undefined | THolder[`uiData`]] {
+export function useUiManager<TRoot extends HTMLElement, THolder extends UiManagerHolder>( handler:(ref:TRoot) => THolder ) {
   const managerHolderRef = useRef<THolder>( null )
 
   const handleRef = (ref:null | TRoot) => {
@@ -102,5 +102,5 @@ export function useUiManager<TRoot extends HTMLElement, THolder extends UiManage
     else managerHolderRef.current?.uiManager.dispose()
   }
 
-  return [ handleRef, managerHolderRef.current?.uiData ]
+  return [ handleRef, managerHolderRef.current?.uiData ] as const // eslint-disable-line react-hooks/refs -- this ref data is needed for UI updating from manager holder
 }
