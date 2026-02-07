@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "types": ["bun"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@fet/*": [ "src/features/*" ],
+      "@lib/*": [ "src/lib/*" ],
+      "@/*": [ "src/*" ]
+    },
+  }
+}

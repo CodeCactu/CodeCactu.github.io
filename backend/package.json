@@ -1,0 +1,22 @@
+{
+  "name": "cactuvoting",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^9.39.2",
+    "eslint-config-eye": "^2.0.0-beta.25",
+    "formidable": "^1.2.6",
+    "node-fetch": "^2.7.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.8"
+  }
+}
