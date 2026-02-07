@@ -34,7 +34,7 @@ export default class CactuGradientsController implements UiManagerHolder {
     ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height )
 
     ctx.shadowBlur = tileSize * 2
-    ctx.shadowColor = `rgb( 128, 0, 255 )`
+    ctx.shadowColor = `rgb(3, 49, 20)`
 
     for (let i = 0;  i < this.mouseTileHistory.length;  ++i) {
       const { x, y, createdAt } = this.mouseTileHistory[ i ]
@@ -46,13 +46,13 @@ export default class CactuGradientsController implements UiManagerHolder {
       }
 
       ctx.beginPath()
-      ctx.fillStyle = `rgba( 128, 0, 255, ${1 - seconds / 1000} )`
+      ctx.fillStyle = `rgba( 0, 49, 20, ${1 - seconds / 1000} )`
       ctx.arc( x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize, 0, Math.PI * 2 )
       ctx.fill()
     }
 
     ctx.shadowBlur = 0
-    ctx.fillStyle = `#fff`
+    ctx.fillStyle = `#fff2`
 
     for (const { x, y } of this.mouseTileHistory) {
       ctx.fillRect( x * tileSize + padding, y * tileSize + padding, tileSize - padding, tileSize - padding )

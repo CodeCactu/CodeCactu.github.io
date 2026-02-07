@@ -7,7 +7,7 @@ export type CactuGradientsProps = {
   className?: string
 }
 
-export default function CactuGradients({ className }:CactuGradientsProps) {
+export default function CactuShadyTrail({ className }:CactuGradientsProps) {
   const [ handleRef ] = useUiManager<HTMLDivElement, CactuGradientsController>(
     rootElement => new CactuGradientsController( rootElement ),
   )
