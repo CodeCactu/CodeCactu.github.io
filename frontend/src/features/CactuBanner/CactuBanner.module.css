@@ -1,15 +1,30 @@
 .banner {
-  --_size-multiplier: 1;
+  --_signetWidth: 294px;
 
   position: relative;
   display: flex;
-  width: calc( 1130px * var( --_size-multiplier ) );
-  height: calc( 405px * var( --_size-multiplier ) );
-  padding-bottom: calc( 60px * var( --_size-multiplier ) );
+  padding-right: 0.5em;
+  padding-bottom: 1.5%;
   align-items: center;
   font-family: var( --font-cactu );
-  font-size: calc( 210px * var( --_size-multiplier ) );
+  font-size: 210px;
   letter-spacing: 0.19em;
+
+  @media screen and (max-width:1400px) {
+    --_signetWidth: 227px;
+    font-size: 140px;
+  }
+
+  @media screen and (max-width:900px) {
+    --_signetWidth: 140px;
+    font-size: 95px;
+  }
+
+  @media screen and (max-width:600px) {
+    & :not( .signet, .grass ) {
+      display: none;
+    }
+  }
 }
 
 .singleSign {
@@ -18,8 +33,9 @@
 }
 
 .signet {
-  height: 100%;
-  aspect-ratio: 294px / 345px;
+  width: var( --_signetWidth );
+  height: unset;
+  aspect-ratio: 294 / 345;
   z-index: 10;
 }
 
@@ -27,64 +43,52 @@
   transform: unset;
   align-self: flex-end;
   color: #5da234;
-  line-height: calc( 95px * var( --_size-multiplier ) );
+  line-height: 0.45em;
 }
 
 .floatingFace {
   width: 0.8em;
-  top: calc( 50px * var( --_size-multiplier ) );
-}
+  height: unset;
+  bottom: 0.75em;
 
-.floatingFace.is1 {
-  left: calc( 404px * var( --_size-multiplier ) );
-}
+  &.is1 {
+    left: calc( var( --_signetWidth ) + 0.51em );
+  }
 
-.floatingFace.is2 {
-  left: calc( 694px * var( --_size-multiplier ) );
+  &.is2 {
+    left: calc( var( --_signetWidth ) + 1.895em );
+  }
 }
 
 .grass {
-  width: calc( 100px * var( --_size-multiplier ) );
-  height: calc( 45.45px * var( --_size-multiplier ) );
-}
+  width: calc( var( --_signetWidth ) * 0.35 );
+  height: unset;
+  aspect-ratio: 100 / 45;
 
-.grass.is1 {
-  bottom: calc( 120px * var( --_size-multiplier ) );
-  left: calc( 150px * var( --_size-multiplier ) );
-}
+  &.is1 {
+    bottom: 23%;
+    left: calc( var( --_signetWidth ) * 0.5 );
+  }
 
-.grass.is2 {
-  bottom: calc( 45px * var( --_size-multiplier ) );
-  left: calc( 14px * var( --_size-multiplier ) );
-  z-index: 100;
-}
+  &.is2 {
+    bottom: 4%;
+    left: calc( var( --_signetWidth ) * 0.03);
+    z-index: 100;
+  }
 
-.grass.is3 {
-  bottom: 0;
-  left: calc( 183px * var( --_size-multiplier ) );
+  &.is3 {
+    bottom: 0;
+    left: calc( var( --_signetWidth ) * 0.97 );
+    translate: -100% 0;
+    z-index: 100;
+  }
 }
 
 .noSign {
-  display: block;
-  bottom: 0.44em;
+  bottom: 0.25em;
   right: 0;
-  width: calc( 100px * var( --_size-multiplier ) );
-}
-
-@media screen and (max-width:1400px) {
-  .banner {
-    --_size-multiplier: 0.75;
-  }
-}
-
-@media screen and (max-width:1000px) {
-  .banner {
-    --_size-multiplier: 0.5;
-  }
-}
-
-@media screen and (max-width:600px) {
-  .banner {
-    --_size-multiplier: 0.25;
-  }
+  display: block;
+  width: 0.5em;
+  height: unset;
+  aspect-ratio: 100 / 66;
 }

@@ -8,7 +8,7 @@
 }
 
 .userPanel {
-  position: absolute;
+  position: fixed;
   left: 6px;
   bottom: 6px;
 }

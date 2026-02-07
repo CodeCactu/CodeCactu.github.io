@@ -1,6 +1,8 @@
 body {
   display: grid;
   place-items: center;
+  gap: 64px;
+  padding-block: 32px;
   background-color: #12131d;
   background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
   background-repeat: no-repeat;
