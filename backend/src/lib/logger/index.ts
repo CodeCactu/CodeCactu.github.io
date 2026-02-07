@@ -39,7 +39,15 @@ export default function log( ...items:LoggerItem[] ) {
     }
   }
 
-  console.log( results.join( `` ) )
+  const result:unknown[] = []
+  for (const item of results) {
+    const last = result.at( -1 )
+
+    if (typeof last === `string` && typeof item === `string`) result[ result.length - 1 ] = last + item
+    else result.push( item )
+  }
+
+  console.log( ...result )
 }
 
 function align( str:string, { align = `left`, minLength = 0, maxLength }:AlignConfig ) {
