@@ -2,6 +2,7 @@
 
 import { useRef } from "react"
 import { Primitive } from "@lib/core/types"
+import Loop from "./Loop"
 
 export type UiData = Record<string, Primitive>
 export type UiUpdater<T extends UiData = UiData> = (data:T) => void
@@ -14,10 +15,8 @@ type RegisteredEvent = {
 }
 
 export default class UiManager<TEle extends HTMLElement> {
-  #loopId = -1
-  #loopCb: null | LoopCallback = null
+  loop = new Loop()
   #registeredEvents = new Set<RegisteredEvent>()
-  #uiUpdater: null | UiUpdater = null
 
   ctxs = new Map<string, CanvasRenderingContext2D>()
   rootElement: TEle
@@ -25,15 +24,6 @@ export default class UiManager<TEle extends HTMLElement> {
   constructor( rootElement:TEle ) {
     this.rootElement = rootElement
   }
-
-  setUIUpdater( updater:(data:UiData) => void ) {
-    this.#uiUpdater = updater
-  }
-
-  updateUi( uiData:UiData ) {
-    if (this.#uiUpdater) this.#uiUpdater( structuredClone( uiData ) )
-  }
-
   registerEvent<TEv extends keyof HTMLElementEventMap>(element:Window | HTMLElement, eventname:TEv, handler:(e:HTMLElementEventMap[TEv]) => void) {
     this.#registeredEvents.add({ element, eventname, handler })
     element.addEventListener( eventname, handler as EventListener )
@@ -59,30 +49,20 @@ export default class UiManager<TEle extends HTMLElement> {
   }
 
   startLoop( cb:LoopCallback ) {
-    this.#loopCb = cb
-    this.resumeLoop()
+    this.loop.startLoop( cb )
   }
 
   pauseLoop() {
-    window.cancelAnimationFrame( this.#loopId )
+    this.loop.pauseLoop()
   }
 
   resumeLoop() {
-    const loopCb = this.#loopCb
-
-    if (!loopCb) return
-
-    const loop = (timestamp:number) => {
-      this.#loopId = window.requestAnimationFrame( loop )
-      loopCb( timestamp )
-    }
-
-    loop( performance.now() )
+    this.loop.resumeLoop()
   }
 
   dispose() {
     console.log( `dispose` )
-    this.pauseLoop()
+    this.loop.pauseLoop()
     this.#registeredEvents.forEach( data => {
       data.element.removeEventListener( data.eventname, data.handler )
     } )
@@ -102,5 +82,5 @@ export function useUiManager<TRoot extends HTMLElement, THolder extends UiManage
     else managerHolderRef.current?.uiManager.dispose()
   }
 
-  return [ handleRef, managerHolderRef.current?.uiData ] as const // eslint-disable-line react-hooks/refs -- this ref data is needed for UI updating from manager holder
+  return [ handleRef, managerHolderRef ] as const
 }

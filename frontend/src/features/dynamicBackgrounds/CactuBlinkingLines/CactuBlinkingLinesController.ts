@@ -31,8 +31,6 @@ class Color {
   }
 }
 
-
-
 export class Line {
   lastUpdateColorPair: [from:Color, to:Color] = [ { r:0, g:0, b:0 }, { r:0, g:0, b:0 } ]
   initialColor: Color = { r:0, g:0, b:0 }
@@ -150,7 +148,7 @@ export default class CactuBlinkingLinesController implements UiManagerHolder {
     this.uiManager = new UiManager( divRef )
     this.ctx = this.uiManager.registerCtx( `main`, `canvas` )
     this.generateObjects()
-    this.uiManager.startLoop( () => this.update() )
+    this.uiManager.startLoop( timeMult => this.update( timeMult ) )
 
     this.luminateDomElements()
     window.addEventListener( `resize`, () => this.luminateDomElements() )
@@ -230,7 +228,7 @@ export default class CactuBlinkingLinesController implements UiManagerHolder {
     return line
   }
 
-  update() {
+  update( timeMult:number ) {
     const { ctx, lines, effects } = this
     const { width:canvasWidth, height:canvasHeight } = ctx.canvas
 
@@ -253,7 +251,7 @@ export default class CactuBlinkingLinesController implements UiManagerHolder {
       line.update( luminatingEffect?.color )
 
       if (line.x > canvasWidth) this.createLine( line, true )
-      else line.x += line.speed
+      else line.x += line.speed * timeMult
 
       ctx.fillStyle = `rgba( ${line.color.r}, ${line.color.g}, ${line.color.b}, ${line.opacity} )`
       ctx.beginPath()
