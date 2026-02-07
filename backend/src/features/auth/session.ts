@@ -17,7 +17,7 @@ db.run( `
 ` )
 
 export class Session {
-  static readonly expirationTimeMinutes = 1
+  static readonly expirationTimeMinutes = 30
   static readonly #deleteOutdatedQuery = db.prepare( `DELETE FROM sessions WHERE DATETIME( expiresAt ) <= DATETIME( "now" )` )
   static readonly #deletebyUserQuery = db.prepare( `DELETE FROM sessions WHERE userId = ?` )
   static readonly #inserQuery = db.prepare( `INSERT INTO sessions (token, expiresAt, userId) VALUES ($token, $expiresAt, $userId)` )
