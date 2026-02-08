@@ -1,0 +1,41 @@
+main, .textCOntainer {
+  & > * {
+    margin-bottom: var( --textContainer-margin );
+  }
+
+  & > :first-child {
+    margin-top: 0;
+  }
+
+  & > :last-child {
+    margin-bottom: 0;
+  }
+
+  & > ul:not( [class] ) {
+    list-style: disc;
+    padding-left: 22px;
+  }
+
+  & > h1, .as-display {
+    font: 4em / 1 var( --font-cactu );
+    color: var( --color-primary );
+    letter-spacing: 0.19em;
+    text-transform: lowercase;
+  }
+}
+
+:where( [style*="--rwd-align"], [style*="--align"] ) {
+  text-align: var( --align );
+
+  @media (width <= 600px) {
+    text-align: var( --rwd-align-mobile, var( --align ) );
+  }
+
+  @media (600px < width <= 1200px) {
+    text-align: var( --rwd-align-tablet, var( --align ) );
+  }
+
+  @media (1200px < width) {
+    text-align: var( --rwd-align-desktop, var( --align ) );
+  }
+}

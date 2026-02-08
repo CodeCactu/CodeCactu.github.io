@@ -1,0 +1,15 @@
+.dropArea {
+  min-height: 25px;
+
+  &:empty {
+    background-color: #55f5;
+  }
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  min-height: 25px;
+  background-color: white;
+  color: black;
+}

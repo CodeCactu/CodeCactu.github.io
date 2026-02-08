@@ -1,5 +1,6 @@
 import "./normalize.css"
 import "./layout.css"
+import "@fet/flow/Text.globals.css"
 import Image from "next/image"
 import rescaleImage from "@lib/core/functions/rescaleImage"
 import Link from "@lib/core/controls/Link"

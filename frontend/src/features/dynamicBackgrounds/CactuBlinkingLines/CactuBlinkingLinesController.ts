@@ -152,6 +152,8 @@ export default class CactuBlinkingLinesController implements UiManagerHolder {
 
     this.luminateDomElements()
     window.addEventListener( `resize`, () => this.luminateDomElements() )
+    const mutationObserver = new MutationObserver( () => this.luminateDomElements() )
+    mutationObserver.observe( document.body, { childList:true, subtree:true } )
   }
 
   luminateDomElements() {
