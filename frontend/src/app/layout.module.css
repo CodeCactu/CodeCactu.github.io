@@ -1,3 +1,14 @@
+.navItem {
+  border-radius: 50%;
+  display: flex;
+  overflow: hidden;
+  transition: border-radius 0.2s;
+
+  &:hover {
+    border-radius: 12px;
+  }
+}
+
 .background {
   position: fixed;
   top: 0;

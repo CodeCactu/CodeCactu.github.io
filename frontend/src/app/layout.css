@@ -9,3 +9,9 @@ body {
   font-family: sans-serif, arial, monospace;
   color: #fefefe;
 }
+
+body > nav {
+  position: fixed;
+  left: 6px;
+  top: 6px;
+}

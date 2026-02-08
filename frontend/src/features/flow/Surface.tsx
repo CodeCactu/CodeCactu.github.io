@@ -1,23 +1,25 @@
-import { cn, makeKebabCaseFromCamelCase } from "@lib/core/functions"
+import createDatasetAttributes, { Dataset } from "@lib/core/functions/createDatasetAttributes"
+import { cn } from "@lib/core/functions"
+import Link from "@lib/core/controls/Link"
 import classes from "./Surface.module.css"
 
 export type SurfaceProps = {
   children: React.ReactNode
   className?: string
   href?: string
-  dataset?: Record<string, string | number>
+  dataset?: Dataset
 }
 
 export default function Surface( props:SurfaceProps ) {
-  const dataset = Object.fromEntries(
-    Object.entries( props.dataset ?? {} ).map( ([ k, v ]) => [ `data-${makeKebabCaseFromCamelCase( k )}`, v ] ),
+  if (props.href) return (
+    <Link className={cn( classes.surface, props.className )} dataset={props.dataset} href={props.href}>
+      {props.children}
+    </Link>
   )
 
-  const As = props.href ? `a` : `div`
-
   return (
-    <As className={cn( classes.surface, props.className )} {...dataset} href={props.href}>
+    <div className={cn( classes.surface, props.className )} {...createDatasetAttributes( props.dataset )}>
       {props.children}
-    </As>
+    </div>
   )
 }
