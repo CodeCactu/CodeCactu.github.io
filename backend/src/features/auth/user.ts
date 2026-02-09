@@ -5,7 +5,7 @@ db.run( `
     id          TEXT PRIMARY KEY,
     createdAt   TEXT NOT NULL,
     name        TEXT NOT NULL,
-    avatarHash  TEXT NOT NULL
+    avatarHash  TEXT
   )
 ` )
 
@@ -18,7 +18,7 @@ export class User {
     public id:string,
     public createdAt:Date,
     public name:string,
-    public avatarHash:string,
+    public avatarHash:null | string,
   ) {}
 
   get publicData() {
@@ -29,7 +29,7 @@ export class User {
     }
   }
 
-  static async getOrCreate( id:string, name:string, avatarHash:string ) {
+  static async getOrCreate( id:string, name:string, avatarHash:null | string ) {
     const existingUser = User.get( id )
     if (existingUser) return existingUser
 

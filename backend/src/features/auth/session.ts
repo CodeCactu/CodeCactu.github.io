@@ -12,7 +12,7 @@ db.run( `
   CREATE TABLE IF NOT EXISTS sessions (
     token       TEXT PRIMARY KEY,
     expiresAt   TEXT NOT NULL,
-    userId      TEXT
+    userId      TEXT NOT NULL
   )
 ` )
 

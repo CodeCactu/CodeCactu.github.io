@@ -26,12 +26,12 @@ export default function UserPanel({ className }:UserPanelProps) {
   )
 
   return (
-    <a className={cn( classes.userPanel, className )} href={loginLink}>
+    <div className={cn( classes.userPanel, className )}>
       <Image src={`https://cdn.discordapp.com/avatars/${session.discordId}/${session.avatarHash}.png?size=64`} width={50} height={50} className="pixelart" alt="User avatar" />
 
       <div>
-        Zaloguj się
+        Nie wylogowuj
       </div>
-    </a>
+    </div>
   )
 }

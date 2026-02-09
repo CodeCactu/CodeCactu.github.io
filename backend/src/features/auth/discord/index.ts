@@ -2,23 +2,13 @@ import z from "zod"
 import { getApiError } from "@fet/server"
 import { logColorInfo } from "@fet/loggers/logInfo"
 import { logColorDimmed, logColorPositive } from "@fet/loggers/log"
+import loadDiscordUserOAuth from "@fet/discord/loadDiscordUserOAuth"
 import { User } from "../user"
 import { Session } from "../session"
 import logAuth from "../logAuth"
 import { getUserSession } from "../endpoints"
 import { getSessionHeadersInit } from ".."
 import config from "@/config"
-
-export type DiscordUser = {
-  id: string
-  username: string
-  global_name: string
-  avatar: string
-  discriminator: string
-  public_flags: number
-  flags: string
-  accent_color: number
-}
 
 const createSessionBodyScheme = z.object({ code:z.string() })
 
@@ -48,30 +38,10 @@ export default async function createSessionWithDiscordEndpoint( req:Bun.BunReque
 }
 
 export async function authorizeByDiscord( redirectUri:string, code:string ) {
-  const discordParams = {
-    grant_type: `authorization_code`,
-    redirect_uri: redirectUri,
-    code,
-    scope: `identify`,
-  }
-
-  const authInfo = await fetch( `https://discord.com/api/v10/oauth2/token`, {
-    method: `POST`,
-    headers: {
-      "Content-Type": `application/x-www-form-urlencoded`,
-      Authorization: `Basic ${btoa( `${config.clientId}:${config.clientSecret}` )}`,
-    },
-    body: new URLSearchParams( discordParams ),
-  } ).then( res => res.json() )
-
-  const discordUser = await fetch( `https://discord.com/api/v10/users/@me`, {
-    headers: {
-      authorization: `${authInfo.token_type} ${authInfo.access_token}`,
-    },
-  } ).then<DiscordUser | { code: number }>( res => res.json() )
+  const discordUser = await loadDiscordUserOAuth( config.clientId, config.clientSecret, code, redirectUri )
 
   if (`code` in discordUser) {
-    logAuth( `Cannot log in`, [ { discordParams, discordResponse:discordUser } ] )
+    logAuth( `Cannot log in`, [ { discordResponse:discordUser } ] )
     if (discordUser.code === 0) return getApiError( `OBSOLETE_CODE` )
     return getApiError( `UNKNOWN_FAILURE` )
   }

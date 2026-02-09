@@ -20,7 +20,7 @@ export function useAuth() {
 
     const code = searchParams.get( `code` )
 
-    setLoginLink( getDiscordIntegrationLink() ) // eslint-disable-line react-hooks/set-state-in-effect -- it is safe operation, not an infinite effect loop
+    setLoginLink( getDiscordIntegrationLink() ) // eslint-disable-line react-hooks/set-state-in-effect -- Intentional dealing with hydration mssmatch
 
     const handleSessionData = (data:null | SessionData) => {
       if (!data) {

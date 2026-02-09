@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { loadCactuJamGames } from "@fet/backend/games"
 import classes from "./TierList.module.css"
 
 interface Game {
@@ -18,6 +19,10 @@ const initialGames:Game[] = [
 
 export default function TierList() {
   const dragAndDropContainerRef = useDragAndDrop()
+
+  useEffect( () => {
+    loadCactuJamGames().then( console.log )
+  } )
 
   return (
     <div ref={dragAndDropContainerRef} className={classes.wrapper}>
