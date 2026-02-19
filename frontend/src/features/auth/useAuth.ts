@@ -38,13 +38,13 @@ export function useAuth() {
       } )
     }
 
-    if (Session.checkExistance()) {
-      Session.get().then( handleSessionData )
-    } else if (code) {
+    if (code) {
       Session.create( code ).then( data => {
         handleSessionData( data )
         router.push( `/` )
       } )
+    } else if (Session.checkExistance()) {
+      Session.get().then( handleSessionData )
     } else {
       logAuth( `No available session` )
       updateSessionStore( null )

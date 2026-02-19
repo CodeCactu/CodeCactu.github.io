@@ -1,53 +1,71 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { loadCactuJamGames } from "@fet/backend/games"
 import classes from "./TierList.module.css"
 
-interface Game {
-  id: number
-  title: string
+export type DragItem = {
+  id: string
+  name: string
+}
+export type DragItemTierAssignements = Record<string, DragItem[`name`][]>
+
+export type DragAreaLists = Record<string, string[]>
+
+type DragAndDropHookConfig = {
+  onDragEnd?: (lists:DragAreaLists) => void
 }
 
-const tiers = [ `S`, `A`, `B` ]
-const initialGames:Game[] = [
-  { id:1, title:`Cyber Pustynia 2077` },
-  { id:2, title:`Symulator Gotowania Ziemniaków` },
-  { id:3, title:`Kosmiczny Skoczek` },
-  { id:4, title:`Przygoda w Labiryncie` },
-]
+export type TierListProps = DragAndDropHookConfig & {
+  highestValue: number
+  items: DragItem[]
+  assignements: DragItemTierAssignements
+}
 
-export default function TierList() {
-  const dragAndDropContainerRef = useDragAndDrop()
+export default function TierList({ highestValue, items, assignements, ...dragAndDropHookConfig }:TierListProps) {
+  const dragAndDropContainerRef = useDragAndDrop( dragAndDropHookConfig )
 
-  useEffect( () => {
-    loadCactuJamGames().then( console.log )
+  const renderdropArea = (ids:undefined | DragItem[`id`][]) => ids?.map( id => {
+    const item = items.find( i => i.id == id )
+    if (!item) throw new Error( `item "${id}" not found` )
+    return (
+      <div key={item.id} draggable data-drag-id={item.id} className={classes.item}>
+        <span>{item.name}</span>
+        <span className={classes.handle}>☰</span>
+      </div>
+    )
   } )
 
   return (
-    <div ref={dragAndDropContainerRef} className={classes.wrapper}>
-      {
-        tiers.map( tier => (
-          <div key={tier} className={classes.tierRow}>
-            <div className={classes.label}>{tier}</div>
-            <div className={classes.dropArea} data-drop>
-              {
-                (tier === `S` ? initialGames.slice( 0, 1 ) : tier === `A` ? initialGames.slice( 1 ) : null)?.map( game => (
-                  <div key={game.id} draggable className={classes.item}>
-                    <span>{game.title}</span>
-                    <span className={classes.handle}>☰</span>
-                  </div>
-                ) )
-              }
-            </div>
-          </div>
-        ) )
-      }
-    </div>
+    <article ref={dragAndDropContainerRef} className={classes.dragArea}>
+      <div className={classes.results}>
+        <div className={classes.resultsLegend}>
+          <p>Słabsze</p>
+          <p>Lepsze</p>
+        </div>
+
+        {
+          Array.from( { length:highestValue + 1 }, (_, i) => highestValue - i ).map( tier => (
+            <section key={tier}>
+              <p className={classes.rowLabel}>{tier}</p>
+              <div className={classes.dropArea} data-drop-area={`t${tier}`}>
+                {renderdropArea( assignements[ `t${tier}` ] )}
+              </div>
+            </section>
+          ) )
+        }
+      </div>
+
+      <section className={classes.items}>
+        <p>Nieskategoryzowani</p>
+        <div className={classes.dropArea} data-drop-area="uncategorised">
+          {renderdropArea( assignements[ `uncategorised` ] )}
+        </div>
+      </section>
+    </article>
   )
 }
 
-function useDragAndDrop() {
+function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
   const containerRef = useRef<HTMLDivElement>( null )
 
   useEffect( () => {
@@ -56,49 +74,56 @@ function useDragAndDrop() {
 
     const abortController = new AbortController()
     const activeAnimations = new WeakMap<HTMLElement, Animation>()
-    let draggingElement:null | HTMLDivElement = null
+    let draggingItem:null | HTMLDivElement = null
 
-    container.childNodes.forEach( child => {
-      if (!(child instanceof HTMLElement)) return
+    const dropAreas = document.querySelectorAll( `[data-drop-area]` )
 
-      child.addEventListener( `dragenter`, e => {
+    dropAreas.forEach( dragArea => {
+      if (!(dragArea instanceof HTMLElement)) return
+
+      dragArea.addEventListener( `dragenter`, e => {
         e.preventDefault()
 
         const target = e.target
         if (!(target instanceof HTMLElement)) return
 
-        const underDrag = target.closest( `.${classes.item}, [data-drop]:empty` )
-        if (!(underDrag instanceof HTMLElement)) return
-        if (!draggingElement || underDrag === draggingElement || activeAnimations.has( underDrag )) return
+        let underDrag = target.closest<HTMLElement>( `.${classes.item}, [data-drop-area]` )
+        if (!underDrag) return
+        if (!draggingItem || underDrag === draggingItem || activeAnimations.has( underDrag )) return
 
-        const draggingRect = draggingElement.getBoundingClientRect()
+        const draggingRect = draggingItem.getBoundingClientRect()
         const targetRect = underDrag.getBoundingClientRect()
         const animationOptions = {
           duration: 200,
-          easing: `cubic-bezier(0.2, 0, 0, 1)`,
+          easing: `cubic-bezier( 0.2, 0, 0, 1 )`,
         }
 
-        if (`drop` in underDrag.dataset) {
+        if (`dropArea` in underDrag.dataset && underDrag.childNodes.length) {
+          const last = underDrag.childNodes[ underDrag.childNodes.length - 1 ]
+          if (last instanceof HTMLElement) underDrag = last
+        }
+
+        if (`dropArea` in underDrag.dataset) {
           /*
             Future code
             const offsets = { x:0, y:0 }
             const computedStyles = window.getComputedStyle( underDrag )
             offsets.x = parseInt( computedStyles.padding )
             offsets.y = parseInt( computedStyles.padding )
-          */
-          underDrag.insertAdjacentElement( `afterbegin`, draggingElement )
+            */
+          underDrag.insertAdjacentElement( `afterbegin`, draggingItem )
         } else {
-          const insertEhere = draggingElement.parentElement === underDrag.parentElement && draggingRect.top < targetRect.top ? `afterend` : `beforebegin`
+          const insertEhere = draggingItem.parentElement === underDrag.parentElement && (draggingRect.top < targetRect.top || draggingRect.left < targetRect.left) ? `afterend` : `beforebegin`
 
-          underDrag.classList.add( classes.isDragOver )
-          underDrag.insertAdjacentElement( insertEhere, draggingElement )
+          underDrag.insertAdjacentElement( insertEhere, draggingItem )
 
           const targetRectAfter = underDrag.getBoundingClientRect()
+          const targetDeltaX = targetRect.left - targetRectAfter.left
           const targetDeltaY = targetRect.top - targetRectAfter.top
 
           const targetAnim = underDrag.animate( [
-            { transform:`translateY(${targetDeltaY}px)` },
-            { transform:`translateY(0)` },
+            { transform:`translate(${targetDeltaX}px,${targetDeltaY}px)` },
+            { transform:`translate(0,0)` },
           ], animationOptions )
 
           activeAnimations.set( underDrag, targetAnim )
@@ -106,37 +131,52 @@ function useDragAndDrop() {
           targetAnim.onfinish = () => activeAnimations.delete( underDrag )
         }
 
-
+        const deltaX = draggingRect.left - targetRect.left
         const deltaY = draggingRect.top - targetRect.top
 
-        draggingElement.animate( [
-          { transform:`translateY(${deltaY}px)` },
-          { transform:`translateY(0)` },
+        draggingItem.animate( [
+          { transform:`translate(${deltaX}px,${deltaY}px)` },
+          { transform:`translate(0,0)` },
         ], animationOptions )
 
       } )
 
-      child.addEventListener( `dragleave`, e => {
+      dragArea.addEventListener( `dragleave`, e => {
         const related = e.relatedTarget
 
-        if (related instanceof Node && !child.contains( related )) {
-          child.classList.remove( classes.isDragOver )
+        if (related instanceof Node && !dragArea.contains( related )) {
+          dragArea.classList.remove( classes.isDragOver )
         }
       } )
     } )
 
     container.addEventListener( `dragstart`, ({ target }) => {
       if (target instanceof HTMLDivElement && target.draggable) {
-        draggingElement = target
+        draggingItem = target
       }
     }, { signal:abortController.signal } )
 
     container.addEventListener( `dragend`, () => {
-      draggingElement = null
+      draggingItem = null
+      if (onDragEnd) onDragEnd( getDragAreasLists( container ) )
     }, { signal:abortController.signal } )
 
     return () => abortController.abort()
-  }, [] )
+  }, [ onDragEnd ] )
 
   return containerRef
+}
+
+function getDragAreasLists( container:HTMLElement ) {
+  const dropAreas = Array.from( container.querySelectorAll<HTMLElement>( `[data-drop-area]` ) )
+  const dragAreas:DragAreaLists = {}
+
+  dropAreas.forEach( area => {
+    const id = area.dataset.dropArea as string
+    const items = Array.from( area.querySelectorAll<HTMLElement>( `[data-drag-id]` ) ).map( i => i.dataset.dragId as string )
+
+    dragAreas[ id ] = items
+  } )
+
+  return dragAreas
 }

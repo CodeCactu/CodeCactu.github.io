@@ -1,8 +1,59 @@
-.dropArea {
-  min-height: 25px;
+.dragArea {
+  --_element-width: min( 100px, 15vw );
+  --_gap: 24px;
 
-  &:empty {
-    background-color: #55f5;
+  display: flex;
+  gap: var( --_gap );
+}
+
+.dragArea [data-drop-area] {
+  background-color: #00f5;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+
+  & .resultsLegend {
+    display: flex;
+    justify-content: space-between;
+    margin-left: calc( var( --_gap ) + 1lh );
+  }
+
+  & > section {
+    display: flex;
+    align-items: center;
+    height: var( --_element-width );
+    gap: var( --_gap );
+
+    &:not( :first-of-type ) {
+      margin-top: var( --_gap )
+    }
+
+    & .rowLabel {
+      width: 1lh;
+    }
+  }
+
+  & [data-drop-area] {
+    display: flex;
+    min-width: calc( var( --_element-width ) * 3 );
+    height: 100%;
+  }
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  width: calc( var( --_element-width ) * 2.5 );
+
+  & [data-drop-area] {
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column wrap;
+    align-content: flex-start;
+    gap: var( --_gap );
+    height: calc( var(--_element-width) * 3 );
   }
 }
 
@@ -10,6 +61,12 @@
   display: flex;
   justify-content: space-between;
   min-height: 25px;
+  width: var( --_element-width );
+  height: var( --_element-width );
   background-color: white;
   color: black;
+}
+
+.isDragOver {
+  color: red;
 }

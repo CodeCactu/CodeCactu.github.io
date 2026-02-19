@@ -1,6 +1,5 @@
 import log, { LoggerItem } from "@fet/loggers/log"
 
-// export const logInfoColor = `oklch( 0.8 0.15 221.96 )`
 export const logInfoColor = `cyan`
 
 export default function logInfo( ...items:LoggerItem[] ) {

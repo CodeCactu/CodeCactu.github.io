@@ -12,10 +12,12 @@ type SessionRes = { code: string } | SessionData
 
 export default class Session {
   static readonly expirationCookiename = `sessionExpiresAt`
-  static loaded: undefined | null | SessionData = undefined // eslint-disable-line sonarjs/public-static-readonly -- Global value for entire app
+  static #loaded: undefined | null | SessionData = undefined // eslint-disable-line sonarjs/public-static-readonly -- Global value for entire app
   static #pendingDiscordUser: null | Promise<null | SessionData> = null // eslint-disable-line sonarjs/public-static-readonly -- Global value for entire app
 
   static create( code:string ) {
+    Session.#loaded = null
+
     if (Session.#pendingDiscordUser) return Session.#pendingDiscordUser
 
     Session.#pendingDiscordUser = fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions`, {
@@ -25,12 +27,12 @@ export default class Session {
     } ).then<SessionRes>( res => res.json() )
       .then( data => {
         if (`code` in data) { // Error
-          Session.loaded = null
+          Session.#loaded = null
         } else {
-          Session.loaded = data
+          Session.#loaded = data
         }
 
-        return Session.loaded
+        return Session.#loaded
       } )
       .finally( () => Session.#pendingDiscordUser = null )
 
@@ -38,21 +40,26 @@ export default class Session {
   }
 
   static get() {
-    return fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/my`, { credentials:`include` } )
+    Session.#pendingDiscordUser = fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include` } )
       .then<SessionRes>( res => res.json() )
       .then( data => `code` in data ? null : data )
+      .finally( () => Session.#pendingDiscordUser = null )
+
+    return Session.#pendingDiscordUser
   }
 
   static delete() {
-    return fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/my`, { credentials:`include`, method:`DELETE` } )
+    return fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include`, method:`DELETE` } )
   }
 
   static checkExistance() {
-    return !!getCookie( Session.expirationCookiename )
+    const existance = !!getCookie( Session.expirationCookiename )
+    if (!existance) Session.#loaded = null
+    return !!existance
   }
 
   static checkIsInitialised() {
-    return Session.loaded !== undefined
+    return Session.#pendingDiscordUser !== null || Session.#loaded !== undefined
   }
 
   static getExpirationDate() {

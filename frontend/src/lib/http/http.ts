@@ -24,30 +24,35 @@ export type HttpConfig = Omit<RequestInit, `method` | `body` | `headers`> & {
   headers?: HttpHeaders
   body?: any
   next?: NextFetchRequestConfig | undefined
+  middlewares?: {
+    request: HttpRequestMiddleware[]
+    response: HttpResponseMiddleware[]
+  }
 }
 
-export type HttpBodyMethod = Omit<HttpConfig, `method`>
-export type HttpWithoutBodyMethod = Omit<HttpConfig, `method` | `body`>
+export type HttpBodyMethod = Omit<HttpConfig, `middlewares` | `method`>
+export type HttpWithoutBodyMethod = Omit<HttpConfig, `middlewares` | `method` | `body`>
 
-export type HttpResponse<T = unknown> = Promise<[T, HttpResponseInfo]>
-export type HttpResponseInfo<T = unknown> = T & {
+export type HttpResponse<T = unknown> = Promise<T> & { getMeta: () => Promise<HttpResponseInfo> }
+export type HttpResponseInfo = {
   url: string
   headers: Headers
   status: HTTPStatusCode
   ok: boolean
 }
 
-export type HttpRequestMiddleware = (config:HttpConfig) => (undefined | HttpConfig)
-export type HttpResponseMiddleware = (res:Awaited<HttpResponse>) => (undefined | Awaited<HttpResponse>)
+
+export type HttpRequestMiddleware = (config:HttpConfig) => void
+export type HttpResponseMiddleware<T = unknown> = (res:Awaited<{ data: T, readonly resInfo: HttpResponseInfo }>) => void
 export type HttpManagerConfig = {
   reqMiddleware?: HttpRequestMiddleware
   resMiddleware?: HttpResponseMiddleware
 }
 
 export class HttpManager {
-  #middlewares = {
-    request: [] as HttpRequestMiddleware[],
-    response: [] as HttpResponseMiddleware[],
+  #middlewares: NonNullable<HttpConfig[`middlewares`]> = {
+    request: [],
+    response: [],
   }
 
   constructor( { reqMiddleware, resMiddleware }:HttpManagerConfig = {} ) {
@@ -56,77 +61,68 @@ export class HttpManager {
   }
 
   post<T = unknown>( config:HttpBodyMethod ): HttpResponse<T>
-  post<T = unknown>( url:string, body?:Body, config?:HttpConfig ): HttpResponse<T>
-  post<T = unknown>( urlOrConfig:string | HttpBodyMethod, body?:Body, config?:HttpConfig ): HttpResponse<T> {
-    const fullConfig:HttpConfig = {
+  post<T = unknown>( url:string, body?:Body, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T>
+  post<T = unknown>( urlOrConfig:string | HttpBodyMethod, body?:Body, config?:HttpConfig ) {
+    return HttpManager.fetchWithResHandler<T>({
       ...config,
       method: `POST`,
       url: typeof urlOrConfig === `string` ? urlOrConfig : urlOrConfig.url,
       body: body || config?.body || (typeof urlOrConfig === `string` ? undefined : urlOrConfig.body),
-    }
-
-    return this.fetchWithResHandler<T>( fullConfig )
+      middlewares: this.#middlewares,
+    })
   }
 
   get<T = unknown>( config:HttpWithoutBodyMethod ): HttpResponse<T>
   get<T = unknown>( url:string, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T>
-  get<T = unknown>( urlOrConfig:string | HttpWithoutBodyMethod, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T> {
-    const fullConfig:HttpConfig = {
+  get<T = unknown>( urlOrConfig:string | HttpWithoutBodyMethod, config?:Omit<HttpWithoutBodyMethod, `url`> ) {
+    return HttpManager.fetchWithResHandler<T>({
       ...config,
       method: `GET`,
       url: typeof urlOrConfig === `string` ? urlOrConfig : urlOrConfig.url,
-    }
-
-    return this.fetchWithResHandler<T>( fullConfig )
+      middlewares: this.#middlewares,
+    })
   }
 
   put<T = unknown>( config:HttpBodyMethod ): HttpResponse<T>
-  put<T = unknown>( url:string, body?:Body, config?:HttpConfig ): HttpResponse<T>
-  put<T = unknown>( urlOrConfig:string | HttpBodyMethod, body?:Body, config?:HttpConfig ): HttpResponse<T> {
-    const fullConfig:HttpConfig = {
+  put<T = unknown>( url:string, body?:Body, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T>
+  put<T = unknown>( urlOrConfig:string | HttpBodyMethod, body?:Body, config?:HttpConfig ) {
+    return HttpManager.fetchWithResHandler<T>({
       ...config,
       method: `PUT`,
       url: typeof urlOrConfig === `string` ? urlOrConfig : urlOrConfig.url,
       body: body || config?.body || (typeof urlOrConfig === `string` ? undefined : urlOrConfig.body),
-    }
-
-    return this.fetchWithResHandler<T>( fullConfig )
+      middlewares: this.#middlewares,
+    })
   }
 
   patch<T = unknown>( config:HttpBodyMethod ): HttpResponse<T>
-  patch<T = unknown>( url:string, body?:Body, config?:HttpConfig ): HttpResponse<T>
-  patch<T = unknown>( urlOrConfig:string | HttpBodyMethod, body?:Body, config?:HttpConfig ): HttpResponse<T> {
-    const fullConfig:HttpConfig = {
+  patch<T = unknown>( url:string, body?:Body, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T>
+  patch<T = unknown>( urlOrConfig:string | HttpBodyMethod, body?:Body, config?:HttpConfig ) {
+    return HttpManager.fetchWithResHandler<T>({
       ...config,
       method: `PATCH`,
       url: typeof urlOrConfig === `string` ? urlOrConfig : urlOrConfig.url,
       body: body || config?.body || (typeof urlOrConfig === `string` ? undefined : urlOrConfig.body),
-    }
-
-    return this.fetchWithResHandler<T>( fullConfig )
+      middlewares: this.#middlewares,
+    })
   }
 
   delete<T = unknown>( config:HttpWithoutBodyMethod ): HttpResponse<T>
   delete<T = unknown>( url:string, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T>
-  delete<T = unknown>( urlOrConfig:string | HttpWithoutBodyMethod, config?:Omit<HttpWithoutBodyMethod, `url`> ): HttpResponse<T> {
-    const fullConfig:HttpConfig = {
+  delete<T = unknown>( urlOrConfig:string | HttpWithoutBodyMethod, config?:Omit<HttpWithoutBodyMethod, `url`> ) {
+    return HttpManager.fetchWithResHandler<T>({
       ...config,
-      method: `DELETE`,
       url: typeof urlOrConfig === `string` ? urlOrConfig : urlOrConfig.url,
-    }
-
-    return this.fetchWithResHandler<T>( fullConfig )
+      method: `DELETE`,
+      middlewares: this.#middlewares,
+    })
   }
 
-  async fetchWithResHandler<T = unknown>( config:HttpConfig ) {
-    this.#middlewares.request.forEach( fn => fn( config ) )
-    const res = await HttpManager.fetchWithResHandler<T>( config )
-    this.#middlewares.response.forEach( fn => fn( res ) )
-    return res
-  }
+  static fetchWithResHandler<T = unknown>( { middlewares, ...fullConfig }:HttpConfig ) {
+    middlewares?.request.forEach( mw => mw( fullConfig ) )
 
-  static async fetchWithResHandler<T = unknown>( { url, ...config }:HttpConfig ): HttpResponse<T> {
-    const isFormData = typeof FormData !== `undefined` && config.body instanceof FormData
+    const { url, ...config } = fullConfig
+    const isFormData = typeof FormData !== `undefined` && fullConfig.body instanceof FormData
 
     if (!isFormData && !Object.keys( config.headers ?? {} ).find( h => h.toLowerCase() === `content-type` )) {
       config.headers ||= {}
@@ -134,25 +130,34 @@ export class HttpManager {
     }
 
     const finalBody = !config.body ? undefined : (isFormData ? config.body : JSON.stringify( config.body ))
-    const response = await fetch( url, {
+    const fetchPromise = fetch( url, {
       ...config,
       headers: config.headers as Record<string, string>,
       body: finalBody,
+    } ).then( async r => {
+      const contentType = r.headers.get( `content-type` )
+
+      const responseObj = {
+        data: await (contentType?.includes( `json` ) ? r.json() : r.text()) as T,
+        get resInfo() {
+          return {
+            url,
+            headers: r.headers,
+            status: r.status as HTTPStatusCode,
+            ok: r.ok,
+          }
+        },
+      }
+
+      middlewares?.response.forEach( mw => mw( responseObj ) )
+
+      return responseObj
     } )
 
+    const dataPromise = fetchPromise.then( r => r.data ) as HttpResponse<T>
+    dataPromise.getMeta = () => fetchPromise.then( r => r.resInfo )
 
-    const contentType = response.headers.get( `content-type` )
-    const data = await (contentType?.includes( `json` ) ? response.json() : response.text())
-
-    return [
-      data,
-      {
-        url,
-        headers: response.headers,
-        status: response.status as HTTPStatusCode,
-        ok: response.ok,
-      },
-    ]
+    return dataPromise
   }
 }
 
