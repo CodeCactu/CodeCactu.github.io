@@ -6,6 +6,7 @@ export const colors = {
   "primary": `#5da234`,
   "secondary": `#444`,
   "surface": `#0001`,
+  "surface-on": `#fefefe`,
   "surface-e100": `#0004`,
   "accent": `color-mix( in srgb, var( --color-secondary ), white 10% )`,
 } as const satisfies Record<string, string>

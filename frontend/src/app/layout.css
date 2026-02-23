@@ -7,7 +7,7 @@ body {
   background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
   background-repeat: no-repeat;
   font-family: sans-serif, arial, monospace;
-  color: #fefefe;
+  color: var( --color-surface-on );
 }
 
 body > nav {

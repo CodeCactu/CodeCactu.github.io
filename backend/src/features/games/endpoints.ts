@@ -1,3 +1,4 @@
+import { promises as fs } from "node:fs"
 import z from "zod"
 import logInfo, { logColorInfo } from "@fet/loggers/logInfo"
 import { User } from "@fet/auth/user"
@@ -38,4 +39,19 @@ export async function updateMyGamesVotesEndpoint( req:Bun.BunRequest, user:User 
   saveVotes( user.id, votes )
 
   return Response.json({ votes })
+}
+
+
+export async function getUploadedResource( req:Bun.BunRequest<`/uploads/games/:gameId/:filename`> ) {
+  const gamesPath = `./uploads/games`
+  const uploadsDir = await fs.readdir( gamesPath ).catch( () => null )
+  if (!uploadsDir) throw new Error( `Games uploads directory not found` )
+
+  const gameDirName = uploadsDir.find( d => d.startsWith( req.params.gameId ) )
+  if (!gameDirName) return Response.json( { code:`NOT_FOUND` }, { status:404 } )
+
+  const file = Bun.file( `${gamesPath}/${gameDirName}/${req.params.filename}` )
+  if (!file) return Response.json( { code:`NOT_FOUND` }, { status:404 } )
+
+  return new Response( file )
 }

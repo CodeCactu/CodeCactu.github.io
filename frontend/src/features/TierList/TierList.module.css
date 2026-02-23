@@ -4,6 +4,11 @@
 
   display: flex;
   gap: var( --_gap );
+
+  & > .overview {
+    width: calc( var( --_element-width ) * 2 );
+    anchor-name: --item-anchor;
+  }
 }
 
 .dragArea [data-drop-area] {
@@ -42,7 +47,7 @@
   }
 }
 
-.items {
+.uncategorised {
   display: flex;
   flex-direction: column;
   width: calc( var( --_element-width ) * 2.5 );
@@ -58,13 +63,38 @@
 }
 
 .item {
-  display: flex;
-  justify-content: space-between;
-  min-height: 25px;
-  width: var( --_element-width );
-  height: var( --_element-width );
-  background-color: white;
-  color: black;
+  & .handle {
+    display: block;
+    width: var( --_element-width );
+    height: var( --_element-width );
+    min-height: 25px;
+    background: var( --color-surface-on ) center / cover var( --bgr );
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  & .overview {
+    position: absolute;
+    position-anchor: --item-anchor;
+    left: anchor( left );
+    right: anchor( right );
+    top: anchor( top );
+    bottom: anchor( bottom );
+    padding: 8px;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      var( --color-surface-on ) center / cover var( --bgr );
+
+    :is( :not( :hover ), .isDragging, :active ) > & {
+      display: none;
+    }
+
+    & > img {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+    }
+  }
 }
 
 .isDragOver {

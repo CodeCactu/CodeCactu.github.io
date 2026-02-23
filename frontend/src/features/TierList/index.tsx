@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import Image from "next/image"
+import { cn } from "@lib/core/functions"
+import { Text } from "@fet/flow/Text"
+import { CactuJamGame } from "@fet/backend/games"
+import { configClient } from "@/config.client"
 import classes from "./TierList.module.css"
 
-export type DragItem = {
-  id: string
-  name: string
-}
+export type DragItem = CactuJamGame
 export type DragItemTierAssignements = Record<string, DragItem[`name`][]>
 
 export type DragAreaLists = Record<string, string[]>
@@ -28,15 +30,29 @@ export default function TierList({ highestValue, items, assignements, ...dragAnd
     const item = items.find( i => i.id == id )
     if (!item) throw new Error( `item "${id}" not found` )
     return (
-      <div key={item.id} draggable data-drag-id={item.id} className={classes.item}>
-        <span>{item.name}</span>
+      <article
+        key={item.id}
+        draggable
+        data-drag-id={item.id}
+        className={classes.item}
+        style={{ "--bgr":`url( ${configClient.BACKEND_ORIGIN}${item.thumbnailUri} )` } as React.CSSProperties}
+      >
         <span className={classes.handle}>☰</span>
-      </div>
+
+        <address className={cn( `textContainer`, classes.overview )}>
+          <h3>{item.name}</h3>
+          {item.description && <Text looksLike="body-2">{item.description}</Text>}
+          <small>~{item.author.name}</small>
+          {item.author.avatarUri && <Image src={item.author.avatarUri} alt={`${item.author.name}'s avatar`} width={75} height={75} />}
+        </address>
+      </article>
     )
   } )
 
   return (
     <article ref={dragAndDropContainerRef} className={classes.dragArea}>
+      <aside className={classes.overview} />
+
       <div className={classes.results}>
         <div className={classes.resultsLegend}>
           <p>Słabsze</p>
@@ -55,7 +71,7 @@ export default function TierList({ highestValue, items, assignements, ...dragAnd
         }
       </div>
 
-      <section className={classes.items}>
+      <section className={classes.uncategorised}>
         <p>Nieskategoryzowani</p>
         <div className={classes.dropArea} data-drop-area="uncategorised">
           {renderdropArea( assignements[ `uncategorised` ] )}
@@ -74,7 +90,7 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
 
     const abortController = new AbortController()
     const activeAnimations = new WeakMap<HTMLElement, Animation>()
-    let draggingItem:null | HTMLDivElement = null
+    let draggingItem:null | HTMLElement = null
 
     const dropAreas = document.querySelectorAll( `[data-drop-area]` )
 
@@ -88,8 +104,7 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
         if (!(target instanceof HTMLElement)) return
 
         let underDrag = target.closest<HTMLElement>( `.${classes.item}, [data-drop-area]` )
-        if (!underDrag) return
-        if (!draggingItem || underDrag === draggingItem || activeAnimations.has( underDrag )) return
+        if (!draggingItem || !underDrag || underDrag === draggingItem || activeAnimations.has( underDrag )) return
 
         const draggingRect = draggingItem.getBoundingClientRect()
         const targetRect = underDrag.getBoundingClientRect()
@@ -104,13 +119,6 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
         }
 
         if (`dropArea` in underDrag.dataset) {
-          /*
-            Future code
-            const offsets = { x:0, y:0 }
-            const computedStyles = window.getComputedStyle( underDrag )
-            offsets.x = parseInt( computedStyles.padding )
-            offsets.y = parseInt( computedStyles.padding )
-            */
           underDrag.insertAdjacentElement( `afterbegin`, draggingItem )
         } else {
           const insertEhere = draggingItem.parentElement === underDrag.parentElement && (draggingRect.top < targetRect.top || draggingRect.left < targetRect.left) ? `afterend` : `beforebegin`
@@ -151,12 +159,14 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
     } )
 
     container.addEventListener( `dragstart`, ({ target }) => {
-      if (target instanceof HTMLDivElement && target.draggable) {
+      if (target instanceof HTMLElement && target.draggable) {
         draggingItem = target
+        draggingItem.classList.add( classes.isDragging )
       }
     }, { signal:abortController.signal } )
 
     container.addEventListener( `dragend`, () => {
+      draggingItem?.classList.remove( classes.isDragging )
       draggingItem = null
       if (onDragEnd) onDragEnd( getDragAreasLists( container ) )
     }, { signal:abortController.signal } )

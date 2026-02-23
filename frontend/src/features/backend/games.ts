@@ -8,6 +8,7 @@ export type CactuJamGameAuthor = {
 export type CactuJamGame = {
   id: string
   name: string
+  description?: string
   author: CactuJamGameAuthor
   thumbnailUri: null | string
 }

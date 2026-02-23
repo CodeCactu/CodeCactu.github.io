@@ -23,6 +23,14 @@ const fonts = {
     fontSize: 14,
     fontFamily: "consolas",
   },
+  "body-2": {
+    fontSize: 12,
+    fontFamily: "consolas",
+  },
+  "body-3": {
+    fontSize: 10,
+    fontFamily: "consolas",
+  },
 } as const satisfies Record<string, FontConfig>
 
 export type FontName = keyof typeof fonts

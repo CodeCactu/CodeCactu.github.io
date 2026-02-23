@@ -1,4 +1,4 @@
-main, .textCOntainer {
+main, .textContainer {
   & > * {
     margin-bottom: var( --textContainer-margin );
   }
@@ -21,6 +21,12 @@ main, .textCOntainer {
     color: var( --color-primary );
     letter-spacing: 0.19em;
     text-transform: lowercase;
+  }
+  .as-body-2 {
+    font: var( --font-body-2 );
+  }
+  & > small, .as-body-3 {
+    font: var( --font-body-3 );
   }
 }
 

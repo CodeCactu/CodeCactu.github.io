@@ -14,6 +14,8 @@ export type UserPanelProps = {
 export default function UserPanel({ className }:UserPanelProps) {
   const [ session, loginLink ] = useAuth()
 
+  console.log({ loginLink })
+
   if (session === undefined) return null
   if (session === null) return (
     <a className={cn( classes.userPanel, className )} href={loginLink}>

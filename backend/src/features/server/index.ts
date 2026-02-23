@@ -19,7 +19,7 @@ export function getApiError( code:string ) {
   return Response.json({ code })
 }
 
-export function withCors( handler:(req:Bun.BunRequest) => Response | Promise<Response> ) {
+export function withCors( handler:(req:Bun.BunRequest<any>) => Response | Promise<Response> ) { // eslint-disable-line @typescript-eslint/no-explicit-any -- It can be any path
   return async(req:Bun.BunRequest) => {
     return withCorsHeaders( await handler( req ) )
   }

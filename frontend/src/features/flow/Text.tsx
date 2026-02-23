@@ -1,6 +1,6 @@
 import cn from "@lib/core/functions/createClassName"
 import LibText, { TextProps as LibTextProps } from "@lib/core/flow/Text"
-import { ColorName, FontName } from "@fet/theming"
+import { ColorName, FontName } from "@fet/theme"
 
 export type TextProps = LibTextProps & {
   color?: ColorName
