@@ -1,4 +1,4 @@
-import { withCors, withCorsHeaders } from "@fet/server"
+import { checkCors, withCors, withCorsHeaders } from "@fet/server"
 import logInfo from "@fet/loggers/logInfo"
 import { getGamesCategoriesEndpoint, getGamesEndpoint, getMyGamesVotesEndpoint, getUploadedResource, updateMyGamesVotesEndpoint } from "@fet/games/endpoints"
 import { createUserSessionEndpoint, deleteUserSessionEndpoint, getUserSessionEndpoint } from "@fet/auth/endpoints"
@@ -6,8 +6,10 @@ import { withAuth } from "@fet/auth"
 
 const server = Bun.serve({
   port: 3001,
+  hostname: `0.0.0.0`,
 
   routes: {
+    "/api/ping": Response.json({ message:`Pong` }),
     "/api/auth/sessions": {
       POST: withCors( createUserSessionEndpoint ),
     },
@@ -31,8 +33,15 @@ const server = Bun.serve({
   },
 
   fetch( req ) {
-    if (req.method === `OPTIONS`) return withCorsHeaders( new Response( null ) )
-    return new Response( null, { status:404 } )
+    if (req.method === `OPTIONS`) {
+      const origin = checkCors( req )
+      if (!origin) return new Response( null, { status:403 } )
+
+      const res = new Response( null, { status:204 } )
+      return origin === `SAME_ORIGIN` ? res : withCorsHeaders( origin, res )
+    }
+
+    return Response.json( { code:`NOT_FOUND` }, { status:404 } )
   },
 })
 

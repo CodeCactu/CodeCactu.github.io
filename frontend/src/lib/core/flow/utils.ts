@@ -34,7 +34,7 @@ export type VerticallAlign = `top` | `center` | `bottom`
 \*/
 
 export function getGap( gap:undefined | string | boolean | number ) {
-  return typeof gap === `number` ? `calc( var( --space ) * ${gap} )`
+  return typeof gap === `number` ? gap
     : typeof gap === `string` ? gap
       : gap === true ? `var( --space )`
         : undefined

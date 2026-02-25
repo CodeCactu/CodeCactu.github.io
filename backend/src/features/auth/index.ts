@@ -1,6 +1,7 @@
 import { getApiError } from "@fet/server"
 import { User } from "./user"
 import { Session } from "./session"
+import logAuth from "./logAuth"
 
 export function getSessionToken( req:Bun.BunRequest ) {
   return req.cookies.get( `sessionToken` )
@@ -8,7 +9,10 @@ export function getSessionToken( req:Bun.BunRequest ) {
 
 export function authReq( req:Bun.BunRequest ) {
   const token = getSessionToken( req )
-  if (!token) return null
+  if (!token) {
+    logAuth( `Cannot extract session token from request`, [ req.cookies ] )
+    return null
+  }
 
   return Session.get( token )
 }

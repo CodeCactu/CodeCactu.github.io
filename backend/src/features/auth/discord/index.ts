@@ -19,7 +19,7 @@ export default async function createSessionWithDiscordEndpoint( req:Bun.BunReque
   const discordUser = await authorizeByDiscord( req.headers.get( `origin` ) ?? ``, body.data.code )
   if (discordUser instanceof Response) return discordUser
 
-  const user = await User.getOrCreate( discordUser.id, discordUser.global_name, discordUser.avatar )
+  const user = await User.getOrCreate( discordUser.id, discordUser.global_name || discordUser.username, discordUser.avatar )
   const session = await Session.create( user.id )
 
   logAuth(

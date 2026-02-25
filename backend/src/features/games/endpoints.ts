@@ -41,7 +41,6 @@ export async function updateMyGamesVotesEndpoint( req:Bun.BunRequest, user:User 
   return Response.json({ votes })
 }
 
-
 export async function getUploadedResource( req:Bun.BunRequest<`/uploads/games/:gameId/:filename`> ) {
   const gamesPath = `./uploads/games`
   const uploadsDir = await fs.readdir( gamesPath ).catch( () => null )

@@ -12,6 +12,7 @@ import UserPanel from "@fet/auth/UserPanel"
 import packageJson from "@/../package.json"
 import classes from "./layout.module.css"
 import cactuLogoImg from "./cactu-logo.png"
+import TanstackQueryProvider from "./TanstackQueryProvider"
 import AppMetaLogger from "./AppMetaLogger"
 
 export default function RootLayout( props:LayoutProps<`/`> ) {
@@ -22,25 +23,27 @@ export default function RootLayout( props:LayoutProps<`/`> ) {
       </head>
 
       <body>
-        <AppMetaLogger
-          logEntries={
-            [
-              [ `App version`, packageJson.version ],
-            ]
-          }
-        />
+        <TanstackQueryProvider>
+          <AppMetaLogger
+            logEntries={
+              [
+                [ `App version`, packageJson.version ],
+              ]
+            }
+          />
 
-        <nav>
-          <Link href="/" className={classes.navItem}>
-            <Image {...rescaleImage( cactuLogoImg, 50, 50 )} alt="Cactu logo" />
-          </Link>
-        </nav>
+          <nav>
+            <Link href="/" className={classes.navItem}>
+              <Image {...rescaleImage( cactuLogoImg, 50, 50 )} alt="Cactu logo" />
+            </Link>
+          </nav>
 
-        {props.children}
+          {props.children}
 
-        <UserPanel className={classes.userPanel} />
-        <CactuBlinkingLines className={classes.background} />
-        <CactuShadyTrail className={classes.background} />
+          <UserPanel className={classes.userPanel} />
+          <CactuBlinkingLines className={classes.background} />
+          <CactuShadyTrail className={classes.background} />
+        </TanstackQueryProvider>
       </body>
     </html>
   )

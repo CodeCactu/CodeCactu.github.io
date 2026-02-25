@@ -9,7 +9,7 @@ export type DiscordUserAvatarDecoration = {
 export type DiscordUser = {
   id: string
   username: string
-  global_name: string
+  global_name: null | string
   discriminator: string
   avatar: null | string
   avatar_decoration_data: null | DiscordUserAvatarDecoration

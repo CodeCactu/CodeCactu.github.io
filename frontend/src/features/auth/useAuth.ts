@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { createStore } from "@lib/stores"
 import { getWindow } from "@lib/core/functions"
 import Session, { SessionData } from "./session/Session"
 import logAuth from "./logAuth"
 
+export type AuthHookOptions = {
+  required?: boolean
+}
+
 const [ useSessionStore, updateSessionStore ] = createStore<undefined | null | SessionData>( undefined )
 
-export function useAuth() {
+export function useAuth( { required }:AuthHookOptions = {} ) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [ session ] = useSessionStore()
-  const [ loginLink, setLoginLink ] = useState( `` )
+  const [ loginLink, setLoginLink ] = useState<string>()
 
   useEffect( () => {
+    setLoginLink( getDiscordIntegrationLink() ) // eslint-disable-line react-hooks/set-state-in-effect -- Intentional dealing with hydration mssmatch
+
     if (Session.checkIsInitialised()) return
 
     logAuth( `Session loading...` )
 
-    const code = searchParams.get( `code` )
-
-    setLoginLink( getDiscordIntegrationLink() ) // eslint-disable-line react-hooks/set-state-in-effect -- Intentional dealing with hydration mssmatch
+    const code = new URL( location.href ).searchParams.get( `code` )
 
     const handleSessionData = (data:null | SessionData) => {
       if (!data) {
@@ -34,7 +37,7 @@ export function useAuth() {
 
       Session.runExpirationTimer( () => {
         updateSessionStore( null )
-        logAuth( `Session expired` )
+        logAuth( `Sessionexpired ` )
       } )
     }
 
@@ -49,7 +52,11 @@ export function useAuth() {
       logAuth( `No available session` )
       updateSessionStore( null )
     }
-  }, [ router, searchParams ] )
+  }, [ router ] )
+
+  useEffect( () => {
+    if (session === null && required) router.push( `/` )
+  }, [ router, session, required ] )
 
   return [ session && session.user, loginLink ] as const
 }
@@ -60,5 +67,5 @@ function getDiscordIntegrationLink() {
     + `&redirect_uri=${encodeURIComponent( getWindow()?.location.origin ?? `` )}`
     + `&response_type=code`
     + `&scope=identify`
-    + `&prompt=none`
+    // + `&prompt=none`
 }

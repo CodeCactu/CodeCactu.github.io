@@ -34,6 +34,7 @@ export default class Session {
 
         return Session.#loaded
       } )
+      .catch( () => Session.#loaded = null )
       .finally( () => Session.#pendingDiscordUser = null )
 
     return Session.#pendingDiscordUser
@@ -43,6 +44,7 @@ export default class Session {
     Session.#pendingDiscordUser = fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include` } )
       .then<SessionRes>( res => res.json() )
       .then( data => `code` in data ? null : data )
+      .catch( () => null )
       .finally( () => Session.#pendingDiscordUser = null )
 
     return Session.#pendingDiscordUser

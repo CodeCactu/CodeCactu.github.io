@@ -30,7 +30,7 @@ export class Game {
         author: {
           id,
           name: discordUser.global_name ?? discordUser.username,
-          avatarUri: getDiscordAvatarUri( discordUser.id, discordUser.avatar ),
+          avatarUri: getDiscordAvatarUri( discordUser.id, discordUser.avatar, 256 ),
         },
         thumbnailUri: !isThumbnailed ? null : `/uploads/games/${id}/thumbnail.png`,
         ...about,

@@ -6,9 +6,11 @@ import classes from "./Surface.module.css"
 export type SurfaceProps = {
   children: React.ReactNode
   className?: string
-  href?: string
+  href?: false | string
   dataset?: Dataset
 }
+
+export const surfaceBackgroundClassName = classes.surfaceBackground
 
 export default function Surface( props:SurfaceProps ) {
   if (props.href) return (
@@ -18,7 +20,7 @@ export default function Surface( props:SurfaceProps ) {
   )
 
   return (
-    <div className={cn( classes.surface, props.className )} {...createDatasetAttributes( props.dataset )}>
+    <div className={cn( classes.surface, props.href === false && classes.asLink, props.className )} {...createDatasetAttributes( props.dataset )}>
       {props.children}
     </div>
   )

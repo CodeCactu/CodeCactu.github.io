@@ -1,10 +1,28 @@
+.surfaceBackground {
+  grid-area: stack;
+  background-color: var( --color-surface );
+  backdrop-filter: blur( 8px );
+  z-index: -1;
+
+  :has( > & ) {
+    display: grid;
+    grid-template-areas: "stack";
+    border: 1px solid var( --color-secondary );
+  }
+
+  ~ * {
+    grid-area: stack;
+    padding: 32px;
+  }
+}
+
 .surface {
   padding: 32px;
   border: 1px solid var( --color-secondary );
   background-color: var( --color-surface );
   backdrop-filter: blur( 8px );
 
-  a& {
+  a&, &.asLink {
     color: var( --color-primary );
     font-family: var( --font-cactu );
     font-size: 30px;
@@ -21,6 +39,10 @@
 
     &:active {
       background-color: var( --color-surface-m100 );
+    }
+
+    &:not( [href] ) {
+      cursor: no-drop;
     }
   }
 }

@@ -41,9 +41,13 @@ export default function TierList({ highestValue, items, assignements, ...dragAnd
 
         <address className={cn( `textContainer`, classes.overview )}>
           <h3>{item.name}</h3>
-          {item.description && <Text looksLike="body-2">{item.description}</Text>}
+          {
+            item.description && <Text looksLike="body-2">
+              {item.description.length > 203 ? item.description.slice( 0, 260 ) + `...` : item.description}
+            </Text>
+          }
           <small>~{item.author.name}</small>
-          {item.author.avatarUri && <Image src={item.author.avatarUri} alt={`${item.author.name}'s avatar`} width={75} height={75} />}
+          {item.author.avatarUri && <Image src={item.author.avatarUri} alt={`${item.author.name}'s avatar`} width={256} height={256} />}
         </address>
       </article>
     )
@@ -51,18 +55,16 @@ export default function TierList({ highestValue, items, assignements, ...dragAnd
 
   return (
     <article ref={dragAndDropContainerRef} className={classes.dragArea}>
-      <aside className={classes.overview} />
-
-      <div className={classes.results}>
-        <div className={classes.resultsLegend}>
+      <div className={classes.tiers}>
+        <div className={classes.legend}>
           <p>Słabsze</p>
           <p>Lepsze</p>
         </div>
 
         {
           Array.from( { length:highestValue + 1 }, (_, i) => highestValue - i ).map( tier => (
-            <section key={tier}>
-              <p className={classes.rowLabel}>{tier}</p>
+            <section key={tier} className={classes.row}>
+              <p className={classes.label}>{tier}</p>
               <div className={classes.dropArea} data-drop-area={`t${tier}`}>
                 {renderdropArea( assignements[ `t${tier}` ] )}
               </div>
@@ -77,7 +79,21 @@ export default function TierList({ highestValue, items, assignements, ...dragAnd
           {renderdropArea( assignements[ `uncategorised` ] )}
         </div>
       </section>
+
+      <section className={classes.smallScreenInfo}>
+        Tabela niedostępna na małych ekranach
+      </section>
     </article>
+  )
+}
+
+export function OverviewAnchor() {
+  return (
+    <div>
+      <aside className={classes.overviewAnchor}>
+        Najedź wskaźnikiem myszy nad element tabeli aby zobaczyć jego opis
+      </aside>
+    </div>
   )
 }
 
@@ -91,6 +107,7 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
     const abortController = new AbortController()
     const activeAnimations = new WeakMap<HTMLElement, Animation>()
     let draggingItem:null | HTMLElement = null
+    let draggingItemAnimation:null | Animation = null
 
     const dropAreas = document.querySelectorAll( `[data-drop-area]` )
 
@@ -101,52 +118,72 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
         e.preventDefault()
 
         const target = e.target
-        if (!(target instanceof HTMLElement)) return
+        if (!draggingItem || !(target instanceof HTMLElement)) return
 
         let underDrag = target.closest<HTMLElement>( `.${classes.item}, [data-drop-area]` )
-        if (!draggingItem || !underDrag || underDrag === draggingItem || activeAnimations.has( underDrag )) return
+        if (!underDrag) return
+
+        let isUnderDragDropArea = `dropArea` in underDrag.dataset
+
+        if (isUnderDragDropArea) underDrag.classList.add( classes.isDragOver )
+        if (underDrag === draggingItem.parentElement || activeAnimations.has( underDrag )) return
 
         const draggingRect = draggingItem.getBoundingClientRect()
-        const targetRect = underDrag.getBoundingClientRect()
+        const targetRect = (() => {
+          const rect = underDrag.getBoundingClientRect()
+          const styles = underDrag.computedStyleMap()
+
+          return {
+            x: rect.left + parseInt( styles.get( `padding-left` )?.toString() ?? `0` ),
+            y: rect.top + parseInt( styles.get( `padding-top` )?.toString() ?? `0` ),
+          }
+        })()
+
         const animationOptions = {
           duration: 200,
           easing: `cubic-bezier( 0.2, 0, 0, 1 )`,
         }
 
-        if (`dropArea` in underDrag.dataset && underDrag.childNodes.length) {
+        if (isUnderDragDropArea && underDrag.childNodes.length) {
           const last = underDrag.childNodes[ underDrag.childNodes.length - 1 ]
           if (last instanceof HTMLElement) underDrag = last
+          isUnderDragDropArea = `dropArea` in underDrag.dataset
         }
 
-        if (`dropArea` in underDrag.dataset) {
+        if (isUnderDragDropArea) {
           underDrag.insertAdjacentElement( `afterbegin`, draggingItem )
         } else {
-          const insertEhere = draggingItem.parentElement === underDrag.parentElement && (draggingRect.top < targetRect.top || draggingRect.left < targetRect.left) ? `afterend` : `beforebegin`
+          const insertHere = draggingItem.parentElement === underDrag.parentElement && (draggingRect.top < targetRect.y || draggingRect.left < targetRect.x) ? `afterend` : `beforebegin`
 
-          underDrag.insertAdjacentElement( insertEhere, draggingItem )
+          underDrag.insertAdjacentElement( insertHere, draggingItem )
 
           const targetRectAfter = underDrag.getBoundingClientRect()
-          const targetDeltaX = targetRect.left - targetRectAfter.left
-          const targetDeltaY = targetRect.top - targetRectAfter.top
+          const targetDeltaX = targetRect.x - targetRectAfter.left
+          const targetDeltaY = targetRect.y - targetRectAfter.top
 
           const targetAnim = underDrag.animate( [
             { transform:`translate(${targetDeltaX}px,${targetDeltaY}px)` },
             { transform:`translate(0,0)` },
           ], animationOptions )
 
+          underDrag.classList.add( classes.isDragging )
           activeAnimations.set( underDrag, targetAnim )
 
-          targetAnim.onfinish = () => activeAnimations.delete( underDrag )
+          targetAnim.onfinish = () => {
+            activeAnimations.delete( underDrag )
+            underDrag.classList.remove( classes.isDragging )
+          }
         }
 
-        const deltaX = draggingRect.left - targetRect.left
-        const deltaY = draggingRect.top - targetRect.top
+        const deltaX = draggingRect.left - targetRect.x
+        const deltaY = draggingRect.top - targetRect.y
 
-        draggingItem.animate( [
+        draggingItemAnimation = draggingItem.animate( [
           { transform:`translate(${deltaX}px,${deltaY}px)` },
           { transform:`translate(0,0)` },
         ], animationOptions )
 
+        draggingItemAnimation.addEventListener( `finish`, () => draggingItemAnimation = null )
       } )
 
       dragArea.addEventListener( `dragleave`, e => {
@@ -166,9 +203,17 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
     }, { signal:abortController.signal } )
 
     container.addEventListener( `dragend`, () => {
-      draggingItem?.classList.remove( classes.isDragging )
-      draggingItem = null
-      if (onDragEnd) onDragEnd( getDragAreasLists( container ) )
+      const removeClassName = () => {
+        draggingItem?.classList.remove( classes.isDragging )
+
+        if (onDragEnd) onDragEnd( getDragAreasLists( container ) )
+        container.querySelector( `.${classes.isDragOver}` )?.classList.remove( classes.isDragOver )
+
+        draggingItem = null
+      }
+
+      if (!draggingItemAnimation) removeClassName()
+      else draggingItemAnimation.addEventListener( `finish`, removeClassName )
     }, { signal:abortController.signal } )
 
     return () => abortController.abort()

@@ -1,5 +1,5 @@
+import "./page.css"
 import { Text } from "@fet/flow/Text"
-import Surface from "@fet/flow/Surface"
 import { loadCactuJamGames } from "@fet/backend/games"
 import { loadCactuJamCategories } from "@fet/backend/categories"
 import TierLists from "./TierLists"
@@ -14,9 +14,7 @@ export default async function CactuJamPage() {
     <main>
       <Text as="h1">CactuJam</Text>
 
-      <Surface>
-        <TierLists games={games} categories={categories} />
-      </Surface>
+      <TierLists games={games} categories={categories} />
     </main>
   )
 }

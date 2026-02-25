@@ -1,3 +1,4 @@
+import { categories } from "./categories"
 import db from "@/db"
 
 export type CategoryName = string
@@ -22,14 +23,8 @@ const saveVotesQuery = db.prepare( `
   VALUES ($userId, $votes)
   ON CONFLICT(userId) DO UPDATE SET
     updatedAt = CURRENT_TIMESTAMP,
-    votesJson = $votes
+    votesJson = json_patch( votesJson, $votes )
 ` )
-
-const initialVotes = {
-  theme: {
-    uncategorised: [ `1`, `2`, `3` ],
-  },
-} satisfies UserVotes
 
 
 export function getVotes( userId?:string ) {
@@ -37,9 +32,16 @@ export function getVotes( userId?:string ) {
     ? getVotesQuery.get( userId ) as null | { userId: string, votesJson: string }
     : getAllVotesQuery.get() as null | { userId: string, votesJson: string }
 
-  if (!lastVotesResult) return initialVotes
+  const lastVotes = !lastVotesResult ? {} : JSON.parse( lastVotesResult.votesJson )
 
-  const lastVotes = JSON.parse( lastVotesResult.votesJson )
+  for (const category of categories) {
+    if (category.name in lastVotes) continue
+
+    lastVotes[ category.name ] = category.name === `bonus`
+      ? { t0:[ `1`, `2`, `3` ] }
+      : { uncategorised:[ `1`, `2`, `3` ] }
+  }
+
   return lastVotes
 }
 
