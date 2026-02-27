@@ -29,10 +29,10 @@ export function getSessionHeadersInit( session:Session ) {
 export function withAuth( handler:(req:Bun.BunRequest, user:User) => Response | Promise<Response> ) {
   return async(req:Bun.BunRequest) => {
     const session = authReq( req )
-    if (!session) return getApiError( `UNAUTHORIZED` )
+    if (!session) return getApiError( `UNAUTHORIZED`, 401 )
 
     const user = User.get( session.userId )
-    if (!user) return getApiError( `UNAUTHORIZED` )
+    if (!user) return getApiError( `UNAUTHORIZED`, 401 )
 
     const res = await handler( req, user )
 

@@ -1,5 +1,6 @@
 node_modules/
-uploads/**/*discord*.json
 
 .env
 db.sqlite
+uploads/games/*/*
+!uploads/games/*/about.json

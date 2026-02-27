@@ -9,8 +9,8 @@ const CORS_HEADERS = {
   "Vary": `Origin`,
 }
 
-export function getApiError( code:string ) {
-  return Response.json({ code })
+export function getApiError( code:string, status = 400 ) {
+  return Response.json( { code }, { status } )
 }
 
 export function checkCors( req:Request ): `SAME_ORIGIN` | (string & {}) | null {

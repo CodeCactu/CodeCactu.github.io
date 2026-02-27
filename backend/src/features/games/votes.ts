@@ -38,8 +38,8 @@ export function getVotes( userId?:string ) {
     if (category.name in lastVotes) continue
 
     lastVotes[ category.name ] = category.name === `bonus`
-      ? { t0:[ `1`, `2`, `3` ] }
-      : { uncategorised:[ `1`, `2`, `3` ] }
+      ? { t0:[ `1`, `2`, `3`, `4`, `5`, `6`, `7` ] }
+      : { uncategorised:[ `1`, `2`, `3`, `4`, `5`, `6`, `7` ] }
   }
 
   return lastVotes

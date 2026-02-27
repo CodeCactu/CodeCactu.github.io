@@ -28,6 +28,7 @@ export default function TierList({ highestValue, items, assignements, ...dragAnd
 
   const renderdropArea = (ids:undefined | DragItem[`id`][]) => ids?.map( id => {
     const item = items.find( i => i.id == id )
+
     if (!item) throw new Error( `item "${id}" not found` )
     return (
       <article
@@ -131,11 +132,11 @@ function useDragAndDrop( { onDragEnd }:DragAndDropHookConfig = {} ) {
         const draggingRect = draggingItem.getBoundingClientRect()
         const targetRect = (() => {
           const rect = underDrag.getBoundingClientRect()
-          const styles = underDrag.computedStyleMap()
+          const styles = window.getComputedStyle( underDrag )
 
           return {
-            x: rect.left + parseInt( styles.get( `padding-left` )?.toString() ?? `0` ),
-            y: rect.top + parseInt( styles.get( `padding-top` )?.toString() ?? `0` ),
+            x: rect.left + parseInt( styles.paddingLeft ?? `0` ),
+            y: rect.top + parseInt( styles.paddingTop ?? `0` ),
           }
         })()
 
