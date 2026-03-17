@@ -1,0 +1,27 @@
+@layer reset, lib;
+
+@layer reset {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  p {
+    margin: 0;
+  }
+
+  a {
+    text-decoration: inherit;
+    font: inherit;
+    color: inherit;
+  }
+
+  .pixelart {
+    image-rendering: pixelated;
+  }
+}

@@ -1,0 +1,35 @@
+:where( .dropdown ) {
+  display: flex;
+  align-items: center;
+  width: max-content;
+}
+
+.optionsWrapper {
+  position: relative;
+}
+
+:where( .dropdownLabel ) {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.dropdown.isHoverable:hover,
+.dropdown.isHoverable:focus-within,
+.dropdown.isHoverable:has( input:focus-visible ),
+.dropdown:not( .isHoverable ):has( > input:checked ) {
+  z-index: 10;
+}
+:where(
+  .dropdown.isHoverable:not( :hover, :focus-within, :has( input:focus-visible ) ) > .options,
+  .dropdown:not( .isHoverable ) > input:not( :checked ) ~ .options
+ ) {
+  display: none;
+}
+
+:where( .options ) {
+  position: absolute;
+  left: 0;
+  top: 100%;
+}

@@ -1,0 +1,31 @@
+.carousel {
+  flex-grow: 1;
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
+  scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel::scrollbar {
+  display: none;
+}
+
+.itemContainer {
+  gap: var( --carousel-gap );
+}
+.itemContainer > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  min-width: var( --minCardWidth );
+  width: calc( 100% / var( --count ) - var( --carousel-gap ) * (var( --count ) - 1) / var( --count ) );
+}
+
+.extraItems {
+  display: flex;
+}

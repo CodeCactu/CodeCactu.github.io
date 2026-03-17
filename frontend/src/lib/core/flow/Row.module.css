@@ -1,0 +1,14 @@
+.stretchedRow,
+.resizeableRow,
+.row {
+  display: flex;
+}
+.resizeableRow > * {
+  flex-basis: 0;
+  width: var( --width );
+}
+
+.stretchedRow > * {
+  flex-grow: 1;
+  flex-basis: 0;
+}

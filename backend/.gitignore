@@ -1,0 +1,9 @@
+node_modules/
+
+_*.sh
+_*.ts
+*.sqlite
+.env
+db.sqlite
+uploads/games/*/*
+!uploads/games/*/about.json

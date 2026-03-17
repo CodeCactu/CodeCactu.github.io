@@ -1,0 +1,147 @@
+.dragArea {
+  --_authorAvatarSize: 75px;
+  --_element-width: min( 100px, 15vw );
+  --_areasGap: 24px;
+  --_itemsGap: 8px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var( --_areasGap );
+
+  &.isBig {
+    --_authorAvatarSize: 100%;
+  }
+
+  .smallScreenInfo {
+    display: none;
+    font-style: italic;
+  }
+
+  @media (width <= 700px) {
+    > * {
+      display: none;
+    }
+
+    .smallScreenInfo {
+      display: block;
+    }
+  }
+}
+
+.overviewAnchor {
+  anchor-name: --item-anchor;
+
+  position: sticky;
+  top: calc( 50% - 200px );
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  width: calc( min( 100px, 15vw ) * 2 );
+  height: 400px;
+  border: var( --border-width ) solid currentColor;
+  text-align: center;
+  line-height: 1.5em;
+  color: var( --color-secondary );
+}
+
+.dragArea [data-drop-area] {
+  padding: var( --_itemsGap );
+  border: var( --border-width ) solid currentColor;
+}
+
+:where( .tiers ) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  .legend {
+    display: flex;
+    justify-content: space-between;
+    margin-left: calc( var( --_areasGap ) + 1lh );
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    height: calc( var( --_element-width ) + var( --_itemsGap ) * 2 + var( --border-width ) * 2 );
+    gap: var( --_areasGap );
+
+    &:not( :first-of-type ) {
+      margin-top: var( --_areasGap )
+    }
+
+    .label {
+      width: 1lh;
+    }
+
+    [data-drop-area] {
+      flex-grow: 1;
+      display: flex;
+      gap: var( --_itemsGap );
+      min-width: calc( var( --_element-width ) * 3 + var( --_itemsGap ) * 4 + var( --border-width ) * 2 );
+      height: 100%;
+    }
+  }
+}
+
+:where( .uncategorised ) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: calc( var( --_element-width ) * 2 + var( --_itemsGap ) * 3 + var( --border-width ) * 2 );
+
+  & [data-drop-area] {
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: var( --_itemsGap );
+    width: calc( var( --_element-width ) * 2 + var( --_itemsGap ) * 3 + var( --border-width ) * 2 );
+    min-height: calc( var( --_element-width ) * 3 + var( --_itemsGap ) * 4 + var( --border-width ) * 2 );
+  }
+}
+
+.item {
+  .handle {
+    display: block;
+    width: var( --_element-width );
+    height: var( --_element-width );
+    min-height: 25px;
+    background: var( --color-surface-on ) center / cover var( --bgr );
+    font-size: 20px;
+    font-weight: bold;
+    cursor: move;
+    touch-action: none;
+  }
+
+  .overview {
+    position: absolute;
+    position-anchor: --item-anchor;
+    inset:
+      calc( anchor( top ) + var( --_itemsGap ) + var( --border-width ) )
+      calc( anchor( right ) + var( --_itemsGap ) + var( --border-width ) )
+      calc( anchor( bottom ) + var( --_itemsGap ) + var( --border-width ) )
+      calc( anchor( left ) + var( --_itemsGap ) + var( --border-width ) * 2 );
+    padding: 8px;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      var( --color-surface-on ) center / cover var( --bgr );
+
+    :is( :not( :hover ), .isDragging, :active ) > & {
+      display: none;
+    }
+
+    & > img {
+      position: absolute;
+      width: var( --_authorAvatarSize );
+      height: unset;
+      aspect-ratio: 1;
+      left: 0;
+      bottom: 0;
+    }
+  }
+}
+
+.isDragOver {
+  background-color: var( --color-secondary );
+}

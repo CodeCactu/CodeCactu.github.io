@@ -1,9 +1,0 @@
-body > nav {
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  left: 0;
-  right: 0;
-  padding: var( --space-normal );
-}
