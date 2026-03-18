@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets'
+import classes from "./CactuBanner.module.css"
+import noSign from "./svg/Banner-no_sign.svg"
+import logo from "./svg/Banner-logo.svg"
+import grass from "./svg/Banner-grass.svg"
+import floatingFace from "./svg/Banner-floating_face.svg"
+
+interface Props {
+  class?: string
+}
+
+const { class:className } = Astro.props
+---
+<figure class:list={[ classes.banner, className ]}>
+  <Image class:list={[ classes.signet ]} src={logo} width={294} height={345} alt="Cactu signet" priority />
+
+  <Image class:list={[classes.singleSign, classes.floatingFace, classes.is1 ]} src={floatingFace} width={168} height={137} alt="Floating face" />
+  <Image class:list={[classes.singleSign, classes.floatingFace, classes.is2 ]} src={floatingFace} width={168} height={137} alt="Floating face" />
+
+  <Image class:list={[classes.singleSign, classes.grass, classes.is1 ]} src={grass} width={100} height={45} alt="Grass" />
+  <Image class:list={[classes.singleSign, classes.grass, classes.is2 ]} src={grass} width={100} height={45} alt="Grass" />
+  <Image class:list={[classes.singleSign, classes.grass, classes.is3 ]} src={grass} width={100} height={45} alt="Grass" />
+
+  <p class={classes.logotype}>cactu</p>
+
+  <Image class:list={[classes.singleSign, classes.noSign ]} src={noSign} width={100} height={66} alt="No sign" />
+</figure>

@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class:className } = Astro.props
+---
+
+<canvas id="dynamicBackground-shadyTrail" class={className} />
+
+<script>
+  import CactuGradientsController from "./logic"
+
+  const canvas = document.querySelector<HTMLCanvasElement>(`#dynamicBackground-shadyTrail`)
+  if (canvas) new CactuGradientsController( canvas )
+</script>

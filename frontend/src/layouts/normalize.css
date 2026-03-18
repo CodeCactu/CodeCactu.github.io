@@ -1,0 +1,69 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  scrollbar-gutter: stable;
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+body,
+p, figure {
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  margin: 0;
+}
+
+ol, ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+img {
+  max-width: 100%;
+  height: unset;
+  vertical-align: top;
+}
+
+svg {
+  vertical-align: middle;
+}
+
+fieldset {
+  border: none;
+}
+
+button, a {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button {
+  padding: 0;
+  border: none;
+  background: unset;
+}
+
+label {
+  cursor: pointer
+}
+
+input:not( [type="radio"], [type="checkbox"], [hidden] ) {
+  display: block;
+  padding: 0;
+  border: none;
+  background-color: unset;
+
+  &:focus {
+    outline: none;
+  }
+}

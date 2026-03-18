@@ -1,0 +1,30 @@
+@layer reset, lib, layout;
+
+@import "./normalize.css" layer( reset );
+@import "@lib/flow/flow.css" layer( lib );
+@import "@fet/theme/font/cactu.css";
+
+@layer layout {
+  body {
+    background-color: #12131d;
+    background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
+    color: white;
+  }
+  .page-content {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+  }
+
+  .page-content ~ canvas {
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: -1;
+  }
+
+  .row, .columns {
+    gap: 24px;
+  }
+}

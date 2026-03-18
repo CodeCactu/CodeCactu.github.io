@@ -1,0 +1,22 @@
+---
+import "./RootLayout.css"
+import CactuShadyTrail from "@fet/dynamicBackgrounds/CactuShadyTrail/index.astro"
+import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines/index.astro"
+---
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<title>Cactu</title>
+	</head>
+	<body>
+		<div class="page-content">
+			<slot />
+		</div>
+
+		<CactuBlinkingLines />
+		<CactuShadyTrail />
+	</body>
+</html>

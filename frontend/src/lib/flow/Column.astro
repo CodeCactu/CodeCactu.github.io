@@ -1,0 +1,21 @@
+---
+import type * as CSS from 'csstype'
+
+type Props = {
+  style: CSS.Properties
+  width?: number | { percent:number } | { flex:string }
+}
+
+const { style, width } = Astro.props
+
+let finalStyle:null | CSS.Properties = { ...style }
+
+if (width) {
+  if (typeof width === `number`) finalStyle.flex = `0 0 ${width}px`
+  else if (`percent` in width) finalStyle.flex = `0 0 ${width.percent}%`
+  else finalStyle.flex = width.flex
+}
+---
+<div style={finalStyle}>
+  <slot/>
+</div>

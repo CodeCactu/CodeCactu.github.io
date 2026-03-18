@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class:className } = Astro.props
+---
+
+<canvas id="dynamicBackground-blinkingLines" class={className} />
+
+<script>
+  import CactuBlinkingLines from "./logic"
+
+  const canvas = document.querySelector<HTMLCanvasElement>(`#dynamicBackground-blinkingLines`)
+  if (canvas) new CactuBlinkingLines( canvas )
+</script>

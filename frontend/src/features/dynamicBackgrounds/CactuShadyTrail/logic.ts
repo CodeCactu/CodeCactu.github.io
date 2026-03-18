@@ -1,4 +1,4 @@
-import { UiManager, UiManagerHolder } from "@lib/dynamicUi"
+import Loop from "../Loop"
 
 type Point = {
   x: number
@@ -9,8 +9,7 @@ type MouseHoverTile = Point & {
   createdAt: number
 }
 
-export default class CactuGradientsController implements UiManagerHolder {
-  uiManager: UiManager<HTMLDivElement>
+export default class CactuShadyTrail {
   ctx: CanvasRenderingContext2D
   uiData = {
     test: true,
@@ -18,13 +17,19 @@ export default class CactuGradientsController implements UiManagerHolder {
 
   tileSize = 10
   mouseTileHistory: MouseHoverTile[] = []
+  loop = new Loop()
 
+  constructor( canvas:HTMLCanvasElement ) {
+    const ctx = canvas.getContext(`2d`)
+    if (!ctx) throw new Error( `Cannot create canvas 2D context` )
 
-  constructor( root:HTMLDivElement ) {
-    this.uiManager = new UiManager( root )
-    this.ctx = this.uiManager.registerCtx( `main`, `canvas` )
-    this.uiManager.registerEvent( window, `mousemove`, e => this.handleMouseMove( e ) )
-    this.uiManager.startLoop( () => this.update() )
+    const style = window.getComputedStyle( canvas )
+    canvas.width = parseInt( style.width )
+    canvas.height = parseInt( style.height )
+
+    this.ctx = ctx
+    window.addEventListener( `mousemove`, e => this.handleMouseMove( e ) )
+    this.loop.startLoop( () => this.update() )
   }
 
   update() {
