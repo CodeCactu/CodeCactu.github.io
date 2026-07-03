@@ -1,0 +1,14 @@
+---
+import "@fet/serverOnly"
+import { prepareConfig } from "@lib/prepareConfig"
+
+export const [ clientConfig ] = prepareConfig( {
+  BACKEND_ORIGIN: {
+    rawValue: import.meta.env.BACKEND_ORIGIN,
+  },
+})
+
+---
+<script is:inline id="clientConfig" define:vars={{ clientConfig }}>
+  window.clientConfig = clientConfig
+</script>

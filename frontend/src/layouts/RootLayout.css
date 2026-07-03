@@ -1,7 +1,7 @@
 @layer reset, lib, layout;
 
 @import "./normalize.css" layer( reset );
-@import "@lib/flow/flow.css" layer( lib );
+@import "@lib/core/flow/flow.css" layer( lib );
 @import "@fet/theme/font/cactu.css";
 
 @layer layout {
