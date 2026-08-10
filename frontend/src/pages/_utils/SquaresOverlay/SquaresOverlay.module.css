@@ -1,0 +1,88 @@
+:has( > .squares ) {
+  --_tileSize: var( --tileSize );
+  --_squaresBSize: calc( var( --_tileSize ) * 6 );
+  --_squaresFill: black;
+
+  @media (width >= 600px) {
+    padding-left: calc( var( --_tileSize ) * 7 )
+  }
+}
+
+
+.body {
+  padding-left: var( --_tileSize );
+  padding-bottom: var( --_tileSize );
+
+  @media (width >= 600px) {
+    position: absolute;
+    bottom: 0;
+    z-index: 11;
+    width: calc( var( --_tileSize ) * 10.5 );
+  }
+}
+
+.squares {
+  @media (width >= 600px) {
+    position: absolute;
+    inset: 0;
+  }
+
+  @media (width < 600px) {
+    position: relative;
+    width: 100vw;
+    margin-top: var( --_squaresBSize );
+    background-color: var( --_squaresFill );
+  }
+}
+
+.squaresWrapper {
+  position: relative;
+  height: 100%;
+  overflow-x: clip;
+
+  @media (width < 600px) {
+    position: absolute;
+    inset: 0;
+
+    svg:not( .squaresB ) {
+      display: none;
+    }
+  }
+
+  svg {
+    position: absolute;
+    z-index: 10;
+    fill: var( --_squaresFill );
+  }
+  .squaresLb {
+    left: 0;
+    bottom: 0;
+    height: calc( var( --_tileSize ) * 31 );
+  }
+  .squaresLt {
+    left: 0;
+    top: 0;
+    display: none;
+    height: calc( var( --_tileSize ) * 16 );
+  }
+  .squaresRb {
+    right: 0;
+    bottom: 0;
+    height: calc( var( --_tileSize ) * 11 );
+  }
+  .squaresRt {
+    right: 0;
+    top: 0;
+    height: calc( var( --_tileSize ) * 4 );
+  }
+  .squaresB {
+    left: 50%;
+    translate: -50% 0;
+    bottom: calc( 100% - 1px );
+    height: var( --_squaresBSize );
+
+    @media (width >= 600px) {
+      display: none;
+    }
+  }
+}

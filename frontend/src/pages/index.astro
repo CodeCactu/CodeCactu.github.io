@@ -1,7 +1,21 @@
 ---
 import RootLayout from "@/layouts/RootLayout.astro"
 import CactuBanner from "./_utils/CactuBanner/index.astro"
+import SquaresOverlay from "./_utils/SquaresOverlay/index.astro"
+import Button from "@fet/controls/Button.astro"
+import classes from "./page.module.css"
+import cn from "@lib/core/functions/createClassName"
 ---
+
 <RootLayout>
-  <CactuBanner/>
+  <SquaresOverlay bodyClassName={cn( `prose`, classes.nav )}>
+    <main>
+      <CactuBanner />
+    </main>
+
+    <Fragment slot="squared-surface">
+      <Button>Lorem ipsum</Button>
+      <Button variant="yellow">Lorem ipsum at dolor</Button>
+    </Fragment>
+  </SquaresOverlay>
 </RootLayout>

@@ -1,0 +1,17 @@
+---
+import classes from "./Button.module.css"
+import { select } from "@lib/core/functions"
+
+interface Props {
+  variant?: `yellow` | `green`
+  style?: astroHTML.JSX.CSSProperties
+}
+
+const variantClassName = select( Astro.props.variant, {
+  "yellow" : classes.isYellow
+} )
+---
+
+<button class:list={[ `button`, variantClassName ]} style={Astro.props.style}>
+  <slot />
+</button>

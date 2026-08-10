@@ -1,0 +1,242 @@
+---
+import classes from "./SquaresOverlay.module.css"
+
+interface Props {
+  bodyClassName?: string
+}
+---
+<slot />
+
+<div class={classes.squares}>
+  {Astro.slots.has( `squared-surface` ) && (
+    <div class:list={[ classes.body, Astro.props.bodyClassName ]}>
+      <slot name="squared-surface" />
+    </div>
+  )}
+
+  <div class={classes.squaresWrapper}>
+    <svg class={classes.squaresLb} viewBox="0 0 17 31">
+      <rect x="13" y="29" width="1" height="1" />
+      <rect x="15" y="30" width="2" height="1" />
+
+      <path d="
+        M 0 31
+        h 12
+        v -1
+        h -1
+        v -2
+        h  1
+        v -1
+        h -1
+        v -1
+        h  1
+        v -1
+        h -2
+        v -1
+        h -1
+        v -1
+
+        h  1
+        v -1
+        h -1
+        v  1
+
+        h -1
+        v -2
+
+        h  1
+        v -1
+        h -1
+        v  1
+
+        h -1
+        v -1
+        h  1
+        v -2
+        h  1
+        v -1
+        h -2
+        v  1
+        h -1
+        v -1
+        h  1
+        v -1
+
+        h  1
+        v -1
+        h -1
+        v -2
+        h -1
+        v  1
+        h -1
+        v -2
+        h  1
+        v -3
+        h -1
+        v  1
+        h -1
+        v -1
+        h  1
+        v -1
+        h  1
+        v -1
+        h -1
+        v -1
+        h -2
+        v -1
+        h  1
+        v -1
+        h -1
+        v -1
+        h  1
+        v  1
+        h  1
+        v -2
+        h -1
+        v -2
+
+        H 0
+      " />
+    </svg>
+
+    <svg class={classes.squaresLt} viewBox="0 0 22 16">
+      <path d="
+        M 0 11
+        h 10
+        v -1
+        h  2
+        v -1
+        h -1
+        v -2
+        h  1
+        v -1
+        h -1
+        v -1
+        h  1
+        v  1
+        h  1
+        v -1
+        h -1
+        v -1
+        h  3
+        v  1
+        h  1
+        v -2
+        h -1
+        v -1
+        h  2
+        v -1
+        h  1
+        v -1
+
+        L 0 0
+      " />
+    </svg>
+
+    <!-- <svg id="squares-rb" viewBox="0 0 9 11"> -->
+    <svg class={classes.squaresRb} viewBox="0 0 6 11">
+      <path d="
+        M 9 0
+        h -1
+        v  1
+        h -2
+        v  1
+        h  1
+        v  2
+        h -1
+        v  1
+        h  1
+        v  1
+        h -1
+        v -1
+        h -1
+        v  1
+        h  1
+        v  1
+        h -3
+        v -1
+        h -1
+        v  2
+        h  1
+        v  1
+        h -2
+        v  1
+        h -1
+        v  1
+        h  9
+      " />
+    </svg>
+
+    <svg class={classes.squaresRt} viewBox="0 0 5 4">
+      <rect x="0" y="0" width="1" height="1" />
+      <rect x="4" y="0" width="1" height="2" />
+      <rect x="4" y="3" width="1" height="1" />
+    </svg>
+
+    <svg class={classes.squaresB} viewBox="0 0 35 6">
+      <rect x="8" y="1" width="1" height="1" />
+      <rect x="19" y="0" width="1" height="1" />
+
+      <path d="
+        M 0 0
+        h  1
+        v  1
+        h  1
+        v  1
+        h  2
+        v  1
+        h  1
+        v  1
+        h  1
+        v -1
+        h  2
+        v  1
+        h  2
+        v -1
+
+        h  1
+        v  1
+        h  2
+        v  1
+        h  3
+        v -1
+
+        h -1
+        v -1
+        h  1
+        v  1
+
+        h  3
+        v -1
+        h  3
+        v  1
+        h  1
+        v -1
+        h  1
+        v -1
+        h  2
+
+        v -1
+        h  1
+        v  1
+        h -1
+
+        v  1
+        h  2
+        v -1
+        h  1
+        v -1
+        h  2
+        v  1
+        h  1
+        v -1
+        h  1
+        v -1
+        h  1
+
+        v 10
+        H 0
+      " />
+    </svg>
+  </div>
+</div>

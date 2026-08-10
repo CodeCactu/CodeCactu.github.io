@@ -1,0 +1,18 @@
+:global( .button ) {
+  display: block;
+  height: calc( var( --tileSize ) * 2 );
+  corner-shape: notch;
+  border-radius: var( --border-width );
+  border: var( --border-width ) solid var( --color-green-m100 );
+  border-left-color: var( --color-green-e100 );
+  border-top-color: var( --color-green-e100 );
+  background-color: var( --color-green );
+  padding-inline: var( --tileSize );
+}
+
+.isYellow {
+  border-color: var( --color-yellow-e100 );
+  border-left-color: var( --color-yellow-e100 );
+  border-top-color: var( --color-yellow-e100 );
+  background-color: var( --color-yellow );
+}

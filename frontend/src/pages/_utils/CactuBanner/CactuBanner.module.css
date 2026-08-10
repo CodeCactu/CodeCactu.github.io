@@ -4,25 +4,26 @@
   position: relative;
   display: flex;
   width: max-content;
-  padding-right: 0.5em;
-  padding-bottom: 1.5%;
   align-items: center;
   font-family: cactu;
   font-size: 210px;
   letter-spacing: 0.19em;
 
-  @media screen and (max-width:1400px) {
+  @container (width < 1400px) {
     --_signetWidth: 227px;
     font-size: 140px;
   }
 
-  @media screen and (max-width:900px) {
+  @container (width < 900px) {
     --_signetWidth: 140px;
     font-size: 95px;
   }
 
-  @media screen and (max-width:600px) {
-    & :not( .signet, .grass ) {
+  @container (width < 600px) {
+    flex-direction: column;
+    gap: 50px;
+
+    .floatingFace {
       display: none;
     }
   }
@@ -34,10 +35,38 @@
 }
 
 .signet {
+  position: relative;
   width: var( --_signetWidth );
   height: unset;
+  padding-bottom: 1.5%;
+  margin-bottom: -1.5%;
   aspect-ratio: 294 / 345;
   z-index: 10;
+
+  .grass {
+    width: calc( var( --_signetWidth ) * 0.35 );
+    height: unset;
+    aspect-ratio: 100 / 45;
+    z-index: -1;
+
+    &.is1 {
+      bottom: 23%;
+      left: calc( var( --_signetWidth ) * 0.5 );
+    }
+
+    &.is2 {
+      bottom: 4%;
+      left: calc( var( --_signetWidth ) * 0.03);
+      z-index: 100;
+    }
+
+    &.is3 {
+      bottom: 0;
+      left: calc( var( --_signetWidth ) * 0.97 );
+      translate: -100% 0;
+      z-index: 100;
+    }
+  }
 }
 
 .logotype {
@@ -45,51 +74,44 @@
   align-self: flex-end;
   color: #5da234;
   line-height: 0.45em;
-}
 
-.floatingFace {
-  width: 0.8em;
-  height: unset;
-  bottom: 0.75em;
+  @container (width >= 600px) {
+    padding-right: 0.5em;
 
-  &.is1 {
-    left: calc( var( --_signetWidth ) + 0.51em );
+    .noSign {
+      right: 0;
+    }
   }
 
-  &.is2 {
-    left: calc( var( --_signetWidth ) + 1.895em );
-  }
-}
-
-.grass {
-  width: calc( var( --_signetWidth ) * 0.35 );
-  height: unset;
-  aspect-ratio: 100 / 45;
-
-  &.is1 {
-    bottom: 23%;
-    left: calc( var( --_signetWidth ) * 0.5 );
+  @container (width < 600px) {
+    .noSign {
+      left: 100%;
+    }
   }
 
-  &.is2 {
-    bottom: 4%;
-    left: calc( var( --_signetWidth ) * 0.03);
-    z-index: 100;
+  @container (width < 450px) {
+    display: none;
   }
 
-  &.is3 {
-    bottom: 0;
-    left: calc( var( --_signetWidth ) * 0.97 );
-    translate: -100% 0;
-    z-index: 100;
+  .noSign {
+    bottom: 0.13em;
+    display: block;
+    width: 0.5em;
+    height: unset;
+    aspect-ratio: 100 / 66;
   }
-}
 
-.noSign {
-  bottom: 0.25em;
-  right: 0;
-  display: block;
-  width: 0.5em;
-  height: unset;
-  aspect-ratio: 100 / 66;
+  .floatingFace {
+    width: 0.8em;
+    height: unset;
+    bottom: 0.75em;
+
+    &.is1 {
+      left: calc( var( --_signetWidth ) + 0.51em );
+    }
+
+    &.is2 {
+      left: calc( var( --_signetWidth ) + 1.895em );
+    }
+  }
 }

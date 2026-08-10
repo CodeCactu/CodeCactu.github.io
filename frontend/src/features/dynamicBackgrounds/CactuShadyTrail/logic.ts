@@ -23,9 +23,14 @@ export default class CactuShadyTrail {
     const ctx = canvas.getContext(`2d`)
     if (!ctx) throw new Error( `Cannot create canvas 2D context` )
 
-    const style = window.getComputedStyle( canvas )
-    canvas.width = parseInt( style.width )
-    canvas.height = parseInt( style.height )
+    const onResize = () => {
+      const style = window.getComputedStyle( canvas )
+      canvas.width = parseInt( style.width )
+      canvas.height = parseInt( style.height )
+    }
+
+    window.addEventListener( `resize`, onResize )
+    onResize()
 
     this.ctx = ctx
     window.addEventListener( `mousemove`, e => this.handleMouseMove( e ) )

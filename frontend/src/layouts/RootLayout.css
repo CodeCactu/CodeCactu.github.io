@@ -5,14 +5,28 @@
 @import "@fet/theme/font/cactu.css";
 
 @layer layout {
+  :root {
+    --tileSize: calc( 100vh / 31 );
+    --pixelSize: calc( var( --tileSize ) / 7 );
+
+    --color-green-e100: #59B820;
+    --color-green: #6F9D46;
+    --color-green-m100: #3A9704;
+    --color-yellow-e100: #F3D638;
+    --color-yellow: #D6B916;
+    --color-yellow-m100: #B59A00;
+
+    --border-width: var( --pixelSize );
+  }
+
   body {
     background-color: #12131d;
     background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
     color: white;
   }
+
   .page-content {
-    display: grid;
-    place-items: center;
+    container-type: inline-size;
     min-height: 100dvh;
   }
 
@@ -26,5 +40,11 @@
 
   .row, .columns {
     gap: 24px;
+  }
+
+  .prose {
+    > * + * {
+      margin-top: 10px;
+    }
   }
 }
