@@ -1,0 +1,8 @@
+---
+import Image from "astro/components/Image.astro"
+import type { ComponentProps } from "astro/types"
+import classes from "./NotchedImage.module.css"
+
+type Props = ComponentProps<typeof Image>
+---
+<Image {...Astro.props} class:list={[ classes.notchedImage, Astro.props.class ]} />

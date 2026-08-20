@@ -8,6 +8,12 @@
   border-top-color: var( --color-green-e100 );
   background-color: var( --color-green );
   padding-inline: var( --tileSize );
+
+  &[disabled] {
+    opacity: 0.5;
+    filter: grayscale( 0.5 );
+    cursor: no-drop;
+  }
 }
 
 .isYellow {
@@ -15,4 +21,11 @@
   border-left-color: var( --color-yellow-e100 );
   border-top-color: var( --color-yellow-e100 );
   background-color: var( --color-yellow );
+}
+
+.isBrown {
+  border-color: var( --color-brown-e100 );
+  border-left-color: var( --color-brown-e100 );
+  border-top-color: var( --color-brown-e100 );
+  background-color: var( --color-brown );
 }

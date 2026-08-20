@@ -1,0 +1,4 @@
+.notchedImage {
+  corner-shape: notch;
+  border-radius: var( --border-width );
+}

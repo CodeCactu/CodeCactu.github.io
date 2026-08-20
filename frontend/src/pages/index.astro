@@ -5,17 +5,28 @@ import SquaresOverlay from "./_utils/SquaresOverlay/index.astro"
 import Button from "@fet/controls/Button.astro"
 import classes from "./page.module.css"
 import cn from "@lib/core/functions/createClassName"
----
+import NotchedImage from "@fet/flow/NotchedImage.astro"
 
+const user = {
+  avatar: {
+    src: `https://cdn.discordapp.com/avatars/263736841025355777/71e72d4716775044564a12ef51c4e74f.png?size=1024`
+  }
+}
+---
 <RootLayout>
   <SquaresOverlay bodyClassName={cn( `prose`, classes.nav )}>
+    <Fragment slot="squares-column">
+      <NotchedImage width={50} height={50} src={user.avatar.src} alt="Evolveye" />
+    </Fragment>
+
     <main>
       <CactuBanner />
     </main>
 
-    <Fragment slot="squared-surface">
-      <Button>Lorem ipsum</Button>
-      <Button variant="yellow">Lorem ipsum at dolor</Button>
+    <Fragment slot="squares-surface">
+      <Button disabled>Wiki</Button>
+      <Button variant="yellow">Gamejam</Button>
+      <Button variant="brown" disabled>Serwer Minecraft</Button>
     </Fragment>
   </SquaresOverlay>
 </RootLayout>

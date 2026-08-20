@@ -9,7 +9,18 @@
 }
 
 
-.body {
+.bodyColumn {
+  padding: calc( var( --_tileSize ) * 0.5 );
+
+  @media (width >= 600px) {
+    position: absolute;
+    top: 0;
+    z-index: 11;
+    width: calc( var( --_tileSize ) * 3 );
+  }
+}
+
+.bodySurface {
   padding-left: var( --_tileSize );
   padding-bottom: var( --_tileSize );
 
