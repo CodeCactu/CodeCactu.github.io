@@ -2,12 +2,29 @@
   display: block;
   height: calc( var( --tileSize ) * 2 );
   corner-shape: notch;
-  border-radius: var( --border-width );
-  border: var( --border-width ) solid var( --color-green-m100 );
-  border-left-color: var( --color-green-e100 );
-  border-top-color: var( --color-green-e100 );
-  background-color: var( --color-green );
+
+  border: calc( var( --border-width ) * 2 ) solid transparent;
+  border-image: url( "./frame.png" );
+  border-image-slice: 2;
+  border-radius: calc( var( --border-width ) );
+  background-repeat: no-repeat;
+  background-image:
+    url( "./tileBgr.png" ),
+    linear-gradient( var( --_color ) );
+  background-size:
+    auto calc( var( --pixelSize ) * 9 ), /* height of image */
+    cover;
+  background-clip:
+    padding-box,
+    border-box;
+  background-origin:
+    padding-box,
+    border-box;
+
+  image-rendering: crisp-edges;
   padding-inline: var( --tileSize );
+
+  --_color: var( --color-green );
 
   &[disabled] {
     opacity: 0.5;
@@ -17,15 +34,9 @@
 }
 
 .isYellow {
-  border-color: var( --color-yellow-e100 );
-  border-left-color: var( --color-yellow-e100 );
-  border-top-color: var( --color-yellow-e100 );
-  background-color: var( --color-yellow );
+  --_color: var( --color-yellow );
 }
 
 .isBrown {
-  border-color: var( --color-brown-e100 );
-  border-left-color: var( --color-brown-e100 );
-  border-top-color: var( --color-brown-e100 );
-  background-color: var( --color-brown );
+  --_color: var( --color-brown );
 }

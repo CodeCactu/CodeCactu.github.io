@@ -7,20 +7,15 @@
 @layer layout {
   :root {
     --tileSize: calc( 100vh / 31 );
-    --pixelSize: calc( var( --tileSize ) / 7 );
+    --pixelSize: calc( var( --tileSize ) / 6 );
 
     --color-white: #fff;
     --color-green-e100: #59B820;
     --color-green: #6F9D46;
-    --color-green-m100: #3A9704;
-    --color-yellow-e100: #F3D638;
-    --color-yellow: #D6B916;
-    --color-yellow-m100: #B59A00;
-    --color-brown-e100: #d3852c;
+    --color-yellow: #d6b816;
     --color-brown: #c57316;
-    --color-brown-m100: #b66911;
 
-    --border-width: var( --pixelSize );
+    --border-width: calc( var( --pixelSize ) * 1 );
   }
 
   body {

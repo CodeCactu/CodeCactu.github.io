@@ -15,7 +15,7 @@ export default class CactuShadyTrail {
     test: true,
   }
 
-  tileSize = 10
+  tileSize = document.body.offsetHeight / 31 / 6 * 2
   mouseTileHistory: MouseHoverTile[] = []
   loop = new Loop()
 
