@@ -1,16 +1,26 @@
+@property --_color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
 :global( .button ) {
+  --_color: var( --color-green );
+
   display: block;
+  padding-inline: var( --tileSize );
   height: calc( var( --tileSize ) * 2 );
-  corner-shape: notch;
 
   border: calc( var( --border-width ) * 2 ) solid transparent;
-  border-image: url( "./frame.png" );
-  border-image-slice: 2;
-  border-radius: calc( var( --border-width ) );
-  background-repeat: no-repeat;
+  border-image: url( "./frame.png" ) 2;
+  border-radius: var( --border-width );
+  corner-shape: notch;
+
+
   background-image:
     url( "./tileBgr.png" ),
     linear-gradient( var( --_color ) );
+  background-repeat: no-repeat;
   background-size:
     auto calc( var( --pixelSize ) * 9 ), /* height of image */
     cover;
@@ -22,9 +32,10 @@
     border-box;
 
   image-rendering: crisp-edges;
-  padding-inline: var( --tileSize );
+  transition: 0.2s ease;
+  transition-property: --_color, box-shadow, opacity;
+  font: calc( var( --border-width ) * 4 ) monospace;
 
-  --_color: var( --color-green );
 
   &[disabled] {
     opacity: 0.5;
@@ -35,6 +46,21 @@
 
 .isYellow {
   --_color: var( --color-yellow );
+
+  &:hover {
+    --_color: color-mix( var( --color-yellow ), #fff 10% );
+
+    &:not( :active ) {
+      box-shadow: 0 0 5px var( --_color );
+    }
+  }
+
+  &:active {
+    transition-duration: 0.05s;
+    border-image: url( "./frame-rotated.png" ) 2;
+    translate: calc( var( --pixelSize ) * -0.5 ) calc( var( --pixelSize ) * 0.5 );
+    opacity: 0.9
+  }
 }
 
 .isBrown {

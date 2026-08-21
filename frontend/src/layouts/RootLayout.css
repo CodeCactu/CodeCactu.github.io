@@ -22,6 +22,7 @@
     background-color: #12131d;
     background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
     color: white;
+    font: 14px / 14px var( --fontFamily-lato );
   }
 
   .page-content {

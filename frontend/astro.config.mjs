@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config'
+import { defineConfig, fontProviders } from 'astro/config'
 
 export default defineConfig({
   vite: {
@@ -7,5 +7,12 @@ export default defineConfig({
         generateScopedName: `_[hash:base64:5]-[local]`
       }
     }
-  }
+  },
+  fonts:[
+    {
+      provider: fontProviders.google(),
+      name: `Lato`,
+      cssVariable: `--fontFamily-lato`,
+    }
+  ]
 })

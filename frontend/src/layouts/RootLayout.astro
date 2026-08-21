@@ -3,14 +3,19 @@ import "./RootLayout.css"
 import CactuShadyTrail from "@fet/dynamicBackgrounds/CactuShadyTrail/index.astro"
 import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines/index.astro"
 import ClientConfig from "@/config.client.astro"
+import { Font } from "astro:assets"
 ---
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
+
 		<title>Cactu</title>
+
+		<Font cssVariable="--fontFamily-lato" preload />
 
 		<ClientConfig />
 	</head>
