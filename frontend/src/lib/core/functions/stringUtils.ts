@@ -1,4 +1,4 @@
-import { NumberString } from "../types"
+import { type NumberString } from "../types"
 
 export function separateStr( str:string, sectionSize:number, separator:string, fromEnd = false ) {
   const initialSectionSize = fromEnd ? (str.length % sectionSize) : 0

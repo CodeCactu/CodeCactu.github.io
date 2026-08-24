@@ -48,3 +48,10 @@
     }
   }
 }
+
+@layer lib {
+  .notched {
+    corner-shape: notch;
+    border-radius: var( --border-width );
+  }
+}

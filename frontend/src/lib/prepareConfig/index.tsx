@@ -1,4 +1,4 @@
-import { JSONValue } from "@lib/core/types"
+import { type JSONValue } from "@lib/core/types"
 
 export type EnvVarKey = Uppercase<string>
 export type EnvVarValue = undefined | JSONValue

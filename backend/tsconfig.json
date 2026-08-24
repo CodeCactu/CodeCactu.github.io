@@ -5,11 +5,10 @@
     "moduleResolution": "bundler",
     "target": "esnext",
     "strict": true,
-    "baseUrl": ".",
     "paths": {
-      "@fet/*": [ "src/features/*" ],
-      "@lib/*": [ "src/lib/*" ],
-      "@/*": [ "src/*" ]
+      "@fet/*": [ "./src/features/*" ],
+      "@lib/*": [ "./src/lib/*" ],
+      "@/*": [ "./src/*" ]
     },
   }
 }

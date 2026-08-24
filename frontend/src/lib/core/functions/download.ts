@@ -1,4 +1,4 @@
-import { Primitive } from "../types"
+import { type Primitive } from "../types"
 
 export default function download( data:Blob | Primitive, filename:string = `data.txt`, type:string = `text/plain` ) {
   const a:HTMLAnchorElement = document.createElement( `a` )

@@ -1,3 +1,4 @@
 if (!import.meta.env.SSR) {
-  throw new Error( `Server side code only` );
+  console.trace( new Error( `Server side code only` ) )
+  throw new Error( `Server side code only` )
 }

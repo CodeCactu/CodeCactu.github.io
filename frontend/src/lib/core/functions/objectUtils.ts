@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ObjectsDeepMerge } from "../types/ObjectKeys"
-import { ObjectLeaves, ObjectValueFromKeysChain } from "../types/ObjectKeys"
+import { type ObjectsDeepMerge } from "../types/ObjectKeys"
+import { type ObjectLeaves, type ObjectValueFromKeysChain } from "../types/ObjectKeys"
 
 export function isObj( item:unknown ): item is Record<string, unknown> {
   return (!!item && typeof item === `object` && !Array.isArray( item ))

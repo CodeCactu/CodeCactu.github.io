@@ -1,6 +1,6 @@
 import { logColorInfo } from "@fet/loggers/logInfo"
 import { logColorNegative } from "@fet/loggers/log"
-import { authReq } from "."
+import { authReq, getSessionDeletionHeadersInit } from "."
 import { User } from "./user"
 import { Session } from "./session"
 import logAuth from "./logAuth"
@@ -16,14 +16,17 @@ export function getUserSessionEndpoint( _req:Bun.BunRequest, user:User ) {
 
 export function deleteUserSessionEndpoint( req:Bun.BunRequest ) {
   const session = authReq( req )
-  if (session) {
-    const user = User.get( session.userId )
-    if (!user) return Response.json( `Error` )
+  if (!session) return Response.json( `` )
 
-    logAuth( { value:`- `, color:logColorNegative }, `User logged out (`, { value:user.name, color:logColorInfo }, `)` )
-    Session.deleteByUser( session.userId )
-  }
-  return Response.json( `` )
+  const user = User.get( session.userId )
+  if (!user) return Response.json( `Error` )
+
+  logAuth( { value:`- `, color:logColorNegative }, `User logged out (`, { value:user.name, color:logColorInfo }, `)` )
+  Session.deleteByUser( session.userId )
+
+  const res = Response.json( `` )
+  for (const [ key, value ] of getSessionDeletionHeadersInit()) res.headers.append( key, value )
+  return res
 }
 
 

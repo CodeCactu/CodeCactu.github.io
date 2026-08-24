@@ -17,12 +17,19 @@ export function authReq( req:Bun.BunRequest ) {
   return Session.get( token )
 }
 
-export function getSessionHeadersInit( session:Session ) {
+export function getSessionCreationHeadersInit( session:Session ) {
   const expiresAt = session.expiresAt.toUTCString()
 
   return [
     [ `set-cookie`, `sessionToken=${session.token}; Expires=${expiresAt}; Path=/; HttpOnly` ],
     [ `set-cookie`, `sessionExpiresAt=${expiresAt}; Expires=${expiresAt}; Path=/` ],
+  ] satisfies HeadersInit
+}
+
+export function getSessionDeletionHeadersInit() {
+  return [
+    [ `set-cookie`, `sessionToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly` ],
+    [ `set-cookie`, `sessionExpiresAt=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/` ],
   ] satisfies HeadersInit
 }
 
@@ -36,7 +43,7 @@ export function withAuth( handler:(req:Bun.BunRequest, user:User) => Response | 
 
     const res = await handler( req, user )
 
-    for (const [ key, value ] of getSessionHeadersInit( session )) res.headers.append( key, value )
+    for (const [ key, value ] of getSessionCreationHeadersInit( session )) res.headers.append( key, value )
 
     return res
   }

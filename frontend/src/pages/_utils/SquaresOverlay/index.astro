@@ -9,7 +9,7 @@ interface Props {
 
 <div class={classes.squares}>
   {Astro.slots.has( `squares-column` ) && (
-    <div class:list={[ classes.bodyColumn, Astro.props.bodyClassName ]}>
+    <div class:list={[ classes.bodyColumn ]}>
       <slot name="squares-column" />
     </div>
   )}

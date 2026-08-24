@@ -7,7 +7,7 @@ import { User } from "../user"
 import { Session } from "../session"
 import logAuth from "../logAuth"
 import { getUserSession } from "../endpoints"
-import { getSessionHeadersInit } from ".."
+import { getSessionCreationHeadersInit } from ".."
 import config from "@/config"
 
 const createSessionBodyScheme = z.object({ code:z.string() })
@@ -33,7 +33,7 @@ export default async function createSessionWithDiscordEndpoint( req:Bun.BunReque
 
   return Response.json( getUserSession( user ), {
     status: 201,
-    headers: new Headers( getSessionHeadersInit( session ) ),
+    headers: new Headers( getSessionCreationHeadersInit( session ) ),
   } )
 }
 

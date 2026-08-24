@@ -1,64 +1,56 @@
+import { clientConfig } from "@/config.client"
+import { getCookie } from "@lib/core/functions"
+
 type RawUser = {
   name: string
   discordId: string
   avatarHash: string
 }
 
-export type SessionData = { expiresAt: number, user: RawUser }
+export type SessionData = { expiresAt:number, user:RawUser }
 type SessionRes = { code: string } | SessionData
 
 export default class Session {
   static readonly expirationCookiename = `sessionExpiresAt`
-  static #loaded: undefined | null | SessionData = undefined // eslint-disable-line sonarjs/public-static-readonly -- Global value for entire app
-  static #pendingDiscordUser: null | Promise<null | SessionData> = null // eslint-disable-line sonarjs/public-static-readonly -- Global value for entire app
+  static #expirationTimerId = -1
+  static #data: undefined | null | Promise<null | SessionData> = undefined
 
   static create( code:string ) {
-    Session.#loaded = null
-
-    if (Session.#pendingDiscordUser) return Session.#pendingDiscordUser
-
-    Session.#pendingDiscordUser = fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions`, {
+    Session.#data = fetch( `${clientConfig.BACKEND_ORIGIN}/api/auth/sessions`, {
       method: `POST`,
       credentials: `include`,
       body: JSON.stringify({ code }),
     } ).then<SessionRes>( res => res.json() )
-      .then( data => {
-        if (`code` in data) { // Error
-          Session.#loaded = null
-        } else {
-          Session.#loaded = data
-        }
+      .then( data => `code` in data ? null : data )
+      .catch( () => null )
 
-        return Session.#loaded
-      } )
-      .catch( () => Session.#loaded = null )
-      .finally( () => Session.#pendingDiscordUser = null )
-
-    return Session.#pendingDiscordUser
+    return Session.#data
   }
 
   static get() {
-    Session.#pendingDiscordUser = fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include` } )
+    if (!Session.checkExistance()) return null
+    if (Session.checkIsInitialised()) return Session.#data
+
+    Session.#data = fetch( `${clientConfig.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include` } )
       .then<SessionRes>( res => res.json() )
       .then( data => `code` in data ? null : data )
       .catch( () => null )
-      .finally( () => Session.#pendingDiscordUser = null )
 
-    return Session.#pendingDiscordUser
+    return Session.#data
   }
 
   static delete() {
-    return fetch( `${configClient.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include`, method:`DELETE` } )
+    return fetch( `${clientConfig.BACKEND_ORIGIN}/api/auth/sessions/@my`, { credentials:`include`, method:`DELETE` } )
   }
 
   static checkExistance() {
     const existance = !!getCookie( Session.expirationCookiename )
-    if (!existance) Session.#loaded = null
+    if (!existance) Session.#data = null
     return !!existance
   }
 
   static checkIsInitialised() {
-    return Session.#pendingDiscordUser !== null || Session.#loaded !== undefined
+    return Session.#data === null || Session.#data instanceof Promise
   }
 
   static getExpirationDate() {
@@ -66,7 +58,7 @@ export default class Session {
     return !expiration ? null : new Date( expiration )
   }
 
-  static runExpirationTimer( cb?:() => void ) {
+  static resetExpirationTimer( cb?:() => void ) {
     const expiresAt = getCookie( Session.expirationCookiename )
     if (!expiresAt) {
       cb?.()
@@ -79,6 +71,7 @@ export default class Session {
       return Session.delete()
     }
 
-    window.setTimeout( () => Session.runExpirationTimer( cb ), expirationTime )
+    window.clearTimeout( Session.#expirationTimerId )
+    Session.#expirationTimerId = window.setTimeout( () => Session.resetExpirationTimer( cb ), expirationTime )
   }
 }
