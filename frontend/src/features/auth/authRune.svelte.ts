@@ -5,25 +5,25 @@ let pendingSession:undefined | null | Promise<null | SessionData> = undefined
 
 export const auth = {
   get session() {
-    return currentSession;
+    return currentSession
   },
 
   async loadSession() {
-    if (pendingSession !== undefined) return pendingSession;
+    if (pendingSession !== undefined) return pendingSession
 
-    const session = Session.get();
+    const session = Session.get()
 
-    pendingSession = !session ? session : session.then((data) => {
-      currentSession = data;
-      if (data) Session.resetExpirationTimer();
-      return data;
-    });
+    pendingSession = !session ? session : session.then( data => {
+      currentSession = data
+      if (data) Session.resetExpirationTimer()
+      return data
+    } )
 
     if (!pendingSession) {
-      currentSession = pendingSession;
+      currentSession = pendingSession
     }
 
-    return pendingSession;
+    return pendingSession
   },
 
   getDiscordIntegrationLink() {
@@ -36,8 +36,8 @@ export const auth = {
   },
 
   setSession( data:null | SessionData ) {
-    currentSession = data;
-    if (!data) pendingSession = data;
+    currentSession = data
+    if (!data) pendingSession = data
   },
 
   async login( code:string ) {

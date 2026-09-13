@@ -1,0 +1,21 @@
+.popover {
+  :has( > & ) {
+    position: relative;
+  }
+
+  :has( > & ):not( :hover ) & {
+    display: none;
+  }
+
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  translate: calc( var( --pixelSize ) + var( --tileSize ) * 0.5 ) -50%;
+  display: flex;
+  align-items: center;
+  padding: var( --pixelSize ) calc( var( --pixelSize ) * 4 );
+  width: max-content;
+  height: var( --tileSize );
+  background: black;
+  outline: calc( var( --pixelSize ) * 0.5 ) solid color-mix( var( --color-white ), transparent 10% );
+}

@@ -1,5 +1,5 @@
-import { clientConfig } from "@/config.client"
 import { getCookie } from "@lib/core/functions"
+import { clientConfig } from "@/config.client"
 
 type RawUser = {
   name: string
@@ -7,13 +7,13 @@ type RawUser = {
   avatarHash: string
 }
 
-export type SessionData = { expiresAt:number, user:RawUser }
+export type SessionData = { expiresAt: number, user: RawUser }
 type SessionRes = { code: string } | SessionData
 
 export default class Session {
   static readonly expirationCookiename = `sessionExpiresAt`
-  static #expirationTimerId = -1
-  static #data: undefined | null | Promise<null | SessionData> = undefined
+  static #expirationTimerId = -1 // eslint-disable-line sonarjs/public-static-readonly
+  static #data: undefined | null | Promise<null | SessionData> = undefined // eslint-disable-line sonarjs/public-static-readonly
 
   static create( code:string ) {
     Session.#data = fetch( `${clientConfig.BACKEND_ORIGIN}/api/auth/sessions`, {

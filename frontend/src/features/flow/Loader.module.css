@@ -1,0 +1,46 @@
+.loader {
+  position: relative;
+  container-name: loader;
+  container-type: inline-size;
+  height: 100%;
+  aspect-ratio: 1;
+  animation: spin 1.2s linear infinite;
+}
+
+.loader span {
+  --_x: calc( cos( var( --angle ) ) * 30cqw );
+  --_y: calc( sin( var( --angle ) ) * 30cqw );
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate( calc( var( --_x ) - 50% ), calc( var( --_y ) - 50% ) );
+  width: calc( var( --pixelSize ) * 2 );
+  aspect-ratio: 1;
+  background-color: var( --color-green );
+  border-radius: 50%;
+}
+
+.loader span:nth-child(1) {
+  --angle: 0deg;
+  opacity: 1;
+}
+
+.loader span:nth-child(2) {
+  --angle: -20deg;
+  opacity: 0.75;
+}
+
+.loader span:nth-child(3) {
+  --angle: -40deg;
+  opacity: 0.5;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

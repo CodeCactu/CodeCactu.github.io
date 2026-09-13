@@ -6,6 +6,10 @@ import Button from "@fet/controls/Button.astro"
 import classes from "./page.module.css"
 import cn from "@lib/core/functions/createClassName"
 import UserPanel from "@fet/auth/UserPanel.svelte"
+import Popover from "@fet/flow/Popover.svelte"
+import GameIcon from "./_utils/GameIcon.svelte"
+import CubeIcon from "./_utils/CubeIcon.svelte"
+import BookIcon from "./_utils/BookIcon.svelte"
 ---
 <RootLayout>
   <SquaresOverlay bodyClassName={cn( `prose`, classes.nav )}>
@@ -16,9 +20,20 @@ import UserPanel from "@fet/auth/UserPanel.svelte"
     </main>
 
     <Fragment slot="squares-surface">
-      <Button disabled>Wiki</Button>
-      <Button variant="yellow">Gamejam</Button>
-      <Button variant="brown" disabled>Serwer Minecraft</Button>
+      <Button disabled>
+        <BookIcon width="1.5em" height="1.5em" /> Soon
+        <Popover>Soon</Popover>
+      </Button>
+
+      <Button variant="yellow">
+        <GameIcon width="1.5em" height="1.5em" /> Gamejam
+        <Popover>CactuJam</Popover>
+      </Button>
+
+      <Button variant="brown" disabled>
+        <CubeIcon width="1.5em" height="1.5em" /> Coming soon
+        <Popover>Coming soon</Popover>
+      </Button>
     </Fragment>
   </SquaresOverlay>
 </RootLayout>

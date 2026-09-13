@@ -15,19 +15,7 @@
 .nav {
   @media (width >= 600px) {
     > button {
-      margin-left: auto;
-    }
-
-    button:nth-last-of-type( 3 ) {
-      transform: translate( calc( -6 * var( --_tileSize ) ), calc( -3.5 * var( --_tileSize ) ) );
-    }
-
-    button:nth-last-of-type( 2 ) {
-      transform: translate( calc( -4 * var( --_tileSize ) ), calc( -2.5 * var( --_tileSize ) ) );
-    }
-
-    button:nth-last-of-type( 1 ) {
-      transform: translateY( calc( -1.5 * var( --_tileSize ) ) );
+      margin-block: var( --tileSize ) calc( var( --tileSize ) * 0.5 );
     }
   }
 

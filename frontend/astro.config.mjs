@@ -1,32 +1,28 @@
 import { defineConfig, fontProviders } from 'astro/config'
-import svelte from '@astrojs/svelte'
+import svelte from "@astrojs/svelte"
 
 export default defineConfig({
   integrations: [
-    svelte({
-      compilerOptions:{
-        runes: true
-      }
-    })
+    svelte(),
   ],
 
   vite: {
     css: {
       modules: {
-        generateScopedName: `_[hash:base64:5]-[local]`
-      }
-    }
+        generateScopedName: `_[hash:base64:5]-[local]`,
+      },
+    },
   },
 
   server: {
     port: 3000,
   },
 
-  fonts:[
+  fonts: [
     {
       provider: fontProviders.google(),
       name: `Lato`,
       cssVariable: `--fontFamily-lato`,
-    }
+    },
   ],
 })

@@ -1,0 +1,26 @@
+.avatarArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc( var( --tileSize ) * 3 );
+  color: var( --color-white );
+
+  .avatar {
+    width: calc( var( --tileSize ) * 2 );
+    aspect-ratio: 1;
+    background-color: var( --color-white );
+    padding: var( --pixelSize );
+
+    div& {
+      display: grid;
+      place-items: center;
+    }
+  }
+
+  .login:hover svg {
+    color: var( --color-green-e100 );
+  }
+  .logout:hover svg {
+    color: var( --color-brown );
+  }
+}
