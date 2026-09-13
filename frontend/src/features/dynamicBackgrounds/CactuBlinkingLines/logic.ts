@@ -145,7 +145,7 @@ export default class CactuBlinkingLines {
   }
 
   constructor( canvas:HTMLCanvasElement ) {
-    const ctx = canvas.getContext(`2d`)
+    const ctx = canvas.getContext( `2d` )
     if (!ctx) throw new Error( `Cannot create canvas 2D context` )
 
     const style = window.getComputedStyle( canvas )

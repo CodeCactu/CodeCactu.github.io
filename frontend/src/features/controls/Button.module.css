@@ -7,15 +7,18 @@
 :global( .button ) {
   --_color: var( --color-green );
 
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
   padding-inline: var( --tileSize );
+  width: max-content;
   height: calc( var( --tileSize ) * 2 );
 
   border: calc( var( --border-width ) * 2 ) solid transparent;
   border-image: url( "./frame.png" ) 2;
   border-radius: var( --border-width );
   corner-shape: notch;
-
+  text-decoration: none;
 
   background-image:
     url( "./tileBgr.png" ),
@@ -39,10 +42,6 @@
     filter: grayscale( 0.5 );
     cursor: no-drop;
   }
-}
-
-.isYellow {
-  --_color: var( --color-yellow );
 
   &:hover:not( :active ) {
     outline: var( --border-width ) solid #fffa;
@@ -55,6 +54,18 @@
   }
 }
 
+.isCompact {
+  padding-inline: calc( var( --tileSize ) / 2 );
+}
+
+.isYellow {
+  --_color: var( --color-yellow );
+}
+
 .isBrown {
   --_color: var( --color-brown );
+}
+
+.isBlue {
+  --_color: var( --color-blue );
 }

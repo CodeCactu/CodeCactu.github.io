@@ -3,8 +3,8 @@
   import { auth } from './authRune.svelte'
   import defaultAvatar from "./default-avatar.webp"
   import classes from "./UserPanel.module.css"
-  import LogoutIcon from "./logoutIcon.svelte"
-  import LoginIcon from "./loginIcon.svelte"
+  import LogoutIcon from "@/icons/LogoutIcon.svelte"
+  import LoginIcon from "@/icons/LoginIcon.svelte"
   import Loader from '@fet/flow/Loader.svelte'
   import Popover from '@fet/flow/Popover.svelte'
 

@@ -1,39 +1,8 @@
 ---
-import RootLayout from "@/layouts/RootLayout.astro"
+import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro";
 import CactuBanner from "./_utils/CactuBanner/index.astro"
-import SquaresOverlay from "./_utils/SquaresOverlay/index.astro"
-import Button from "@fet/controls/Button.astro"
-import classes from "./page.module.css"
-import cn from "@lib/core/functions/createClassName"
-import UserPanel from "@fet/auth/UserPanel.svelte"
-import Popover from "@fet/flow/Popover.svelte"
-import GameIcon from "./_utils/GameIcon.svelte"
-import CubeIcon from "./_utils/CubeIcon.svelte"
-import BookIcon from "./_utils/BookIcon.svelte"
+import "./page.css"
 ---
-<RootLayout>
-  <SquaresOverlay bodyClassName={cn( `prose`, classes.nav )}>
-    <UserPanel client:load slot="squares-column"/>
-
-    <main>
-      <CactuBanner />
-    </main>
-
-    <Fragment slot="squares-surface">
-      <Button disabled>
-        <BookIcon width="1.5em" height="1.5em" /> Soon
-        <Popover>Soon</Popover>
-      </Button>
-
-      <Button variant="yellow">
-        <GameIcon width="1.5em" height="1.5em" /> Gamejam
-        <Popover>CactuJam</Popover>
-      </Button>
-
-      <Button variant="brown" disabled>
-        <CubeIcon width="1.5em" height="1.5em" /> Coming soon
-        <Popover>Coming soon</Popover>
-      </Button>
-    </Fragment>
-  </SquaresOverlay>
-</RootLayout>
+<SquaresOverlayLayout>
+  <CactuBanner />
+</SquaresOverlayLayout>

@@ -1,0 +1,13 @@
+:root {
+  scrollbar-gutter: unset;
+}
+
+main {
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+
+  @media (width < 600px) {
+    height: 500px;
+  }
+}

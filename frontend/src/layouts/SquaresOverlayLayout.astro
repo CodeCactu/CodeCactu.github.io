@@ -1,0 +1,50 @@
+---
+import RootLayout from "@/layouts/RootLayout.astro"
+import SquaresOverlay from "./SquaresOverlay/index.astro"
+import Button from "@fet/controls/Button.astro"
+import classes from "./SquaresOverlayLayout.module.css"
+import cn from "@lib/core/functions/createClassName"
+import UserPanel from "@fet/auth/UserPanel.svelte"
+import Popover from "@fet/flow/Popover.svelte"
+import GameIcon from "@/icons/GameIcon.svelte"
+import CubeIcon from "@/icons/CubeIcon.svelte"
+import HomeIcon from "@/icons/HomeIcon.svelte"
+import BookIcon from "@/icons/BookIcon.svelte"
+
+interface Props {
+  compact?: boolean
+}
+
+const isCompact = Astro.props.compact
+---
+<RootLayout>
+  <SquaresOverlay bodyClassName={cn( `prose`, classes.nav )}>
+    <UserPanel client:load slot="squares-column"/>
+
+    <main>
+      <slot />
+    </main>
+
+    <Fragment slot="squares-surface">
+      <Button compact={isCompact} variant="blue" href="/">
+        <HomeIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Home</span>}
+        <Popover>Home page</Popover>
+      </Button>
+
+      <Button compact={isCompact} disabled>
+        <BookIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Soon</span>}
+        <Popover>Soon</Popover>
+      </Button>
+
+      <Button compact={isCompact} variant="yellow" href="/cactu-jam">
+        <GameIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Gamejam</span>}
+        <Popover>CactuJam</Popover>
+      </Button>
+
+      <Button compact={isCompact} variant="brown" disabled>
+        <CubeIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Coming soon</span>}
+        <Popover>Coming soon</Popover>
+      </Button>
+    </Fragment>
+  </SquaresOverlay>
+</RootLayout>

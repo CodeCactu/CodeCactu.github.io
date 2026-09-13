@@ -14,6 +14,8 @@
     --color-green: #6F9D46;
     --color-yellow: #d6b816;
     --color-brown: #c57316;
+    --color-purple: #6e45f3;
+    --color-blue: #4273b3;
 
     --border-width: calc( var( --pixelSize ) * 1 );
   }

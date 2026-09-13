@@ -1,19 +1,31 @@
 ---
+import cn from "@lib/core/functions/createClassName"
 import classes from "./Button.module.css"
 import { select } from "@lib/core/functions"
 
 interface Props {
-  variant?: `yellow` | `green` | `brown`
+  variant?: `yellow` | `green` | `brown` | `blue`
   style?: astroHTML.JSX.CSSProperties
   disabled?: boolean
+  compact?: boolean
+  href?: string
 }
 
 const variantClassName = select( Astro.props.variant, {
   "yellow" : classes.isYellow,
   "brown" : classes.isBrown,
+  "blue" : classes.isBlue,
 } )
+
+const className = cn( `button`, Astro.props.compact && classes.isCompact, variantClassName )
 ---
 
-<button class:list={[ `button`, variantClassName ]} style={Astro.props.style} disabled={Astro.props.disabled}>
-  <slot />
-</button>
+{Astro.props.href ? (
+  <a class={className} style={Astro.props.style} href={Astro.props.href}>
+    <slot />
+  </a>
+) : (
+  <button class={className} style={Astro.props.style} disabled={Astro.props.disabled}>
+    <slot />
+  </button>
+)}

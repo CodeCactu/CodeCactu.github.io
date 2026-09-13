@@ -1,20 +1,6 @@
-:root {
-  scrollbar-gutter: unset;
-}
-
-:global( main ) {
-  display: grid;
-  place-items: center;
-  height: 100dvh;
-
-  @media (width < 600px) {
-    height: 500px;
-  }
-}
-
 .nav {
   @media (width >= 600px) {
-    > button {
+    > :global( .button ) {
       margin-block: var( --tileSize ) calc( var( --tileSize ) * 0.5 );
     }
   }
