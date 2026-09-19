@@ -7,7 +7,7 @@ import { ClientRouter } from 'astro:transitions'
 import { Font } from "astro:assets"
 ---
 <html lang="en">
-	<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
 
@@ -20,13 +20,11 @@ import { Font } from "astro:assets"
 
     <ClientRouter/>
     <ClientConfig />
-	</head>
-	<body>
-    <div class="page-content">
-    	<slot />
-    </div>
+  </head>
+  <body>
+    <slot />
 
     <CactuBlinkingLines />
     <CactuShadyTrail />
-	</body>
+  </body>
 </html>

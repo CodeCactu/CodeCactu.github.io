@@ -6,6 +6,7 @@ main {
   display: grid;
   place-items: center;
   height: 100dvh;
+  container-type: inline-size;
 
   @media (width < 600px) {
     height: 500px;

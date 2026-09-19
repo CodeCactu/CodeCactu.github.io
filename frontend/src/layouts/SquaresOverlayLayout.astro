@@ -13,19 +13,27 @@ import BookIcon from "@/icons/BookIcon.svelte"
 
 interface Props {
   compact?: boolean
+  squaresSurfaceSize?: number
+  squaresBodyClass?: string
 }
 
 const isCompact = Astro.props.compact
 ---
 <RootLayout>
-  <SquaresOverlay bodyClassName={cn( `prose`, classes.nav )}>
-    <UserPanel client:load slot="squares-column"/>
+  <SquaresOverlay
+    id="page-content"
+    bottomBodyClass={cn( `prose`, classes.nav )}
+    middleBodyClass={cn( Astro.props.squaresBodyClass )}
+    straight={isCompact}
+    surfaceSize={Astro.props.squaresSurfaceSize}
+  >
+    <UserPanel client:load slot="squares-body-top"/>
 
-    <main>
-      <slot />
-    </main>
+    <slot slot="squares-body-middle" name="squares-body" />
 
-    <Fragment slot="squares-surface">
+    <slot />
+
+    <Fragment slot="squares-body-bottom">
       <Button compact={isCompact} variant="blue" href="/">
         <HomeIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Home</span>}
         <Popover>Home page</Popover>

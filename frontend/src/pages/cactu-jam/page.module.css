@@ -1,0 +1,5 @@
+.preview {
+  anchor-name: --item-anchor;
+  display: grid;
+  place-items: center;
+}

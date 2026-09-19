@@ -1,6 +1,16 @@
 ---
-import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro";
+import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro"
+import classes from "./page.module.css"
+import GamesTable from "./_utils/GamesTable.svelte"
 ---
-<SquaresOverlayLayout compact>
-  Cactujam!
+<SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.preview}>
+  <main>
+    Cactujam!
+
+    <GamesTable client:load  />
+  </main>
+
+  <Fragment slot="squares-body">
+    Game's description
+  </Fragment>
 </SquaresOverlayLayout>

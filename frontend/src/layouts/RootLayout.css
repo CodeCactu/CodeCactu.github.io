@@ -18,22 +18,25 @@
     --color-blue: #4273b3;
 
     --border-width: calc( var( --pixelSize ) * 1 );
+
+    scrollbar-color: color-mix( var( --color-white ), transparent 50% ) black;
+    scrollbar-width: var( --tileSize );
+    overflow-y: scroll;
   }
 
   body {
     background-color: #12131d;
     background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
-    color: white;
+    color: var( --color-white );
     font: 14px / 14px var( --fontFamily-lato );
   }
 
-  .page-content {
-    container-type: inline-size;
+  #page-content {
     min-height: 100dvh;
   }
 
-  .page-content ~ canvas {
-    position: absolute;
+  #page-content ~ canvas {
+    position: fixed;
     top: 0;
     width: 100vw;
     height: 100dvh;

@@ -1,44 +1,25 @@
-:has( > .squares ) {
+.squaresOverlayWrapper {
   --_tileSize: var( --tileSize );
   --_squaresBSize: calc( var( --_tileSize ) * 6 );
   --_squaresFill: black;
 
+  position: relative;
+  z-index: 1;
+
   @media (width >= 600px) {
-    padding-left: calc( var( --_tileSize ) * 7 )
+    display: grid;
+    grid-template: "stack";
+
+    & > * { grid-area:stack }
+
+    :has( ~ .squaresOverlay ) {
+      order: 1;
+      padding-left: calc( min( 35vw, var( --surfaceSize, 4 ) * var( --tileSize ) ) + var( --tileSize ) * 4 );
+    }
   }
 }
 
-
-.bodyColumn {
-  padding: var( --_tileSize );
-
-  @media (width >= 600px) {
-    position: absolute;
-    top: 0;
-    z-index: 11;
-    width: calc( var( --_tileSize ) * 3 );
-    padding: calc( var( --_tileSize ) * 0.5 );
-  }
-}
-
-.bodySurface {
-  padding-left: var( --_tileSize );
-  padding-bottom: var( --_tileSize );
-
-  @media (width >= 600px) {
-    position: absolute;
-    bottom: 0;
-    z-index: 11;
-    width: calc( var( --_tileSize ) * 10.5 );
-  }
-}
-
-.squares {
-  @media (width >= 600px) {
-    position: absolute;
-    inset: 0;
-  }
-
+.squaresOverlay {
   @media (width < 600px) {
     position: relative;
     width: 100vw;
@@ -47,10 +28,50 @@
   }
 }
 
+.squaresOverlayBody {
+  height: 100%;
+
+  .bodyTop {
+    padding: var( --_tileSize );
+
+    @media (width >= 600px) {
+      position: fixed;
+      top: 0;
+      width: calc( var( --_tileSize ) * 3 );
+      padding: calc( var( --_tileSize ) * 0.5 );
+      z-index: 100;
+    }
+  }
+
+  .bodyBottom {
+    padding-left: calc( var( --_tileSize ) * 0.5 );
+    padding-bottom: calc( var( --_tileSize ) * 0.5 );
+
+    @media (width >= 600px) {
+      position: fixed;
+      bottom: 0;
+      z-index: 100;
+    }
+  }
+
+  .bodyMiddle {
+    @media (width >= 600px) {
+      position: sticky;
+      top: 0;
+      translate: 100px 0;
+      width: calc( min( var( --surfaceSize, 0 ) * var( --tileSize ), 35vw ) - 100px );
+      height: 100dvh;
+      z-index: 12;
+    }
+  }
+}
+
 .squaresWrapper {
-  position: relative;
+  position: fixed;
+  top: 0;
   height: 100%;
   overflow-x: clip;
+  z-index: 11;
 
   @media (width < 600px) {
     position: absolute;
@@ -61,13 +82,21 @@
     }
   }
 
+  &::before {
+    content: "";
+    position: fixed;
+    width: min( 35vw, var( --surfaceSize ) * var( --tileSize ) );
+    height: 100%;
+    background-color: var( --_squaresFill );
+  }
+
   svg {
-    position: absolute;
+    position: fixed;
     z-index: 10;
     fill: var( --_squaresFill );
   }
   .squaresLb {
-    left: 0;
+    left:  min( 35vw, var( --surfaceSize ) * var( --tileSize ) );
     bottom: 0;
     height: calc( var( --_tileSize ) * 31 );
   }
@@ -88,10 +117,11 @@
     height: calc( var( --_tileSize ) * 4 );
   }
   .squaresB {
+    position: absolute;
     left: 50%;
     translate: -50% 0;
     bottom: calc( 100% - 1px );
-    height: var( --_squaresBSize );
+    height: calc( var( --_squaresBSize ) - 1px );
 
     @media (width >= 600px) {
       display: none;

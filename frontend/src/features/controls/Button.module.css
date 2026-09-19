@@ -43,7 +43,7 @@
     cursor: no-drop;
   }
 
-  &:hover:not( :active ) {
+  &:not( [disabled] ):hover:not( :active ) {
     outline: var( --border-width ) solid #fffa;
     outline-offset: calc( -1 * var( --border-width ) );
   }

@@ -67,3 +67,10 @@ input:not( [type="radio"], [type="checkbox"], [hidden] ) {
     outline: none;
   }
 }
+
+.stack {
+  display: grid;
+  grid-template: "stack";
+
+  & > * { grid-area:stack }
+}
