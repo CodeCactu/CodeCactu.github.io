@@ -1,5 +1,64 @@
+.gamesArea {
+  --_spacing: calc( var( --tileSize ) );
+
+  display: grid;
+  grid-template: "preview list" / 3fr 1fr;
+  gap: var( --_spacing );
+  padding: var( --_spacing );
+}
+
 .preview {
   anchor-name: --item-anchor;
   display: grid;
   place-items: center;
+  text-align: center;
+  color: var( --color-neutral-m100 );
+}
+
+.listArea, .list {
+  display: grid;
+  gap: var( --_spacing );
+}
+
+.game {
+  display: block;
+  width: calc( var( --tileSize ) * 3 );
+  aspect-ratio: 1;
+  background: var( --_color-dimming ) center / cover var( --bgr );
+  font-size: 20px;
+  font-weight: bold;
+  cursor: move;
+  touch-action: none;
+
+  &:global( .isOverSource ) {
+    outline: var( --border-width ) solid var( --color-brown );
+    outline-offset: var( --border-width );
+  }
+
+  .overview {
+    position: absolute;
+    position-anchor: --item-anchor;
+    left:   anchor( left );
+    right:  anchor( right );
+    top:    anchor( top );
+    bottom: anchor( bottom );
+    padding: 8px;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      var( --_color-dimming ) center / cover var( --bgr );
+    z-index: 100;
+
+    :is( :not( :hover ), :global( .isDragging ), :active ) > & {
+      display: none;
+    }
+
+    & > img {
+      position: absolute;
+      width: var( --_authorAvatarSize );
+      height: unset;
+      aspect-ratio: 1;
+      left: 0;
+      bottom: 0;
+    }
+  }
 }

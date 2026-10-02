@@ -2,7 +2,8 @@
   --_authorAvatarSize: 75px;
   --_element-width: min( 100px, 15vw );
   --_areasGap: 24px;
-  --_itemsGap: 8px;
+  /* --_itemsGap: 8px; */
+  --_itemsGap: 20px;
 
   display: flex;
   flex-wrap: wrap;
@@ -116,33 +117,6 @@
     touch-action: none;
   }
 }
-
-  .overview {
-    position: absolute;
-    position-anchor: --item-anchor;
-    left:   calc( anchor( left )   + var( --tileSize ) );
-    right:  calc( anchor( right )  + var( --tileSize ) );
-    top:    calc( anchor( top )    + var( --tileSize ) );
-    bottom: calc( anchor( bottom ) + var( --tileSize ) );
-    padding: 8px;
-    background:
-      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-      var( --_color-surface ) center / cover var( --bgr );
-    z-index: 100;
-
-    :is( :not( :hover ), .isDragging, :active ) > & {
-      display: none;
-    }
-
-    & > img {
-      position: absolute;
-      width: var( --_authorAvatarSize );
-      height: unset;
-      aspect-ratio: 1;
-      left: 0;
-      bottom: 0;
-    }
-  }
 
 .isDragOver {
   background-color: var( --color-secondary );

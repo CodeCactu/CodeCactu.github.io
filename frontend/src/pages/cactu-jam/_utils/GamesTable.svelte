@@ -16,10 +16,9 @@
     loadCactuJamUserVotes(),
   ]).then( ([games, userVotes]) => {
     tierLadderData = { games, userVotes }
-    console.log({...{ games, userVotes }})
   })
 </script>
 
 {#if tierLadderData}
-  <TierLadder highestValue={5} items={tierLadderData.games} assignements={tierLadderData.userVotes.theme} />
+  <TierLadder highestValue={5} items={tierLadderData.games} assignments={tierLadderData.userVotes.theme} />
 {/if}

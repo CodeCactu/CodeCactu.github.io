@@ -16,6 +16,8 @@
     --color-brown: #c57316;
     --color-purple: #6e45f3;
     --color-blue: #4273b3;
+    --color-neutral-m100: #aaa;
+    --_color-dimming: #0005;
 
     --border-width: calc( var( --pixelSize ) * 1 );
 

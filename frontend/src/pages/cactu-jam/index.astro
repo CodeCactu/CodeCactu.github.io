@@ -2,8 +2,12 @@
 import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro"
 import classes from "./page.module.css"
 import GamesTable from "./_utils/GamesTable.svelte"
+import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
+import { clientConfig } from "@/config.client"
+
+const games = await loadCactuJamGames()
 ---
-<SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.preview}>
+<SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
   <main>
     Cactujam!
 
@@ -11,6 +15,50 @@ import GamesTable from "./_utils/GamesTable.svelte"
   </main>
 
   <Fragment slot="squares-body">
-    Game's description
+    <section class={classes.preview}>
+      <h3>Kliknij lub najedź lub na miniaturkę gry aby wyświetlić jej opis</h3>
+    </section>
+
+    <section class={classes.listArea} data-source-area>
+      <h3>Gry</h3>
+
+      <ol class={classes.list}>
+        {games.map( game => (
+          <li
+            class={classes.game}
+            draggable="true"
+            data-drag-id={game.id}
+            style={game.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${game.thumbnailUri})`}
+          >
+            <span class={classes.handle}>☰</span>
+
+            <address class={`prose ${classes.overview}`}>
+              <h3>{game.name}</h3>
+
+              {game.description && <p>{game.description}</p>}
+
+              <small>~{game.author.name}</small>
+
+              {game.author.avatarUri && (
+                <img
+                  src={game.author.avatarUri}
+                  alt={`${game.author.name}'s avatar`}
+                  width="256"
+                  height="256"
+                />
+              )}
+            </address>
+          </li>
+        ))}
+      </ol>
+    </section>
   </Fragment>
+
+              <!-- <article
+              draggable="true"
+              data-drag-id={item.id}
+              class={classes.item}
+              style={item.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${item.thumbnailUri})`}
+            >
+            </article> -->
 </SquaresOverlayLayout>
