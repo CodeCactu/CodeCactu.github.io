@@ -9,3 +9,9 @@
     min-height: calc( 100dvh - 500px );
   }
 }
+
+.isCompact {
+  @media (min-aspect-ratio: 2 / 3) {
+    display: none;
+  }
+}

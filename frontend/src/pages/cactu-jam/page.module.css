@@ -1,8 +1,8 @@
 .gamesArea {
   --_spacing: calc( var( --tileSize ) );
+  --_gameTileSize: calc( var( --tileSize ) * 3 );
 
-  display: grid;
-  grid-template: "preview list" / 3fr 1fr;
+  display: flex;
   gap: var( --_spacing );
   padding: var( --_spacing );
 }
@@ -10,55 +10,117 @@
 .preview {
   anchor-name: --item-anchor;
   display: grid;
+  width: min( 20vw, 300px );
   place-items: center;
   text-align: center;
   color: var( --color-neutral-m100 );
+
+  @media (max-aspect-ratio: 4 / 3) {
+    display: none;
+  }
 }
 
 .listArea, .list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var( --_spacing );
+}
+@media (max-aspect-ratio: 2 / 3) {
+  .listArea {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background-color: black;
+    padding: var( --tileSize );
+  }
+  .list {
+    flex-direction: row;
+    overflow: auto;
+    margin-inline: calc( var( --tileSize ) * -1 );
+    padding: var( --tileSize );
+    height: calc( var( --tileSize ) * 2 + var( --_gameTileSize ) );
+  }
 }
 
 .game {
   display: block;
-  width: calc( var( --tileSize ) * 3 );
+  width: var( --_gameTileSize );
   aspect-ratio: 1;
+  border-radius: var( --pixelSize );
+  corner-shape: notch;
   background: var( --_color-dimming ) center / cover var( --bgr );
-  font-size: 20px;
   font-weight: bold;
   cursor: move;
   touch-action: none;
+  user-select: none;
 
   &:global( .isOverSource ) {
     outline: var( --border-width ) solid var( --color-brown );
     outline-offset: var( --border-width );
   }
 
+  &:has( :popover-open ) {
+    outline: var( --border-width ) solid var( --color-green );
+    outline-offset: var( --pixelSize );
+  }
+
+  .handle {
+    display: grid;
+    place-items: flex-start;
+    width: 100%;
+    height: 100%;
+    padding: var( --pixelSize );
+    font-size: 20px;
+  }
+
   .overview {
     position: absolute;
     position-anchor: --item-anchor;
-    left:   anchor( left );
-    right:  anchor( right );
-    top:    anchor( top );
-    bottom: anchor( bottom );
+    left:   anchor( left, 50% );
+    right:  anchor( right, 0 );
+    top:    anchor( top, 50% );
+    bottom: anchor( bottom, 0 );
+    display: flex;
+    flex-direction: column;
+    gap: var( --tileSize );
     padding: 8px;
+    width: auto;
+    height: auto;
     background:
       linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
       var( --_color-dimming ) center / cover var( --bgr );
-    z-index: 100;
+    cursor: default;
+    z-index: 101;
 
-    :is( :not( :hover ), :global( .isDragging ), :active ) > & {
+    /* :is( :not( :hover ), :global( .isDragging ), :active ) > &:not( :popover-open ) { */
+    :is( :not( :hover ), :global( .isDragging ) ) > &:not( :popover-open ) {
+    /* &:not( :popover-open ) { */
       display: none;
     }
 
+    @media (max-aspect-ratio: 4 / 3) {
+      translate: -50% -50%;
+
+      &:not( :popover-open ) {
+        display: none;
+      }
+    }
+
+    @media (width < 600px) {
+      position: fixed;
+    }
+
+    .comment {
+      margin-top: auto;
+    }
+
     & > img {
-      position: absolute;
-      width: var( --_authorAvatarSize );
+      width: 128px;
       height: unset;
       aspect-ratio: 1;
-      left: 0;
-      bottom: 0;
+      margin-inline: auto;
+      border-radius: var( --pixelSize );
+      corner-shape: notch;
     }
   }
 }

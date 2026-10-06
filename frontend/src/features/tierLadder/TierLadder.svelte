@@ -17,7 +17,7 @@
 
   let container: HTMLElement | undefined
 
-  function getItem(id: DragItem["id"]) {
+  function getItem( id:DragItem["id"] ) {
     const item = items.find((item) => item.id == id)
 
     if (!item) {
@@ -28,7 +28,7 @@
     return item
   }
 
-  function getDescription(item: DragItem): string | undefined {
+  function getDescription( item:DragItem ) {
     if (!item.description) return
 
     return item.description.length > 203
@@ -36,15 +36,15 @@
       : item.description
   }
 
-  function getTable(element: Element | null) {
+  function getTable( element:Element | null ) {
     return element?.closest<HTMLElement>( "[data-tier-table]" ) || null
   }
 
-  function getTableId(element: Element | null) {
+  function getTableId( element:Element | null ) {
     return getTable( element )?.dataset.tierTable
   }
 
-  function getDragAreasLists(table: HTMLElement) {
+  function getDragAreasLists( table:HTMLElement ) {
     const dropAreas = Array.from(
       table.querySelectorAll<HTMLElement>( "[data-drop-area]" )
     )
@@ -71,36 +71,69 @@
     if (!container) return
 
     const abortController = new AbortController()
-    const activeAnimations = new WeakMap<HTMLElement, Animation>()
 
     let draggingItem: HTMLElement | null = null
     let draggingOriginal: HTMLElement | null = null
     let draggingClone: HTMLElement | null = null
+
+    let draggingPlaceholder: HTMLElement | null = null
+
     let draggingTable: HTMLElement | null = null
     let draggingTableId: string | undefined
     let draggingFromSource = false
     let draggingOverSource = false
     let draggingItemAnimation: Animation | null = null
 
+    let draggingPointerId: number | null = null
+    let draggingOverElement: HTMLElement | null = null
+
+    let draggingPointerOffsetX = 0
+    let draggingPointerOffsetY = 0
+    let pointerDownX = 0
+    let pointerDownY = 0
+    let pointerDownElement:null | HTMLElement = null
+    let isDragging = false
+
+    const DRAG_START_DISTANCE = 5
+
     const isDraggingClass = `isDragging`
     const isDraggingOverSourceClass = `isOverSource`
+
     const animationOptions: KeyframeAnimationOptions = {
       duration: 200,
       easing: `cubic-bezier( 0.2, 0, 0, 1 )`,
     }
 
+    function removePlaceholder() {
+      if (!draggingPlaceholder) return false
+
+      draggingPlaceholder.remove()
+      draggingPlaceholder = null
+
+      return true
+    }
+
     function resetDragState() {
+      removePlaceholder()
+
       draggingItem?.classList.remove( classes.isDragging )
       draggingClone?.classList.remove( classes.isDragging )
 
       draggingItem = null
       draggingOriginal = null
       draggingClone = null
+
       draggingTable = null
       draggingTableId = undefined
       draggingFromSource = false
       draggingOverSource = false
       draggingItemAnimation = null
+
+      draggingPointerId = null
+      draggingOverElement = null
+
+      draggingPointerOffsetX = 0
+      draggingPointerOffsetY = 0
     }
 
     function notifyDragEnd() {
@@ -137,7 +170,7 @@
       }
 
       const configElement = (ele:HTMLElement, oldRect:DOMRect) => {
-        const newRect = a.getBoundingClientRect()
+        const newRect = ele.getBoundingClientRect()
         const deltaX = oldRect.left - newRect.left
         const deltaY = oldRect.top - newRect.top
 
@@ -165,11 +198,27 @@
       configElement( b, rectB )
     }
 
-    function flyInElement(element:HTMLElement, x:number, y:number) {
-      element.style.transition = `none`
-      element.style.transform = `translate(${x}px, ${y}px)`;
+    function flyElementTo( element:HTMLElement, x:number, y:number ) {
+      const { promise, resolve } = Promise.withResolvers<boolean>()
 
-      element.offsetWidth;
+      requestAnimationFrame( () => {
+        element.classList.add( isDraggingClass )
+        element.style.transition = `transform ${animationOptions.duration}ms cubic-bezier(.2, .8, .2, 1)`
+        element.style.transform = `translate(${x}px, ${y}px)`
+      } )
+
+      element.addEventListener( `transitionend`, () => resolve( true ), { once:true } )
+
+      return promise
+    }
+
+    async function flyInElement( element:HTMLElement, x:number, y:number ) {
+      const { promise, resolve } = Promise.withResolvers<boolean>()
+
+      element.style.transition = `none`
+      element.style.transform = `translate(${x}px, ${y}px)`
+
+      element.offsetWidth
 
       requestAnimationFrame( () => {
         element.classList.add( isDraggingClass )
@@ -181,7 +230,11 @@
         element.classList.remove( isDraggingClass )
         element.style.transition = ``
         element.style.transform = ``
-      }, {once:true} )
+
+        resolve( true )
+      }, { once:true } )
+
+      return promise
     }
 
     function insertElement( container:HTMLElement, element:HTMLElement, index:number ) {
@@ -229,102 +282,131 @@
       }
     }
 
+    function createPreview( element:HTMLElement, x:number, y:number ) {
+      const clone = element.cloneNode(true) as HTMLElement
+      const rect = element.getBoundingClientRect()
 
+      draggingPointerOffsetX = x - rect.left
+      draggingPointerOffsetY = y - rect.top
 
-    // Handlers
+      clone.style.position = "fixed"
+      clone.style.left = `${x - draggingPointerOffsetX}px`
+      clone.style.top = `${y - draggingPointerOffsetY}px`
+      clone.style.width = `${rect.width}px`
+      clone.style.height = `${rect.height}px`
+      clone.style.margin = "0"
+      clone.style.zIndex = "999999"
+      clone.style.pointerEvents = "none"
+      clone.dataset.isClone = `true`
 
-    function handleDragOverDropArea( element:HTMLElement, dropArea:HTMLElement ) {
-      if (dropArea.childElementCount !== 0) return
+      document.body.appendChild( clone )
 
+      return clone
+    }
 
-      // Source -> empty drop area
-      if (draggingFromSource) {
-        if (!draggingOriginal) return
+    function createPlaceholder( element:HTMLElement ) {
+      removePlaceholder()
 
-        const clone = element.cloneNode( true ) as HTMLElement
+      const rect = element.getBoundingClientRect()
+      const placeholder = document.createElement( "div" )
 
-        dropArea.insertAdjacentElement( "afterbegin", clone )
+      placeholder.style.width = `${rect.width}px`
+      placeholder.style.height = `${rect.height}px`
+      placeholder.style.flexShrink = `0`
+      placeholder.style.outline = `1px dashed #aaa`
+      placeholder.dataset.dragId = element.dataset.dragId
 
-        const sourceRect = draggingOriginal.getBoundingClientRect()
-        const cloneRect = clone.getBoundingClientRect()
+      draggingPlaceholder = placeholder
 
-        flyInElement( clone, sourceRect.x - cloneRect.x, sourceRect.y - cloneRect.y )
+      return placeholder
+    }
 
-        draggingFromSource = false
-        draggingItem = clone
+    function startDraggingItem( element:HTMLElement, x:number, y:number ) {
+      const rect = element.getBoundingClientRect()
+
+      draggingPointerOffsetX = x - rect.left
+      draggingPointerOffsetY = y - rect.top
+
+      const placeholder = createPlaceholder( element )
+
+      draggingPlaceholder = placeholder
+      element.parentNode?.insertBefore( placeholder, element )
+
+      element.style.position = `fixed`
+      element.style.left = `${rect.left}px`
+      element.style.top = `${rect.top}px`
+      element.style.width = `${rect.width}px`
+      element.style.height = `${rect.height}px`
+      element.style.margin = `0`
+      element.style.zIndex = `999999`
+      element.style.pointerEvents = `none`
+
+      moveDraggingItem(
+        element,
+        x,
+        y,
+      )
+    }
+
+    function moveDraggingItem( element:HTMLElement, x:number, y:number ) {
+      element.style.left = `${x - draggingPointerOffsetX}px`
+      element.style.top = `${y - draggingPointerOffsetY}px`
+    }
+
+    function restoreDraggingItem() {
+      if (!draggingItem) return
+
+      if (draggingClone) {
+        draggingItem.remove()
+        return
       }
 
-      const sourceDropArea = element.parentElement
-      if (!sourceDropArea || !(`dropArea` in sourceDropArea.dataset)) return
+      if (!draggingPlaceholder?.parentNode) return
 
+      draggingPlaceholder.parentNode.insertBefore( draggingItem, draggingPlaceholder )
+    }
 
-      // Drop area A -> drop area B
-      animateMovedSiblings( sourceDropArea, element, () => {
-        if (!draggingOriginal) return
-        const sourceRect = element.getBoundingClientRect()
+    async function finishDraggingItem() {
+      if (!draggingItem) return
 
-        dropArea.insertAdjacentElement( "afterbegin", element )
+      const x = parseFloat( draggingItem.style.left )
+      const y = parseFloat( draggingItem.style.top )
 
-        const insertedRect = element.getBoundingClientRect()
+      draggingItem.style.position = ``
+      draggingItem.style.left = ``
+      draggingItem.style.top = ``
+      draggingItem.style.width = ``
+      draggingItem.style.height = ``
+      draggingItem.style.margin = ``
+      draggingItem.style.zIndex = ``
+      draggingItem.style.pointerEvents = ``
 
-        flyInElement( element, sourceRect.x - insertedRect.x, sourceRect.y - insertedRect.y )
-      })
+      const rect = draggingItem.getBoundingClientRect()
+
+      await flyInElement( draggingItem, x - rect.x, y - rect.y )
+    }
+
+    function handleDragOverDropArea( element:HTMLElement, dropArea:HTMLElement ) {
+      const dragId = element.dataset.dragId
+      if (!dragId) return
+
+      if (draggingPlaceholder) {
+        const placeholderIndex = Array.from( dropArea.children ).indexOf( draggingPlaceholder )
+        if (placeholderIndex !== -1) return
+      }
+
+      if (!draggingOriginal || (draggingOriginal.parentElement !== dropArea && getContainerItem( dropArea, dragId ))) return
+      const placeholder = createPlaceholder( element )
+
+      animateMovedSiblings( dropArea, placeholder, () => {
+        dropArea.insertAdjacentElement( "afterbegin", placeholder )
+      } )
     }
 
     function handleDragOverDragItem( element:HTMLElement, itemBelow:HTMLElement ) {
-      if (!element?.dataset.dragId) return
-
-      const targetDropArea = itemBelow.parentElement
-      if (!targetDropArea || !(`dropArea` in targetDropArea.dataset)) return
-
-      // Source -> item in drop area
-      if (draggingFromSource) {
-        if (!draggingOriginal || getContainerItem( targetDropArea, element.dataset.dragId )) return
-
-        animateMovedSiblings( targetDropArea, element, () => {
-          if (!draggingOriginal) return
-
-          const clone = element.cloneNode( true ) as HTMLElement
-
-          insertElement( targetDropArea, clone, Array.from( targetDropArea.children ).indexOf( itemBelow ) )
-
-          const sourceRect = draggingOriginal.getBoundingClientRect()
-          const cloneRect = clone.getBoundingClientRect()
-
-          flyInElement( clone, sourceRect.x - cloneRect.x, sourceRect.y - cloneRect.y )
-
-          draggingFromSource = false
-          draggingItem = clone
-        })
-
-        return
+      if (draggingPlaceholder) {
+        swapElements( draggingPlaceholder, itemBelow )
       }
-
-      const sourceDropArea = element.parentElement
-      if (!sourceDropArea || !(`dropArea` in sourceDropArea.dataset)) return
-
-
-      // Items from different drop area
-      if (targetDropArea !== sourceDropArea) {
-        animateMovedSiblings( targetDropArea, element, () => {
-          if (!draggingOriginal) return
-          const sourceRect = element.getBoundingClientRect()
-
-          animateMovedSiblings( sourceDropArea, element, () => {
-            insertElement( targetDropArea, element, Array.from( targetDropArea.children ).indexOf( itemBelow ) )
-          })
-
-          const insertedRect = element.getBoundingClientRect()
-
-          flyInElement( element, sourceRect.x - insertedRect.x, sourceRect.y - insertedRect.y )
-        })
-
-        return
-      }
-
-
-      // Two items in the same drop area
-      swapElements( element, itemBelow )
     }
 
     function handleDragEnterSource( element:HTMLElement ) {
@@ -335,136 +417,218 @@
       element.classList.remove( isDraggingOverSourceClass )
     }
 
-    function handleDropOnSource( element:HTMLElement ) {
-      const sourceDropArea = element.parentElement
-      if (!sourceDropArea || !(`dropArea` in sourceDropArea.dataset)) return
-
-      animateMovedSiblings( sourceDropArea, element, () => element.remove() )
-    }
 
 
+    /*
+     * Events
+     */
 
-    // Events
+    document.addEventListener( "pointerdown", event => {
+      if (!(event.target instanceof HTMLElement)) return
+      if (event.button !== 0) return
 
-    document.addEventListener( "dragenter",
-      (event) => {
-        if (!(event.target instanceof HTMLElement)) return
-        if (!draggingItem) return
+      const target = event.target.closest<HTMLElement>( "[data-drag-id]" )
+      if (!target) return
 
-        event.preventDefault()
+      pointerDownX = event.clientX
+      pointerDownY = event.clientY
+      pointerDownElement = target
+      isDragging = false
+    }, { signal: abortController.signal } )
 
-        const source = event.target.closest<HTMLElement>( "[data-source-area]" )
-        if (source) {
-          draggingOverSource = true
+    document.addEventListener( "pointermove", event => {
+      if (!pointerDownElement) return
 
-          if (!draggingFromSource) handleDragEnterSource( draggingItem )
+      if (!isDragging) {
+        const dx = event.clientX - pointerDownX
+        const dy = event.clientY - pointerDownY
 
-          return
-        }
+        if (Math.hypot( dx, dy ) < DRAG_START_DISTANCE) return
 
-        if (event.target.dataset.dragId === draggingItem.dataset.dragId) return
+        isDragging = true
 
-        const dragItem = event.target.closest<HTMLElement>( "[data-drag-id]" )
-        if (dragItem) return handleDragOverDragItem( draggingItem, dragItem )
+        draggingPointerId = event.pointerId
 
-        const dragArea = event.target.closest<HTMLElement>( "[data-drop-area]" )
-        if (dragArea) return handleDragOverDropArea( draggingItem, dragArea )
-      },
-      { signal: abortController.signal },
-    )
+        draggingOriginal = pointerDownElement
+        draggingItem = pointerDownElement
+        draggingClone = null
 
-    document.addEventListener( "dragleave",
-      (event) => {
-        if (!(event.target instanceof HTMLElement)) return
-
-        const source = event.target.closest<HTMLElement>( "[data-source-area]" )
-        if (!source) return
-
-        const related = event.relatedTarget
-        if (related instanceof Node && source.contains( related )) return
-
-        if (draggingItem) {
-          if (related) handleDragLeaveSource( draggingItem )
-          else handleDropOnSource( draggingItem )
-        }
-
-        draggingOverSource = false
-        source.classList.remove( classes.isDragOver )
-      },
-      { signal: abortController.signal },
-    )
-
-    document.addEventListener( "dragstart",
-      ({ target }) => {
-        if (!(target instanceof HTMLElement) || !target.draggable) return
-
-        draggingOriginal = target
-        draggingItem = target
-
-        draggingTable = getTable( target )
+        draggingTable = getTable( pointerDownElement )
         draggingTableId = draggingTable?.dataset.tierTable
 
         draggingFromSource = !draggingTable
         draggingOverSource = false
 
-        console.log(`start`, draggingItem)
+        if (draggingFromSource && !draggingClone) {
+          const preview = createPreview( draggingOriginal, event.clientX, event.clientY )
+
+          draggingClone = preview
+          draggingItem = preview
+        } else {
+          startDraggingItem( pointerDownElement, event.clientX, event.clientY )
+        }
+
+        console.log( `D&D`, `Start` )
+
         draggingItem.classList.add( isDraggingClass )
-      },
-      { signal: abortController.signal },
-    )
 
-    document.addEventListener( "dragend",
-      () => {
-        const table = draggingTable
-        const overSource = draggingOverSource
-        const clone = draggingClone
+        pointerDownElement.setPointerCapture( event.pointerId )
+        event.preventDefault()
 
-        const removeClassName = () => {
-          document
-            .querySelectorAll<HTMLElement>( `.${classes.isDragOver}` )
-            .forEach((element) => element.classList.remove( classes.isDragOver ))
+        return
+      }
 
-          /*
-           * Przeciągnięcie z listy źródłowej do tabeli:
-           * kopia zostaje.
-           */
-          if (draggingFromSource && !overSource) {
-            if (table) notifyDragEnd()
+      if (!draggingItem || draggingPointerId !== event.pointerId) return
 
-            resetDragState()
-            return
-          }
+      event.preventDefault()
 
-          /*
-           * Przeciągnięcie istniejącego elementu do listy źródłowej:
-           * usuwamy jego kopię z tabeli.
-           */
-          if (overSource && clone) {
-            clone.remove()
+      moveDraggingItem( draggingItem, event.clientX, event.clientY )
 
-            if (table && onDragEnd) onDragEnd( getDragAreasLists( table ) )
+      const element = document.elementFromPoint( event.clientX, event.clientY )
+      if (!(element instanceof HTMLElement)) return
 
-            resetDragState()
-            return
-          }
+      const source = element.closest<HTMLElement>( "[data-source-area]" )
+      if (source) {
+        if (draggingOverElement === source) return
+        console.log( `D&D`, `Entering drag source` )
 
-          /*
-           * Zwykłe przesunięcie elementu wewnątrz tabeli.
-           */
-          if (table) notifyDragEnd()
+        draggingOverElement = source
+        draggingOverSource = true
 
-          resetDragState()
+        if (!draggingFromSource) {
+          draggingOverElement.classList.remove( classes.isDragOver )
+          source.classList.add( classes.isDragOver )
+
+          handleDragEnterSource( draggingItem )
         }
 
-        if (!draggingItemAnimation) {
-          removeClassName()
-          return
+        return
+      }
+
+      if (element.dataset.dragId === draggingItem.dataset.dragId) return
+
+      const dragItem = element.closest<HTMLElement>( "[data-drag-id]" )
+      if (dragItem) {
+        if (draggingOverElement === dragItem) return
+        console.log( `D&D`, `Entering drag item` )
+
+        if (draggingOverElement !== dragItem) {
+          if (draggingOverElement) {
+            draggingOverElement.classList.remove( classes.isDragOver )
+          }
+
+          draggingOverElement = dragItem
+          dragItem.classList.add( classes.isDragOver )
         }
 
-        draggingItemAnimation.addEventListener( "finish", removeClassName, { once: true } )
-      },
-      { signal: abortController.signal },
-    )
+        handleDragOverDragItem( draggingItem, dragItem )
+
+        return
+      }
+
+      const dragArea = element.closest<HTMLElement>( "[data-drop-area]" )
+      if (dragArea) {
+        if (draggingOverElement === dragArea) return
+        console.log( `D&D`, `Entering drag area` )
+
+        const nearesDragArea = draggingOverElement?.closest<HTMLElement>( "[data-drop-area]" )
+        if (draggingOverElement && nearesDragArea !== dragArea) removePlaceholder()
+
+        draggingOverElement = dragArea
+
+        handleDragOverDropArea( draggingItem, dragArea )
+
+        return
+      }
+
+
+      // Leaving
+      if (draggingOverElement?.dataset.sourceArea !== undefined) {
+        console.log( `D&D`, `Leaving drop source` )
+
+        if (draggingOverSource) {
+          draggingOverSource = false
+          handleDragLeaveSource( draggingItem )
+        }
+      } if (draggingOverElement?.dataset.dragId) {
+        console.log( `D&D`, `Leaving drop item` )
+      } else if (draggingOverElement?.dataset.dropArea) {
+        console.log( `D&D`, `Leaving drop area` )
+      }
+
+      if (draggingOverElement) {
+        draggingOverElement.classList.remove( classes.isDragOver )
+        draggingOverElement = null
+      }
+    }, { signal: abortController.signal } )
+
+    document.addEventListener( "pointerup", event => {
+      if (!pointerDownElement) return
+
+      pointerDownElement.releasePointerCapture( event.pointerId )
+      isDragging = false
+      pointerDownElement = null
+
+      if (!draggingItem || draggingPointerId !== event.pointerId) return
+
+      const removeClassName = async () => {
+        if (!draggingItem) return
+
+        console.log( `D&D`, `End` )
+
+        document
+          .querySelectorAll<HTMLElement>( `.${classes.isDragOver}` )
+          .forEach((element) => element.classList.remove( classes.isDragOver ))
+
+        const dropArea = draggingPlaceholder?.parentElement?.dataset.dropArea ? draggingPlaceholder.parentElement : null
+
+        if (draggingPlaceholder && dropArea) {
+          if (draggingOverSource) {
+            draggingItem.remove()
+          } else {
+            const placeholderIndex = Array.from( dropArea.children ).indexOf( draggingPlaceholder )
+
+            insertElement( dropArea, draggingItem, placeholderIndex )
+            finishDraggingItem()
+          }
+
+          removePlaceholder()
+        } else {
+          if (draggingOriginal) {
+            const draggindItemRef = draggingItem
+            const orgRect = draggingOriginal.getBoundingClientRect()
+            const dragRect = draggindItemRef.getBoundingClientRect()
+
+            await flyElementTo( draggindItemRef, orgRect.left - dragRect.left, orgRect.top - dragRect.top )
+
+            draggindItemRef.addEventListener( `transitionend`, () => draggindItemRef.remove(), { once: true } )
+          }
+        }
+
+        resetDragState()
+        notifyDragEnd()
+      }
+
+      if (!draggingItemAnimation) return removeClassName()
+      draggingItemAnimation.addEventListener( "finish", removeClassName, { once: true } )
+    }, { signal: abortController.signal } )
+
+    document.addEventListener( "pointercancel", event => {
+      if (draggingPointerId !== event.pointerId) return
+      if (!draggingItem) return
+
+      /*
+        * Anulowane przeciągnięcie:
+        *
+        * - oryginał wraca do placeholdera
+        * - klon zostaje usunięty
+        */
+      restoreDraggingItem()
+
+      finishDraggingItem()
+
+      resetDragState()
+    }, { signal: abortController.signal } )
 
     return () => abortController.abort()
   })
@@ -504,7 +668,7 @@
               >
                 <h3>{item.name}</h3>
 
-                {#if getDescription(item)}
+                {#if item.description}
                   <p>{getDescription(item)}</p>
                 {/if}
 

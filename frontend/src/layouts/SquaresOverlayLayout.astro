@@ -35,22 +35,22 @@ const isCompact = Astro.props.compact
 
     <Fragment slot="squares-body-bottom">
       <Button compact={isCompact} variant="blue" href="/">
-        <HomeIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Home</span>}
+        <HomeIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Home</span>
         <Popover>Home page</Popover>
       </Button>
 
       <Button compact={isCompact} disabled>
-        <BookIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Soon</span>}
+        <BookIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Soon</span>
         <Popover>Soon</Popover>
       </Button>
 
       <Button compact={isCompact} variant="yellow" href="/cactu-jam">
-        <GameIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Gamejam</span>}
+        <GameIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Gamejam</span>
         <Popover>CactuJam</Popover>
       </Button>
 
       <Button compact={isCompact} variant="brown" disabled>
-        <CubeIcon width="1.5em" height="1.5em" /> {!isCompact && <span aria-hidden>Coming soon</span>}
+        <CubeIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Coming soon</span>
         <Popover>Coming soon</Popover>
       </Button>
     </Fragment>

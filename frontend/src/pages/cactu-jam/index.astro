@@ -26,39 +26,37 @@ const games = await loadCactuJamGames()
         {games.map( game => (
           <li
             class={classes.game}
-            draggable="true"
             data-drag-id={game.id}
             style={game.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${game.thumbnailUri})`}
           >
-            <span class={classes.handle}>☰</span>
+            <button class={classes.handle} popovertarget={`game-${game.id}`}>
+              ☰
+            </button>
 
-            <address class={`prose ${classes.overview}`}>
-              <h3>{game.name}</h3>
-
-              {game.description && <p>{game.description}</p>}
-
-              <small>~{game.author.name}</small>
-
+            <address popover class={`prose ${classes.overview}`} id={`game-${game.id}`}>
               {game.author.avatarUri && (
                 <img
                   src={game.author.avatarUri}
                   alt={`${game.author.name}'s avatar`}
-                  width="256"
-                  height="256"
+                  width="128"
+                  height="128"
                 />
               )}
+
+              <h3>{game.name}</h3>
+
+              {game.description && <div>{game.description}</div>}
+
+              <small>~{game.author.name}</small>
+
+              <div class={classes.comment}>
+                <h4>Komentarz dla uczestnika</h4>
+                <textarea name="comment"></textarea>
+              </div>
             </address>
           </li>
         ))}
       </ol>
     </section>
   </Fragment>
-
-              <!-- <article
-              draggable="true"
-              data-drag-id={item.id}
-              class={classes.item}
-              style={item.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${item.thumbnailUri})`}
-            >
-            </article> -->
 </SquaresOverlayLayout>

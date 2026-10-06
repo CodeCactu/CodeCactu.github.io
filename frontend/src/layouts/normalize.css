@@ -68,9 +68,24 @@ input:not( [type="radio"], [type="checkbox"], [hidden] ) {
   }
 }
 
+textarea {
+  width: 100%;
+}
+
 .stack {
   display: grid;
   grid-template: "stack";
 
   & > * { grid-area:stack }
+}
+
+.isVisuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }

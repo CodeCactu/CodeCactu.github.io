@@ -1,8 +1,7 @@
 .dragArea {
   --_authorAvatarSize: 75px;
-  --_element-width: min( 100px, 15vw );
+  --_element-width: calc( var( --tileSize ) * 3 );
   --_areasGap: 24px;
-  /* --_itemsGap: 8px; */
   --_itemsGap: 20px;
 
   display: flex;
@@ -17,33 +16,7 @@
     display: none;
     font-style: italic;
   }
-
-  @media (width <= 700px) {
-    > * {
-      display: none;
-    }
-
-    .smallScreenInfo {
-      display: block;
-    }
-  }
 }
-
-/* .overviewAnchor {
-  anchor-name: --item-anchor;
-
-  position: sticky;
-  top: calc( 50% - 200px );
-  display: grid;
-  place-items: center;
-  padding: 8px;
-  width: calc( min( 100px, 15vw ) * 2 );
-  height: 400px;
-  border: var( --border-width ) solid currentColor;
-  text-align: center;
-  line-height: 1.5em;
-  color: var( --color-secondary );
-} */
 
 .dragArea [data-drop-area] {
   padding: var( --_itemsGap );

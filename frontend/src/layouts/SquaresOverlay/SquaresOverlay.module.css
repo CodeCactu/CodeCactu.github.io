@@ -6,63 +6,62 @@
   position: relative;
   z-index: 1;
 
-  @media (width >= 600px) {
+  @media (min-aspect-ratio: 2 / 3) {
     display: grid;
-    grid-template: "stack";
+    grid-template: "sqBody body" 100dvh / max-content 1fr;
 
-    & > * { grid-area:stack }
+    & > * {
+      max-height: 100dvh;
+    }
 
-    :has( ~ .squaresOverlay ) {
-      order: 1;
-      padding-left: calc( min( 35vw, var( --surfaceSize, 4 ) * var( --tileSize ) ) + var( --tileSize ) * 4 );
+    & > :not( .squaresOverlay, .squaresOverlayBody ) {
+      grid-area: body;
+      overflow: auto;
+      padding-block: var( --tileSize );
+      padding-left: calc( var( --tileSize ) * 2 )
+    }
+
+    & > :not( .squaresOverlay, .squaresOverlayBody ) {
+      padding-left: calc( var( --tileSize ) * 6 )
     }
   }
 }
 
 .squaresOverlay {
-  @media (width < 600px) {
-    position: relative;
-    width: 100vw;
-    margin-top: var( --_squaresBSize );
-    background-color: var( --_squaresFill );
-  }
+  width: max-content;
+  background-color: var( --_squaresFill );
 }
 
 .squaresOverlayBody {
-  height: 100%;
+  grid-area: sqBody;
+  position: relative;
+  display: grid;
+  grid-template:
+    "top        middle"
+    "bottom     middle" /
+    max-content 1fr;
+  background-color: var( --_squaresFill );
+  z-index: 12;
 
   .bodyTop {
+    grid-area: top;
     padding: var( --_tileSize );
-
-    @media (width >= 600px) {
-      position: fixed;
-      top: 0;
-      width: calc( var( --_tileSize ) * 3 );
-      padding: calc( var( --_tileSize ) * 0.5 );
-      z-index: 100;
-    }
   }
 
   .bodyBottom {
+    grid-area: bottom;
+    align-self: flex-end;
     padding-left: calc( var( --_tileSize ) * 0.5 );
     padding-bottom: calc( var( --_tileSize ) * 0.5 );
-
-    @media (width >= 600px) {
-      position: fixed;
-      bottom: 0;
-      z-index: 100;
-    }
   }
 
   .bodyMiddle {
-    @media (width >= 600px) {
-      position: sticky;
-      top: 0;
-      translate: 100px 0;
-      width: calc( min( var( --surfaceSize, 0 ) * var( --tileSize ), 35vw ) - 100px );
-      height: 100dvh;
-      z-index: 12;
-    }
+    grid-area: middle;
+  }
+
+  @media (max-aspect-ratio: 2 / 3) {
+    margin-top: var( --_squaresBSize );
+    overflow-x: clip;
   }
 }
 
@@ -81,25 +80,39 @@
       display: none;
     }
   }
+}
 
-  &::before {
-    content: "";
+.squaresOverlayBody,
+.squaresOverlay {
+  & > svg {
     position: fixed;
-    width: min( 35vw, var( --surfaceSize ) * var( --tileSize ) );
-    height: 100%;
-    background-color: var( --_squaresFill );
-  }
-
-  svg {
-    position: fixed;
-    z-index: 10;
+    z-index: -1;
     fill: var( --_squaresFill );
   }
+  .squaresL,
   .squaresLb {
-    left:  min( 35vw, var( --surfaceSize ) * var( --tileSize ) );
+    position: absolute;
+    left:  100%;
     bottom: 0;
     height: calc( var( --_tileSize ) * 31 );
   }
+  .squaresL {
+    @media (max-aspect-ratio: 2 / 3) {
+      display: none;
+    }
+  }
+  .squaresLb {
+    @media (width >= 850px) {
+      .squaresL:has( + & ) {
+        display: none;
+      }
+    }
+
+    @media (width < 850px) {
+      display: none;
+    }
+  }
+
   .squaresLt {
     left: 0;
     top: 0;
@@ -123,7 +136,7 @@
     bottom: calc( 100% - 1px );
     height: calc( var( --_squaresBSize ) - 1px );
 
-    @media (width >= 600px) {
+    @media (min-aspect-ratio: 2 / 3) {
       display: none;
     }
   }

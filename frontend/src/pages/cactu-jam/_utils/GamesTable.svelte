@@ -6,7 +6,7 @@
 
   type TierladderData = {
     games: CactuJamGame[]
-    userVotes: CactuJamUserVotes
+    userVotes?: CactuJamUserVotes
   }
 
   let tierLadderData = $state<undefined | TierladderData>( undefined )
@@ -20,5 +20,5 @@
 </script>
 
 {#if tierLadderData}
-  <TierLadder highestValue={5} items={tierLadderData.games} assignments={tierLadderData.userVotes.theme} />
+  <TierLadder highestValue={5} items={tierLadderData.games} assignments={tierLadderData.userVotes?.theme ?? {}} />
 {/if}
