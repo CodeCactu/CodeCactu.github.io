@@ -1,10 +1,10 @@
 import fetchCactu from "./fetchCactu"
 
-export type CactuJamCategories = {
+export type CactuJamCategory = {
   name: string
   highestValue: number
 }
 
 export function loadCactuJamCategories() {
-  return fetchCactu<{ categories: CactuJamCategories[] }>( `/api/games/categories` ).then( r => r.categories )
+  return fetchCactu<{ categories: CactuJamCategory[] }>( `/api/games/categories` ).then( r => r.categories )
 }
