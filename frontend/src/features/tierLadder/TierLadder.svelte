@@ -596,6 +596,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import classes from "./TierLadder.module.css"
+    import cn from "@lib/core/functions/createClassName";
 
   export type DragItem = {
     id: string
@@ -643,8 +644,8 @@
 
 <article bind:this={container} class={classes.ladder} data-tier-table={name}>
   <div class={classes.tiers}>
-    <header class={classes.header}>
-      <h3 class={classes.title}>{name}</h3>
+    <header class={cn( `prose`, `row`, classes.header )}>
+      <h3>{name}</h3>
 
       <p>{description}</p>
     </header>
@@ -657,8 +658,8 @@
 
         {#if i === 0}
           <div class={classes.legend}>
-            <p>Słabsze</p>
-            <p>Lepsze</p>
+            <p>Niżej oceniane</p>
+            <p>Wyżej oceniane</p>
           </div>
         {/if}
 

@@ -93,8 +93,10 @@
       }
     } )
 
-    tierLadderData = { games, userVotes, categories, ladders }
-    console.log(tierLadderData)
+    const ladderData = { games, userVotes, categories, ladders }
+    console.log({ ladderData })
+
+    tierLadderData = ladderData
   })
 </script>
 
@@ -102,8 +104,6 @@
   {#each tierLadderData.ladders as ladder}
     <TierLadder
       name={ladder.name}
-      // items={tierLadderData.games}
-      // assignments={tierLadderData.userVotes?.[ category.name ] ?? {}}
       tiers={ladder.tiers}
       description={ladder.description}
       onDragEnd={ladder => console.log( ladder )}

@@ -23,14 +23,8 @@
   flex-direction: column;
 
   .header {
-    display: flex;
-    align-items: center;
     gap: 1lh;
     margin-bottom: 1em;
-
-    .title {
-      font: var( --font-titleSmall );
-    }
   }
 
   .row {

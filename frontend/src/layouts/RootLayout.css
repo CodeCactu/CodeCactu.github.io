@@ -1,6 +1,8 @@
 @layer reset, lib, layout;
 
 @import "./normalize.css" layer( reset );
+@import "./prose.css" layer( lib );
+@import "./row.css" layer( lib );
 @import "@lib/core/flow/flow.css" layer( lib );
 @import "@fet/theme/font/cactu.css";
 
@@ -22,7 +24,7 @@
     --border-width: calc( var( --pixelSize ) * 1 );
 
     --font-titleSmall: calc( var( --pixelSize ) * 4 ) / 1.2em var( --fontFamily-lato );
-    --font-body: 14px / 14px var( --fontFamily-lato );
+    --font-body: 14px / 18px var( --fontFamily-lato );
 
     scrollbar-color: color-mix( var( --color-white ), transparent 50% ) black;
     scrollbar-width: var( --tileSize );
@@ -49,12 +51,6 @@
 
   .row, .columns {
     gap: 24px;
-  }
-
-  .prose {
-    > * + * {
-      margin-top: 10px;
-    }
   }
 }
 

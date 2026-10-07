@@ -1,0 +1,19 @@
+.prose {
+  --prose-margin: 10px;
+
+  font: var( --font-body );
+
+  > * + * {
+    margin-top: var( --prose-margin );
+  }
+
+  > h3 {
+    font: var( --font-titleSmall );
+  }
+
+  > ul > li {
+    margin-top: var( --prose-margin );
+    margin-left: 20px;
+    list-style: square;
+  }
+}

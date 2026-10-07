@@ -18,28 +18,32 @@ const games = await loadCactuJamGames()
   </main>
 
   <Fragment slot="squares-body">
-    <section class={cn( `prose`, classes.preview )}>
-      <ul>
-        <li>
-          Najedź myszką na kafelek gry aby zobaczyć jej opis
-        </li>
+    <section class={classes.preview}>
+      <div class="prose">
+        <h2>Strefa podglądu</h2>
 
-        <li>
-          Kliknij na kafelek z grą aby panel gry zachował widoczność
-        </li>
+        <ul>
+          <li>
+            Najedź myszką na kafelek gry aby zobaczyć jej opis
+          </li>
 
-        <li>
-          Przeciągaj gry z listy źródłowej na poszczególne wiersze kategorii
-        </li>
+          <li>
+            Kliknij na kafelek z grą aby panel gry zachował widoczność
+          </li>
 
-        <li>
-          Przeciagnij grę z tabeli ocen nad listę źródłową aby usunąć dany głos
-        </li>
+          <li>
+            Przeciągaj gry z listy źródłowej na poszczególne wiersze kategorii
+          </li>
 
-        <li>
-          Rozdysponuj wszystkie gry we wszystkich kategoriach aby mieć ważny głos
-        </li>
-      </ul>
+          <li>
+            Przeciagnij grę z tabeli ocen nad listę źródłową aby usunąć dany głos
+          </li>
+
+          <li>
+            Rozdysponuj wszystkie gry we wszystkich kategoriach aby mieć ważny głos
+          </li>
+        </ul>
+      </div>
     </section>
 
     <section class={classes.listArea} data-source-area>
