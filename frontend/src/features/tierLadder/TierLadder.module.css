@@ -1,16 +1,14 @@
-.dragArea {
+.ladder {
   --_authorAvatarSize: 75px;
-  --_element-width: calc( var( --tileSize ) * 3 );
-  --_areasGap: 24px;
-  --_itemsGap: 20px;
+  --_element-width: calc( var( --tileSize ) * 2 );
+  --_color-surface: #0004;
+  --_areasGap: var( --pixelSize );
+  --_itemsGap: calc( var( --tileSize ) / 2 );
 
   display: flex;
   flex-wrap: wrap;
   gap: var( --_areasGap );
-
-  &.isBig {
-    --_authorAvatarSize: 100%;
-  }
+  margin-block: calc( var( --tileSize ) * 2 );
 
   .smallScreenInfo {
     display: none;
@@ -18,66 +16,83 @@
   }
 }
 
-.dragArea [data-drop-area] {
-  padding: var( --_itemsGap );
-  border: var( --border-width ) solid currentColor;
-}
-
 :where( .tiers ) {
   flex-grow: 1;
   display: flex;
+  gap: var( --_areasGap );
   flex-direction: column;
 
-  .legend {
+  .header {
     display: flex;
-    justify-content: space-between;
-    margin-left: calc( var( --_areasGap ) + 1lh );
+    align-items: center;
+    gap: 1lh;
+    margin-bottom: 1em;
+
+    .title {
+      font: var( --font-titleSmall );
+    }
   }
 
   .row {
-    display: flex;
+    display: grid;
+    grid-template:
+      "label legend"
+      "label assignements"
+      "desc  desc" /
+      var( --tileSize ) 1fr;
     align-items: center;
-    height: calc( var( --_element-width ) + var( --_itemsGap ) * 2 + var( --border-width ) * 2 );
-    gap: var( --_areasGap );
 
-    &:not( :first-of-type ) {
-      margin-top: var( --_areasGap )
-    }
+    border: var( --border-width ) solid var( --color-blue );
+    border-radius: var( --border-width );
+    corner-shape: notch;
+    background-color: var( --_color-surface );
+    overflow: hidden;
 
     .label {
-      width: 1lh;
+      grid-area: label;
+      display: grid;
+      place-items: center;
+      height: 100%;
+      background-color: var( --_color-surface );
+      font-size: var( --tileSize );
+      font-weight: bold;
+      color: var( --color-neutral-m100 );
     }
 
-    [data-drop-area] {
+    /* .assignements {
       flex-grow: 1;
+      height: 100%;
+      background-color: var( --_color-surface );
+    } */
+
+    .assignements {
+      grid-area: assignements;
       display: flex;
       gap: var( --_itemsGap );
+      padding: var( --_itemsGap );
+      min-height: calc( var( --_element-width ) + var( --_itemsGap ) * 2 );
       min-width: calc( var( --_element-width ) * 3 + var( --_itemsGap ) * 4 + var( --border-width ) * 2 );
-      height: 100%;
     }
-  }
-}
 
-:where( .uncategorised ) {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: calc( var( --_element-width ) * 2 + var( --_itemsGap ) * 3 + var( --border-width ) * 2 );
+    .legend {
+      grid-area: legend;
+      display: flex;
+      justify-content: space-between;
+      padding: var( --pixelSize ) calc( var( --pixelSize ) * 2 );
+      background-color: var( --_color-surface );
+      color: var( --color-neutral-m100 );
+    }
 
-  & [data-drop-area] {
-    flex-grow: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: var( --_itemsGap );
-    width: calc( var( --_element-width ) * 2 + var( --_itemsGap ) * 3 + var( --border-width ) * 2 );
-    min-height: calc( var( --_element-width ) * 3 + var( --_itemsGap ) * 4 + var( --border-width ) * 2 );
+    .description {
+      grid-area: desc;
+      padding: calc( var( --_itemsGap ) / 2 );
+      background-color: var( --_color-surface );
+      color: var( --color-neutral-m100 );
+    }
   }
 }
 
 .item {
-  --_color-surface: #0005;
-
   .handle {
     display: block;
     width: var( --_element-width );

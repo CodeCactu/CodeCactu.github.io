@@ -1,6 +1,17 @@
+:root {
+  --_gameTileSize: calc( var( --tileSize ) * 2 );
+}
+
+:global( main ) {
+  display: flex;
+
+  & > div {
+    width: 1000px;
+  }
+}
+
 .gamesArea {
   --_spacing: calc( var( --tileSize ) );
-  --_gameTileSize: calc( var( --tileSize ) * 3 );
 
   display: flex;
   gap: var( --_spacing );
@@ -12,7 +23,6 @@
   display: grid;
   width: min( 20vw, 300px );
   place-items: center;
-  text-align: center;
   color: var( --color-neutral-m100 );
 
   @media (max-aspect-ratio: 4 / 3) {

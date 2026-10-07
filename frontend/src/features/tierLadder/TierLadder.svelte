@@ -2,6 +2,8 @@
   const DRAG_START_DISTANCE = 5
 
   const isDraggingClass = `isDragging`
+  const isPreviewClass = `isPreview`
+  const isPlaceholderClass = `isPlaceholder`
   const isDraggingOverSourceClass = `isOverSource`
 
   const animationOptions: KeyframeAnimationOptions = {
@@ -9,20 +11,21 @@
     easing: `cubic-bezier( 0.2, 0, 0, 1 )`,
   }
 
-  let draggingItem: HTMLElement | null = null
-  let draggingOriginal: HTMLElement | null = null
-  let draggingClone: HTMLElement | null = null
+  let draggingItem: null | HTMLElement = null
+  let draggingOriginal: null | HTMLElement = null
+  let draggingClone: null | HTMLElement = null
 
-  let draggingTable: HTMLElement | null = null
+  let draggingTable: null | HTMLElement = null
   let draggingTableId: string | undefined
+  let draggingDropArea: null | HTMLElement = null
   let draggingFromSource = false
   let draggingOverSource = false
   let draggingItemAnimation: Animation | null = null
 
   let draggingPointerId: number | null = null
-  let draggingOverElement: HTMLElement | null = null
+  let draggingOverElement: null | HTMLElement = null
 
-  let draggingPlaceholder: HTMLElement | null = null
+  let draggingPlaceholder: null | HTMLElement = null
   let draggingPointerOffsetX = 0
   let draggingPointerOffsetY = 0
   let pointerDownX = 0
@@ -33,9 +36,10 @@
   function resetDragState() {
     removePlaceholder()
 
-    draggingItem?.classList.remove( classes.isDragging )
+    draggingItem?.classList.remove( classes.isDragging, isPreviewClass )
     draggingClone?.classList.remove( classes.isDragging )
 
+    draggingDropArea = null
     draggingItem = null
     draggingOriginal = null
     draggingClone = null
@@ -145,7 +149,7 @@
   }
 
   function getContainerItem( container:HTMLElement, itemId:DragItem["id"] ) {
-    return container.querySelector( `[data-drag-id="${itemId}"]` )
+    return container.querySelector( `[data-drag-id="${itemId}"]:not( .${isPreviewClass}, .${isPlaceholderClass} )` )
   }
 
   function flyElementTo( element:HTMLElement, x:number, y:number ) {
@@ -247,7 +251,6 @@
     clone.style.margin = "0"
     clone.style.zIndex = "999999"
     clone.style.pointerEvents = "none"
-    clone.dataset.isClone = `true`
 
     document.body.appendChild( clone )
 
@@ -274,6 +277,7 @@
     placeholder.style.flexShrink = `0`
     placeholder.style.outline = `1px dashed #aaa`
     placeholder.dataset.dragId = element.dataset.dragId
+    placeholder.classList.add( isPlaceholderClass )
 
     draggingPlaceholder = placeholder
 
@@ -311,6 +315,9 @@
   async function finishDraggingItem() {
     if (!draggingItem) return
 
+    const x = parseFloat( draggingItem.style.left )
+    const y = parseFloat( draggingItem.style.top )
+
     draggingItem.style.position = ``
     draggingItem.style.left = ``
     draggingItem.style.top = ``
@@ -319,10 +326,9 @@
     draggingItem.style.margin = ``
     draggingItem.style.zIndex = ``
     draggingItem.style.pointerEvents = ``
+    draggingItem.classList.remove( isPreviewClass )
 
     const rect = draggingItem.getBoundingClientRect()
-    const x = parseFloat( draggingItem.style.left )
-    const y = parseFloat( draggingItem.style.top )
 
     await flyInElement( draggingItem, x - rect.x, y - rect.y )
   }
@@ -401,6 +407,8 @@
       draggingItem = pointerDownElement
       draggingClone = null
 
+      draggingDropArea = pointerDownElement.closest<HTMLElement>( "[data-drop-area]" )
+
       draggingTable = getTable( pointerDownElement )
       draggingTableId = draggingTable?.dataset.tierTable
 
@@ -455,36 +463,47 @@
 
     if (element.dataset.dragId === draggingItem.dataset.dragId) return
 
+    const tableId = getTableId( element )
     const dragItem = element.closest<HTMLElement>( "[data-drag-id]" )
+    const dropArea = element.closest<HTMLElement>( "[data-drop-area]" )
+
+    if (draggingFromSource) {
+      if (tableId) {
+        const table = getTable( element )
+        // console.log( table, getContainerItem( table!, draggingItem.dataset.dragId! ) )
+        if (getContainerItem( table!, draggingItem.dataset.dragId! )) return
+      }
+    } else {
+      if (tableId !== draggingTableId) return
+      if (dropArea && dropArea !== draggingDropArea) {
+        if (getContainerItem( dropArea, draggingItem.dataset.dragId! )) return
+      }
+    }
+
     if (dragItem) {
       if (draggingOverElement === dragItem) return
       console.log( `D&D`, `Entering drag item` )
 
-      if (draggingOverElement !== dragItem) {
-        if (draggingOverElement) {
-          draggingOverElement.classList.remove( classes.isDragOver )
-        }
+      if (draggingOverElement) draggingOverElement.classList.remove( classes.isDragOver )
 
-        draggingOverElement = dragItem
-        dragItem.classList.add( classes.isDragOver )
-      }
+      draggingOverElement = dragItem
+      dragItem.classList.add( classes.isDragOver )
 
       handleDragOverDragItem( draggingItem, dragItem )
 
       return
     }
 
-    const dragArea = element.closest<HTMLElement>( "[data-drop-area]" )
-    if (dragArea) {
-      if (draggingOverElement === dragArea) return
+    if (dropArea) {
+      if (draggingOverElement === dropArea) return
       console.log( `D&D`, `Entering drag area` )
 
       const nearesDragArea = draggingOverElement?.closest<HTMLElement>( "[data-drop-area]" )
-      if (draggingOverElement && nearesDragArea !== dragArea) removePlaceholder()
+      if (draggingOverElement && nearesDragArea !== dropArea) removePlaceholder()
 
-      draggingOverElement = dragArea
+      draggingOverElement = dropArea
 
-      handleDragOverDropArea( draggingItem, dragArea )
+      handleDragOverDropArea( draggingItem, dropArea )
 
       return
     }
@@ -553,8 +572,9 @@
         }
       }
 
+      const table = getTable( draggingItem )
+      if (table && onDragEnd) onDragEnd( getDragAreasLists( table ) )
       resetDragState()
-      if (draggingTable && onDragEnd) onDragEnd( getDragAreasLists( draggingTable ) )
     }
 
     if (!draggingItemAnimation) return removeClassName()
@@ -576,33 +596,36 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import classes from "./TierLadder.module.css"
-  import type { CactuJamGame } from "@fet/backends/cactu/cactuJamGame"
-  import { clientConfig } from "@/config.client"
 
-  export type DragItem = CactuJamGame
-  export type DragItemTierAssignments = Record<string, DragItem["id"][]>
+  export type DragItem = {
+    id: string
+    description: null | string,
+    tiers: TierLadderTier[]
+  }
+
+  export type Assignement = {
+    id: string
+    thumbnailUri?: string
+    author: {
+      name: string
+    }
+  }
+
+  export type TierLadderTier = {
+    description: string
+    assignments: Assignement[]
+  }
+
   export type DragAreaLists = Record<string, string[]>
 
-  let { name, highestValue, items, assignments, onDragEnd }: {
-    name: string
-    highestValue: number
-    items: DragItem[]
-    assignments: DragItemTierAssignments
+  let { name, description, tiers, onDragEnd }: {
+    name: string,
+    description: null | string,
+    tiers: TierLadderTier[]
     onDragEnd?: (lists: DragAreaLists) => void
   } = $props()
 
   let container: HTMLElement | undefined
-
-  function getItem( id:DragItem["id"] ) {
-    const item = items.find((item) => item.id == id)
-
-    if (!item) {
-      console.log( id, items.at( -1 ), items )
-      throw new Error( `item "${id}" not found` )
-    }
-
-    return item
-  }
 
   onMount(() => {
     if (!container) return
@@ -618,60 +641,30 @@
   })
 </script>
 
-<article bind:this={container} class={classes.dragArea} data-tier-table={name}>
+<article bind:this={container} class={classes.ladder} data-tier-table={name}>
   <div class={classes.tiers}>
-    {name}
+    <header class={classes.header}>
+      <h3 class={classes.title}>{name}</h3>
 
-    <div class={classes.legend}>
-      <p>Słabsze</p>
-      <p>Lepsze</p>
-    </div>
+      <p>{description}</p>
+    </header>
 
-    {#each Array.from(
-      { length: highestValue + 1 },
-      (_, i) => highestValue - i
-    ) as tier}
+    {#each tiers as tier, i}
       <section class={classes.row}>
-        <p class={classes.label}>{tier}</p>
+        <p class={classes.label}>{tiers.length - i - 1}</p>
 
-        <div
-          class={classes.dropArea}
-          data-drop-area={`t${tier}`}
-        >
-          {#each assignments[`t${tier}`] ?? [] as id}
-            {@const item = getItem(id)}
+        <ol class={classes.assignements} data-drop-area={`t${tier}`}></ol>
 
-            <article
-              draggable="true"
-              data-drag-id={item.id}
-              class={classes.item}
-              style={item.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${item.thumbnailUri})`}
-            >
-              <span class={classes.handle}>☰</span>
+        {#if i === 0}
+          <div class={classes.legend}>
+            <p>Słabsze</p>
+            <p>Lepsze</p>
+          </div>
+        {/if}
 
-              <address
-                class={`textContainer ${classes.overview}`}
-              >
-                <h3>{item.name}</h3>
-
-                {#if item.description}
-                  <p>{getDescription(item)}</p>
-                {/if}
-
-                <small>~{item.author.name}</small>
-
-                {#if item.author.avatarUri}
-                  <img
-                    src={item.author.avatarUri}
-                    alt={`${item.author.name}'s avatar`}
-                    width="256"
-                    height="256"
-                  />
-                {/if}
-              </address>
-            </article>
-          {/each}
-        </div>
+        <p class={classes.description}>
+          {tier.description}
+        </p>
       </section>
     {/each}
   </div>

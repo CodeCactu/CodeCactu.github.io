@@ -86,7 +86,6 @@
 .squaresOverlay {
   & > svg {
     position: fixed;
-    z-index: -1;
     fill: var( --_squaresFill );
   }
   .squaresL,

@@ -4,19 +4,42 @@ import classes from "./page.module.css"
 import GamesTable from "./_utils/GamesTable.svelte"
 import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
 import { clientConfig } from "@/config.client"
+import cn from "@lib/core/functions/createClassName"
 
 const games = await loadCactuJamGames()
 ---
 <SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
   <main>
-    Cactujam!
+    <div>
+      <h1>Cactujam!</h1>
 
-    <GamesTable client:load  />
+      <GamesTable client:load />
+    </div>
   </main>
 
   <Fragment slot="squares-body">
-    <section class={classes.preview}>
-      <h3>Kliknij lub najedź lub na miniaturkę gry aby wyświetlić jej opis</h3>
+    <section class={cn( `prose`, classes.preview )}>
+      <ul>
+        <li>
+          Najedź myszką na kafelek gry aby zobaczyć jej opis
+        </li>
+
+        <li>
+          Kliknij na kafelek z grą aby panel gry zachował widoczność
+        </li>
+
+        <li>
+          Przeciągaj gry z listy źródłowej na poszczególne wiersze kategorii
+        </li>
+
+        <li>
+          Przeciagnij grę z tabeli ocen nad listę źródłową aby usunąć dany głos
+        </li>
+
+        <li>
+          Rozdysponuj wszystkie gry we wszystkich kategoriach aby mieć ważny głos
+        </li>
+      </ul>
     </section>
 
     <section class={classes.listArea} data-source-area>
