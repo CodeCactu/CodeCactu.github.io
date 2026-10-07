@@ -26,7 +26,11 @@
   color: var( --color-neutral-m100 );
 
   @media (max-aspect-ratio: 4 / 3) {
-    display: none;
+    height: 100px;
+
+    & > * {
+      display: none;
+    }
   }
 }
 
@@ -42,6 +46,7 @@
     bottom: 0;
     background-color: black;
     padding: var( --tileSize );
+    z-index: 1;
   }
   .list {
     flex-direction: row;

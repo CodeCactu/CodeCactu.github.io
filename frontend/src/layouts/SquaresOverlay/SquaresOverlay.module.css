@@ -6,6 +6,10 @@
   position: relative;
   z-index: 1;
 
+  & > :not( .squaresOverlay, .squaresOverlayBody ) {
+    padding: calc( var( --pixelSize ) * 2 );
+  }
+
   @media (min-aspect-ratio: 2 / 3) {
     display: grid;
     grid-template: "sqBody body" 100dvh / max-content 1fr;
@@ -14,14 +18,10 @@
       max-height: 100dvh;
     }
 
-    & > :not( .squaresOverlay, .squaresOverlayBody ) {
+    &.isStraight > :not( .squaresOverlay, .squaresOverlayBody ) {
       grid-area: body;
       overflow: auto;
       padding-block: var( --tileSize );
-      padding-left: calc( var( --tileSize ) * 2 )
-    }
-
-    & > :not( .squaresOverlay, .squaresOverlayBody ) {
       padding-left: calc( var( --tileSize ) * 6 )
     }
   }
@@ -40,12 +40,15 @@
     "top        middle"
     "bottom     middle" /
     max-content 1fr;
-  background-color: var( --_squaresFill );
   z-index: 12;
+
+  &:not( :has( > .squaresLb ) ) {
+    background-color: var( --_squaresFill );
+  }
 
   .bodyTop {
     grid-area: top;
-    padding: var( --_tileSize );
+    padding: calc( var( --_tileSize ) * 0.5 );
   }
 
   .bodyBottom {
@@ -60,6 +63,12 @@
   }
 
   @media (max-aspect-ratio: 2 / 3) {
+    grid-template:
+      "top"
+      "bottom"
+      "middle";
+
+    background-color: var( --_squaresFill );
     margin-top: var( --_squaresBSize );
     overflow-x: clip;
   }
@@ -91,16 +100,20 @@
   .squaresL,
   .squaresLb {
     position: absolute;
-    left:  100%;
     bottom: 0;
     height: calc( var( --_tileSize ) * 31 );
   }
   .squaresL {
+    left:  100%;
+
     @media (max-aspect-ratio: 2 / 3) {
       display: none;
     }
   }
   .squaresLb {
+    left:  0;
+    z-index: -1;
+
     @media (width >= 850px) {
       .squaresL:has( + & ) {
         display: none;

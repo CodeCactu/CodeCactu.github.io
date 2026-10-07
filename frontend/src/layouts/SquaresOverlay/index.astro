@@ -15,7 +15,7 @@ const hasTopBody = Astro.slots.has( `squares-body-top` )
 const hasBottomBody = Astro.slots.has( `squares-body-bottom` )
 const hasMiddleBody = Astro.slots.has( `squares-body-middle` )
 ---
-<div id={Astro.props.id} class={cn( classes.squaresOverlayWrapper, Astro.props.class )}>
+<div id={Astro.props.id} class={cn( classes.squaresOverlayWrapper, Astro.props.straight && classes.isStraight, Astro.props.class )}>
   <slot />
 
   <div class={classes.squaresOverlayBody}>
