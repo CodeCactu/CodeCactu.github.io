@@ -57,14 +57,6 @@
     draggingPointerOffsetY = 0
   }
 
-  function getDescription( item:DragItem ) {
-    if (!item.description) return
-
-    return item.description.length > 203
-      ? item.description.slice( 0, 260 ) + "..."
-      : item.description
-  }
-
   function getTable( element:Element | null ) {
     return element?.closest<HTMLElement>( "[data-tier-table]" ) || null
   }
@@ -129,23 +121,33 @@
     configElement( b, rectB )
   }
 
-  function getDragAreasLists( table:HTMLElement ) {
-    const dropAreas = Array.from(
-      table.querySelectorAll<HTMLElement>( "[data-drop-area]" )
-    )
-
-    const dragAreas: DragAreaLists = {}
+  function getDragAreasListsFromTable( table:HTMLElement ) {
+    const dropAreas = Array.from( table.querySelectorAll<HTMLElement>( "[data-drop-area]" ) )
+    const dragAreas:LadderValues = {}
 
     for (const area of dropAreas) {
       const id = area.dataset.dropArea
       if (!id) continue
 
-      dragAreas[id] = Array.from(
-        area.querySelectorAll<HTMLElement>( "[data-drag-id]" )
-      ).map((item) => item.dataset.dragId!)
+      dragAreas[id] = Array.from( area.querySelectorAll<HTMLElement>( "[data-drag-id]" ) )
+        .map( item => item.dataset.dragId! )
     }
 
     return dragAreas
+  }
+
+  export function getDragAreasLists() {
+    const dropAreas = Array.from( document.querySelectorAll<HTMLElement>( "[data-tier-table]" ) )
+    const ladders:Record<string, LadderValues> = {}
+
+    for (const table of dropAreas) {
+      const tableName = table.dataset.tierTable
+      if (!tableName) continue
+
+      ladders[ tableName ] = getDragAreasListsFromTable( table )
+    }
+
+    return ladders
   }
 
   function getContainerItem( container:HTMLElement, itemId:DragItem["id"] ) {
@@ -237,8 +239,10 @@
   }
 
   function createPreview( element:HTMLElement, x:number, y:number ) {
-    const clone = element.cloneNode(true) as HTMLElement
+    const clone = element.cloneNode( true ) as HTMLElement
     const rect = element.getBoundingClientRect()
+
+    clone.querySelectorAll( `[data-drag-ignore]` ).forEach( n => n.remove() )
 
     draggingPointerOffsetX = x - rect.left
     draggingPointerOffsetY = y - rect.top
@@ -529,7 +533,7 @@
     }
   }
 
-  function handlePointerUp( event:PointerEvent, onDragEnd?:(list:DragAreaLists) => void ) {
+  function handlePointerUp( event:PointerEvent, onDragEnd?:(list:LadderValues) => void ) {
     if (!pointerDownElement) return
 
     pointerDownElement.releasePointerCapture( event.pointerId )
@@ -543,9 +547,8 @@
 
       console.log( `D&D`, `End` )
 
-      document
-        .querySelectorAll<HTMLElement>( `.${classes.isDragOver}` )
-        .forEach((element) => element.classList.remove( classes.isDragOver ))
+      document.querySelectorAll<HTMLElement>( `.${classes.isDragOver}` )
+        .forEach( e => e.classList.remove( classes.isDragOver ) )
 
       const dropArea = draggingPlaceholder?.parentElement?.dataset.dropArea ? draggingPlaceholder.parentElement : null
 
@@ -573,12 +576,12 @@
       }
 
       const table = getTable( draggingItem )
-      if (table && onDragEnd) onDragEnd( getDragAreasLists( table ) )
+      if (table && onDragEnd) onDragEnd( getDragAreasListsFromTable( table ) )
       resetDragState()
     }
 
     if (!draggingItemAnimation) return removeClassName()
-    draggingItemAnimation.addEventListener( "finish", removeClassName, { once: true } )
+    draggingItemAnimation.addEventListener( `finish`, removeClassName, { once: true } )
   }
 
   function handlePointerCancel( event:PointerEvent ) {
@@ -596,7 +599,8 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import classes from "./TierLadder.module.css"
-    import cn from "@lib/core/functions/createClassName";
+  import cn from "@lib/core/functions/createClassName"
+  import TierLadderItem from "./TierLadderItem.svelte"
 
   export type DragItem = {
     id: string
@@ -604,26 +608,34 @@
     tiers: TierLadderTier[]
   }
 
-  export type Assignement = {
+  export type AssignementSummary = {
     id: string
-    thumbnailUri?: string
+    thumbnailUri?: null | string
+  }
+
+  export type Assignement = AssignementSummary & {
+    name: string
+    description?: string
     author: {
       name: string
+      avatarUri?: string
     }
   }
 
   export type TierLadderTier = {
     description: string
-    assignments: Assignement[]
+    assignments: AssignementSummary[]
   }
 
-  export type DragAreaLists = Record<string, string[]>
+  export type LadderValues = Record<string, string[]>
+  export type LaddersValues = Record<string, LadderValues>
 
-  let { name, description, tiers, onDragEnd }: {
+  let { name, label, description, tiers, onDragEnd }: {
     name: string,
+    label: string,
     description: null | string,
     tiers: TierLadderTier[]
-    onDragEnd?: (lists: DragAreaLists) => void
+    onDragEnd?: (ladder:LadderValues) => void
   } = $props()
 
   let container: HTMLElement | undefined
@@ -633,10 +645,10 @@
 
     const abortController = new AbortController()
 
-    document.addEventListener( "pointerdown", handlePointerDown, { signal: abortController.signal } )
-    document.addEventListener( "pointermove", handlePointerMove, { signal: abortController.signal } )
-    document.addEventListener( "pointerup", event => handlePointerUp( event, onDragEnd ), { signal: abortController.signal } )
-    document.addEventListener( "pointercancel", handlePointerCancel, { signal: abortController.signal } )
+    document.addEventListener( `pointerdown`, handlePointerDown, { signal: abortController.signal } )
+    document.addEventListener( `pointermove`, handlePointerMove, { signal: abortController.signal } )
+    document.addEventListener( `pointerup`, event => handlePointerUp( event, onDragEnd ), { signal: abortController.signal } )
+    document.addEventListener( `pointercancel`, handlePointerCancel, { signal: abortController.signal } )
 
     return () => abortController.abort()
   })
@@ -645,16 +657,22 @@
 <article bind:this={container} class={classes.ladder} data-tier-table={name}>
   <div class={classes.tiers}>
     <header class={cn( `prose`, `row`, classes.header )}>
-      <h3>{name}</h3>
+      <h3>{label}</h3>
 
       <p>{description}</p>
     </header>
 
     {#each tiers as tier, i}
-      <section class={classes.row}>
-        <p class={classes.label}>{tiers.length - i - 1}</p>
+      {const place = tiers.length - i - 1}
 
-        <ol class={classes.assignements} data-drop-area={`t${tier}`}></ol>
+      <section class={classes.row}>
+        <p class={classes.label}>{place}</p>
+
+        <ol class={classes.assignements} data-drop-area={`t${place}`}>
+          {#each tier.assignments as assignment}
+            <TierLadderItem assignment={assignment} />
+          {/each}
+        </ol>
 
         {#if i === 0}
           <div class={classes.legend}>

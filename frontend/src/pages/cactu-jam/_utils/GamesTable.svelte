@@ -1,22 +1,14 @@
 <script lang="ts">
-  import { loadCactuJamCategories, type CactuJamCategory } from "@fet/backends/cactu/cactuJamCategory";
+  import { type CactuJamCategory } from "@fet/backends/cactu/cactuJamCategory";
   import { type CactuJamGame } from "@fet/backends/cactu/cactuJamGame"
-  import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
-  import { loadCactuJamUserVotes, type CactuJamUserVotes } from "@fet/backends/cactu/cactuJamVotes"
-  import TierLadder, { type TierLadderTier } from "@fet/tierLadder/TierLadder.svelte"
+  import { loadCactuJamUserVotes, saveCactuJamUserVotes, type CactuJamUserVotes } from "@fet/backends/cactu/cactuJamVotes"
+  import TierLadder, { getDragAreasLists, type AssignementSummary, type TierLadderTier } from "@fet/tierLadder/TierLadder.svelte"
+    import { onMount } from "svelte";
 
-  type TierladderData = {
+  let { games, categories }:{
     games: CactuJamGame[]
-    userVotes?: CactuJamUserVotes
     categories: CactuJamCategory[]
-    ladders: {
-      name: string
-      description: null | string
-      tiers: TierLadderTier[]
-    }[]
-  }
-
-  let tierLadderData = $state<undefined | TierladderData>( undefined )
+  } = $props()
 
   const translation:Record<string,{ name:string, description:null | string, tiers:string[] }> = {
     theme: {
@@ -78,35 +70,47 @@
     },
   }
 
-  Promise.all([
-    loadCactuJamGames(),
-    loadCactuJamUserVotes(),
-    loadCactuJamCategories(),
-  ]).then( ([games, userVotes, categories]) => {
-    const ladders = categories.map( category => {
+  let userVotes = $state<undefined | CactuJamUserVotes>( undefined )
+
+  const ladders = $derived(
+    categories.map( category => {
       const t = translation[ category.name ]
+      const categoryVotes = userVotes?.[ category.name ]
 
-      return {
-        name: t.name,
+      const ladderData = {
+        label: t.name,
+        name: category.name,
         description: t.description,
-        tiers: t.tiers.map<TierLadderTier>( t => ({ description:t, assignments:[] }) )
+        tiers: t.tiers.map<TierLadderTier>( (descriptionText, i) => ({
+          description: descriptionText,
+          assignments: categoryVotes?.[ `t${t.tiers.length - i - 1}` ]
+            .map( v => games.find( g => g.id == v ) )
+            .filter( g => !!g )
+            .map<AssignementSummary>( g => ({ id:g.id, thumbnailUri:g.thumbnailUri }) )
+            ?? []
+        }) )
       }
-    } )
 
-    const ladderData = { games, userVotes, categories, ladders }
-    console.log({ ladderData })
+      return ladderData
+    })
+  )
 
-    tierLadderData = ladderData
-  })
+  function handleDragEnd() {
+    const ladders = getDragAreasLists()
+    console.log( `Votes update`, ladders )
+    saveCactuJamUserVotes( ladders )
+  }
+
+  onMount( () => loadCactuJamUserVotes().then( uv => userVotes = uv ) )
+  $effect( () => userVotes && console.log({ ladders }) )
 </script>
 
-{#if tierLadderData}
-  {#each tierLadderData.ladders as ladder}
-    <TierLadder
-      name={ladder.name}
-      tiers={ladder.tiers}
-      description={ladder.description}
-      onDragEnd={ladder => console.log( ladder )}
-    />
-  {/each}
-{/if}
+{#each ladders as ladder}
+  <TierLadder
+    label={ladder.label}
+    name={ladder.name}
+    tiers={ladder.tiers}
+    description={ladder.description}
+    onDragEnd={handleDragEnd}
+  />
+{/each}

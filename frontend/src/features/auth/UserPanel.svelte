@@ -34,7 +34,7 @@
       width="40"
       height="40"
       alt={""}
-      onerror={e => (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40'}
+      onerror={e => (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/50'}
     />
 
     <a class={classes.login} href={auth.getDiscordIntegrationLink()}>
@@ -50,7 +50,7 @@
       width="50"
       height="50"
       alt={user.name}
-      onerror={e => (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40'}
+      onerror={e => (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/50'}
     >
 
     <button class={classes.logout} onclick={() => auth.logout()}>

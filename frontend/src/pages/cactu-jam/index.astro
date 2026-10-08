@@ -3,17 +3,20 @@ import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro"
 import classes from "./page.module.css"
 import GamesTable from "./_utils/GamesTable.svelte"
 import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
-import { clientConfig } from "@/config.client"
-import cn from "@lib/core/functions/createClassName"
+import TierLadderItem from "@fet/tierLadder/TierLadderItem.svelte"
+import { loadCactuJamCategories } from "@fet/backends/cactu/cactuJamCategory"
 
-const games = await loadCactuJamGames()
+const [ games, categories ] = await Promise.all([
+  loadCactuJamGames(),
+  loadCactuJamCategories(),
+])
 ---
 <SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
   <main>
     <div>
       <h1>Cactujam!</h1>
 
-      <GamesTable client:load />
+      <GamesTable client:load games={games} categories={categories} />
     </div>
   </main>
 
@@ -42,6 +45,10 @@ const games = await loadCactuJamGames()
           <li>
             Rozdysponuj wszystkie gry we wszystkich kategoriach aby mieć ważny głos
           </li>
+
+          <li>
+            Każda akcja jest automatycznie zapisywana
+          </li>
         </ul>
       </div>
     </section>
@@ -50,39 +57,7 @@ const games = await loadCactuJamGames()
       <h3>Gry</h3>
 
       <ol class={classes.list}>
-        {games.map( game => (
-          <li
-            class={classes.game}
-            data-drag-id={game.id}
-            style={game.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${game.thumbnailUri})`}
-          >
-            <button class={classes.handle} popovertarget={`game-${game.id}`}>
-              ☰
-            </button>
-
-            <address popover class={`prose ${classes.overview}`} id={`game-${game.id}`}>
-              {game.author.avatarUri && (
-                <img
-                  src={game.author.avatarUri}
-                  alt={`${game.author.name}'s avatar`}
-                  width="128"
-                  height="128"
-                />
-              )}
-
-              <h3>{game.name}</h3>
-
-              {game.description && <div>{game.description}</div>}
-
-              <small>~{game.author.name}</small>
-
-              <div class={classes.comment}>
-                <h4>Komentarz dla uczestnika</h4>
-                <textarea name="comment"></textarea>
-              </div>
-            </address>
-          </li>
-        ))}
+        {games.map( game => <TierLadderItem assignment={game} />)}
       </ol>
     </section>
   </Fragment>

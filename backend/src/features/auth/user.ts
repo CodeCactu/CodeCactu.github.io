@@ -12,6 +12,7 @@ db.run( `
 export class User {
   static readonly expirationTimeMinutes = 30
   static readonly #inserQuery = db.prepare( `INSERT INTO users (id, createdAt, name, avatarHash) VALUES ($id, $createdAt, $name, $avatarHash)` )
+  static readonly #updateQuery = db.prepare( `UPDATE users SET avatarHash = $avatarHash, name = $name WHERE id = $id` )
   static readonly #selectQuery = db.prepare( `SELECT * FROM users WHERE id = ?` )
 
   constructor(
@@ -31,7 +32,16 @@ export class User {
 
   static async getOrCreate( id:string, name:string, avatarHash:null | string ) {
     const existingUser = User.get( id )
-    if (existingUser) return existingUser
+    if (existingUser) {
+      if (name !== existingUser.name || avatarHash !== existingUser.avatarHash) {
+        existingUser.avatarHash = avatarHash
+        existingUser.name = name
+
+        User.#updateQuery.run({ $id:id, $name:name, $avatarHash:avatarHash })
+      }
+
+      return existingUser
+    }
 
     const newUser = new User( id, new Date(), name, avatarHash )
 

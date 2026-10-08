@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs"
 import z from "zod"
+import { getTrueColor } from "@lib/logger"
 import logInfo, { logColorInfo } from "@fet/loggers/logInfo"
+import { logColorPositive } from "@fet/loggers/log"
 import { User } from "@fet/auth/user"
 import { getVotes, saveVotes } from "./votes"
 import { categories } from "./categories"
@@ -35,7 +37,7 @@ export async function updateMyGamesVotesEndpoint( req:Bun.BunRequest, user:User 
 
   const votes = parsedVotes.data.votes
 
-  logInfo( `User `, { value:user.name, color:logColorInfo }, ` updated their votes:`, [ votes ] )
+  logInfo( `User `, { value:user.name, color:logColorInfo }, ` updated their votes:`, [ formatVotes( votes ) ] )
   saveVotes( user.id, votes )
 
   return Response.json({ votes })
@@ -53,4 +55,18 @@ export async function getUploadedResource( req:Bun.BunRequest<`/uploads/games/:g
   if (!file) return Response.json( { code:`NOT_FOUND` }, { status:404 } )
 
   return new Response( file )
+}
+
+function formatVotes( votes:Record<string, Record<string, string[]>> ) {
+  const summary:string[] = []
+
+  for (const [ category, tiers ] of Object.entries( votes )) {
+    for (const [ tier, ids ] of Object.entries( tiers )) {
+      if (ids.length > 0) {
+        summary.push( `${category}.${tier}: ${getTrueColor( ids.join( `, ` ), { fg:logColorPositive } )}` )
+      }
+    }
+  }
+
+  return summary.length > 0 ? `\n  | ` + summary.join( `\n  | ` ) : `No votes`
 }
