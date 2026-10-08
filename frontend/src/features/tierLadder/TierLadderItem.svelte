@@ -3,6 +3,7 @@
   import type { Assignement, AssignementSummary } from "./TierLadder.svelte"
   import { clientConfig } from "@/config.client"
   import { queryCactuJamComments, saveCactuJamUserComment } from "@fet/backends/cactu/cactuJamComments"
+    import { auth } from "@fet/auth/authRune.svelte";
 
   let { assignment }: {
     assignment: AssignementSummary | Assignement
@@ -13,7 +14,7 @@
   const isWithPopover = $derived( `name` in assignment )
 
   $effect(() => {
-    if (!isWithPopover) return
+    if (!isWithPopover || !auth.session) return
 
     isLoaded = false
     let active = true
@@ -46,7 +47,7 @@
 
 <li
   class={classes.game}
-  data-drag-id={assignment.id}
+  data-drag-id={auth.session ? assignment.id : undefined}
   style={assignment.thumbnailUri && `--bgr: url(${clientConfig.BACKEND_ORIGIN}${assignment.thumbnailUri})`}
 >
   <button class={classes.handle} popovertarget={`game-${assignment.id}`}>
@@ -77,10 +78,12 @@
 
       <small>~{assignment.author.name}</small>
 
-      <div class={classes.comment}>
-        <h4>Komentarz dla uczestnika</h4>
-        <textarea name="comment" bind:value={comment}></textarea>
-      </div>
+      {#if auth.session}
+        <div class={classes.comment}>
+          <h4>Komentarz dla uczestnika</h4>
+          <textarea name="comment" bind:value={comment}></textarea>
+        </div>
+      {/if}
     </address>
   {/if}
 </li>

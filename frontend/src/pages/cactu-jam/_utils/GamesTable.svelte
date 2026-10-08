@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { auth } from "@fet/auth/authRune.svelte";
   import { type CactuJamCategory } from "@fet/backends/cactu/cactuJamCategory";
   import { type CactuJamGame } from "@fet/backends/cactu/cactuJamGame"
   import { loadCactuJamUserVotes, saveCactuJamUserVotes, type CactuJamUserVotes } from "@fet/backends/cactu/cactuJamVotes"
@@ -101,8 +102,14 @@
     saveCactuJamUserVotes( ladders )
   }
 
-  onMount( () => loadCactuJamUserVotes().then( uv => userVotes = uv ) )
+  onMount( () => {
+    if (!auth.session) return
+    loadCactuJamUserVotes().then( uv => userVotes = uv )
+  } )
   $effect( () => userVotes && console.log({ ladders }) )
+  $effect( () => {
+    if (!auth.session && userVotes) userVotes = undefined
+  } )
 </script>
 
 {#each ladders as ladder}

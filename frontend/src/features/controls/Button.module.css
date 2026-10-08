@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 1ch;
-  padding-inline: var( --tileSize );
+  padding-inline: calc( var( --tileSize ) / 2 );
   width: max-content;
   height: calc( var( --tileSize ) * 2 );
 
@@ -52,10 +52,6 @@
     border-image: url( "./frame-rotated.png" ) 2;
     opacity: 0.9
   }
-}
-
-.isCompact {
-  padding-inline: calc( var( --tileSize ) / 2 );
 }
 
 .isYellow {
