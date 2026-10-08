@@ -2,11 +2,47 @@
   import classes from "./TierLadderItem.module.css"
   import type { Assignement, AssignementSummary } from "./TierLadder.svelte"
   import { clientConfig } from "@/config.client"
+  import { queryCactuJamComments, saveCactuJamUserComment } from "@fet/backends/cactu/cactuJamComments"
 
   let { assignment }: {
     assignment: AssignementSummary | Assignement
   } = $props()
+
+  let comment = $state<string>( `` )
+  let isLoaded = false
+  const isWithPopover = $derived( `name` in assignment )
+
+  $effect(() => {
+    if (!isWithPopover) return
+
+    isLoaded = false
+    let active = true
+
+    queryCactuJamComments().then( c => {
+      if (!active) return
+
+      comment = c[ assignment.id ] ?? ``
+      queueMicrotask( () => isLoaded = true )
+    })
+
+    return () => active = false
+  })
+
+  $effect( () => {
+    if (!isWithPopover) return
+
+    const currentComment = comment
+
+    if (!isLoaded) return
+
+    const timeoutId = setTimeout(() => {
+      saveCactuJamUserComment( assignment.id, currentComment )
+    }, 1000 )
+
+    return () => clearTimeout( timeoutId )
+  })
 </script>
+
 
 <li
   class={classes.game}
@@ -43,7 +79,7 @@
 
       <div class={classes.comment}>
         <h4>Komentarz dla uczestnika</h4>
-        <textarea name="comment"></textarea>
+        <textarea name="comment" bind:value={comment}></textarea>
       </div>
     </address>
   {/if}

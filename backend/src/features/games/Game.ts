@@ -4,7 +4,7 @@ import getDiscordAvatarUri from "@fet/discord/getDiscordAvatarUri"
 
 type About = {
   name: string
-  id: string
+  id: number | string
 }
 
 export class Game {
@@ -34,6 +34,7 @@ export class Game {
         },
         thumbnailUri: !isThumbnailed ? null : `/uploads/games/${id}/thumbnail.png`,
         ...about,
+        id: `${about.id}`,
       }
     } ) )
 

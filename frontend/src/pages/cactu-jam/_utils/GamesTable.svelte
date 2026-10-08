@@ -84,7 +84,7 @@
         tiers: t.tiers.map<TierLadderTier>( (descriptionText, i) => ({
           description: descriptionText,
           assignments: categoryVotes?.[ `t${t.tiers.length - i - 1}` ]
-            .map( v => games.find( g => g.id == v ) )
+            .map( v => games.find( g => g.id === v ) )
             .filter( g => !!g )
             .map<AssignementSummary>( g => ({ id:g.id, thumbnailUri:g.thumbnailUri }) )
             ?? []

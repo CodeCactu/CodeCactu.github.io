@@ -1,12 +1,14 @@
-import { categories } from "./categories"
 import db from "@/db"
 
 export type CategoryName = string
 export type GameId = string
-export type UserVotes = Record<
-  CategoryName,
-  Record<`` | string, GameId[]>
->
+export type UserVotes = Record<CategoryName, Record<string, GameId[]>>
+
+type UserVotesRow = {
+  userId: string
+  updatedAt: string
+  votesJson: string
+}
 
 db.run( `
   CREATE TABLE IF NOT EXISTS userVotes (
@@ -23,26 +25,25 @@ const saveVotesQuery = db.prepare( `
   VALUES ($userId, $votes)
   ON CONFLICT(userId) DO UPDATE SET
     updatedAt = CURRENT_TIMESTAMP,
-    votesJson = json_patch( votesJson, $votes )
+    votesJson = $votes
 ` )
 
+export function getUserVotes( userId:string ) {
+  const row = getVotesQuery.get( userId ) as Pick<UserVotesRow, `votesJson`> | null | undefined
+  const userVotes:UserVotes = row ? JSON.parse( row.votesJson ) : {}
 
-export function getVotes( userId?:string ) {
-  const lastVotesResult = userId
-    ? getVotesQuery.get( userId ) as null | { userId: string, votesJson: string }
-    : getAllVotesQuery.get() as null | { userId: string, votesJson: string }
+  return userVotes
+}
 
-  const lastVotes = !lastVotesResult ? {} : JSON.parse( lastVotesResult.votesJson )
+export function getAllVotes() {
+  const rows = getAllVotesQuery.all() as Pick<UserVotesRow, `userId` | `votesJson`>[]
+  const allVotes:Record<string, UserVotes> = {}
 
-  for (const category of categories) {
-    if (category.name in lastVotes) continue
-
-    lastVotes[ category.name ] = category.name === `bonus`
-      ? { t0:[ `1`, `2`, `3`, `4`, `5`, `6`, `7` ] }
-      : { uncategorised:[ `1`, `2`, `3`, `4`, `5`, `6`, `7` ] }
+  for (const row of rows) {
+    allVotes[ row.userId ] = JSON.parse( row.votesJson )
   }
 
-  return lastVotes
+  return allVotes
 }
 
 export function saveVotes( userId:string, votes:UserVotes ) {

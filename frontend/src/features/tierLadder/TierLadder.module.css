@@ -8,7 +8,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var( --_areasGap );
-  margin-block: calc( var( --tileSize ) * 2 );
 
   .smallScreenInfo {
     display: none;

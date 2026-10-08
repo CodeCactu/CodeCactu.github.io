@@ -1,6 +1,6 @@
 import { checkCors, withCors, withCorsHeaders } from "@fet/server"
 import logInfo from "@fet/loggers/logInfo"
-import { getGamesCategoriesEndpoint, getGamesEndpoint, getMyGamesVotesEndpoint, getUploadedResource, updateMyGamesVotesEndpoint } from "@fet/games/endpoints"
+import { getGamesCategoriesEndpoint, getGamesEndpoint, getMyGamesCommentsEndpoint, getMyGamesVotesEndpoint, getUploadedResource, updateMyGameCommentEndpoint, updateMyGamesVotesEndpoint } from "@fet/games/endpoints"
 import { createUserSessionEndpoint, deleteUserSessionEndpoint, getUserSessionEndpoint } from "@fet/auth/endpoints"
 import { withAuth } from "@fet/auth"
 
@@ -26,6 +26,10 @@ const server = Bun.serve({
     "/api/games/votes/@my": {
       GET: withCors( withAuth( getMyGamesVotesEndpoint ) ),
       PUT: withCors( withAuth( updateMyGamesVotesEndpoint ) ),
+    },
+    "/api/games/comments/@my": {
+      GET: withCors( withAuth( getMyGamesCommentsEndpoint ) ),
+      PUT: withCors( withAuth( updateMyGameCommentEndpoint ) ),
     },
     "/uploads/games/:gameId/:filename": {
       GET: withCors( getUploadedResource ),

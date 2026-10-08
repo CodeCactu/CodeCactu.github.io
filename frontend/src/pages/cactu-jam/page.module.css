@@ -5,8 +5,9 @@
 :global( main ) {
   display: flex;
 
-  & > div {
+  & > :global( .prose ) {
     width: 1000px;
+    height: max-content;
   }
 }
 

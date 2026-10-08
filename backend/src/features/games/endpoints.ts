@@ -4,7 +4,8 @@ import { getTrueColor } from "@lib/logger"
 import logInfo, { logColorInfo } from "@fet/loggers/logInfo"
 import { logColorPositive } from "@fet/loggers/log"
 import { User } from "@fet/auth/user"
-import { getVotes, saveVotes } from "./votes"
+import { getUserVotes, saveVotes } from "./votes"
+import { getUserComments, saveComment } from "./comments"
 import { categories } from "./categories"
 import { Game } from "./Game"
 
@@ -17,7 +18,7 @@ export async function getGamesCategoriesEndpoint() {
 }
 
 export async function getMyGamesVotesEndpoint( _:Bun.BunRequest, user:User ) {
-  return Response.json({ votes:getVotes( user.id ) })
+  return Response.json({ votes:getUserVotes( user.id ) })
 }
 
 const updateScheme = z.object({
@@ -41,6 +42,28 @@ export async function updateMyGamesVotesEndpoint( req:Bun.BunRequest, user:User 
   saveVotes( user.id, votes )
 
   return Response.json({ votes })
+}
+
+export async function getMyGamesCommentsEndpoint( _:Bun.BunRequest, user:User ) {
+  return Response.json({ comments:getUserComments( user.id ) })
+}
+
+const updateCommentScheme = z.object({
+  gameId: z.string().min( 1 ),
+  comment: z.string(),
+})
+
+export async function updateMyGameCommentEndpoint( req:Bun.BunRequest, user:User ) {
+  const body = await req.json()
+  const parsed = updateCommentScheme.safeParse( body )
+  if (!parsed.success) return Response.json( { code:`BAD_REQUEST` }, { status:400 } )
+
+  const { gameId, comment } = parsed.data
+
+  saveComment( user.id, gameId, comment )
+  logInfo( `User `, { value:user.name, color:logColorInfo }, ` updated comment for game ${gameId}` )
+
+  return Response.json({ gameId, comment })
 }
 
 export async function getUploadedResource( req:Bun.BunRequest<`/uploads/games/:gameId/:filename`> ) {

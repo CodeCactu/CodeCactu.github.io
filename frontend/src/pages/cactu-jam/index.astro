@@ -13,7 +13,7 @@ const [ games, categories ] = await Promise.all([
 ---
 <SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
   <main>
-    <div>
+    <div class="prose">
       <h1>Cactujam!</h1>
 
       <GamesTable client:load games={games} categories={categories} />
@@ -57,7 +57,7 @@ const [ games, categories ] = await Promise.all([
       <h3>Gry</h3>
 
       <ol class={classes.list}>
-        {games.map( game => <TierLadderItem assignment={game} />)}
+        {games.map( game => <TierLadderItem client:load assignment={game} />)}
       </ol>
     </section>
   </Fragment>
