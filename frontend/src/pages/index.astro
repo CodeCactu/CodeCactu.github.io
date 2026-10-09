@@ -2,6 +2,11 @@
 import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro";
 import CactuBanner from "./_utils/CactuBanner/index.astro"
 import "./page.css"
+
+Astro.cache.set({
+  maxAge: 60 * 60 * 24,
+  swr: 60 * 60,
+})
 ---
 <SquaresOverlayLayout>
   <main>

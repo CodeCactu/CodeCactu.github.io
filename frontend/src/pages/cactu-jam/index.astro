@@ -6,6 +6,11 @@ import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
 import TierLadderItem from "@fet/tierLadder/TierLadderItem.svelte"
 import { loadCactuJamCategories } from "@fet/backends/cactu/cactuJamCategory"
 
+Astro.cache.set({
+  maxAge: 60 * 60 * 24,
+  swr: 60 * 60,
+})
+
 const [ games, categories ] = await Promise.all([
   loadCactuJamGames(),
   loadCactuJamCategories(),

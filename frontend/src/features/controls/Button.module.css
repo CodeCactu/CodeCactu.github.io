@@ -15,13 +15,13 @@
   height: calc( var( --tileSize ) * 2 );
 
   border: calc( var( --border-width ) * 2 ) solid transparent;
-  border-image: url( "./frame.png" ) 2;
+  border-image: url( "/frame.png" ) 2;
   border-radius: var( --border-width );
   corner-shape: notch;
   text-decoration: none;
 
   background-image:
-    url( "./tileBgr.png" ),
+    url( "/tileBgr.png" ),
     linear-gradient( var( --_color ) );
   background-repeat: no-repeat;
   background-size:
@@ -49,7 +49,7 @@
   }
 
   &:active {
-    border-image: url( "./frame-rotated.png" ) 2;
+    border-image: url( "/frame-rotated.png" ) 2;
     opacity: 0.9
   }
 }
