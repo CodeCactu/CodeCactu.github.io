@@ -5,106 +5,14 @@ import classes from "./SquaresOverlay.module.css"
 interface Props {
   id?: string
   class?: string
-  bottomBodyClass?: string
-  middleBodyClass?: string
   straight?: boolean
-  surfaceSize?: number
 }
-
-const hasTopBody = Astro.slots.has( `squares-body-top` )
-const hasBottomBody = Astro.slots.has( `squares-body-bottom` )
-const hasMiddleBody = Astro.slots.has( `squares-body-middle` )
 ---
 <div id={Astro.props.id} class={cn( classes.squaresOverlayWrapper, Astro.props.straight && classes.isStraight, Astro.props.class )}>
   <slot />
 
   <div class={classes.squaresOverlayBody}>
-    {hasTopBody && (
-      <div class:list={[ classes.bodyTop ]}>
-        <slot name="squares-body-top" />
-      </div>
-    )}
-
-    {hasBottomBody && (
-      <div class:list={[ classes.bodyBottom, Astro.props.bottomBodyClass ]}>
-        <slot name="squares-body-bottom" />
-      </div>
-    )}
-
-    {hasMiddleBody && (
-      <div class:list={[ classes.bodyMiddle, Astro.props.middleBodyClass ]}>
-        <slot name="squares-body-middle" />
-      </div>
-    )}
-
-    <svg class={classes.squaresL} viewBox="0 0 4 31">
-      <path d="
-        M 0 31
-        h  3
-        v -1
-        h -1
-        v -2
-        h  1
-        v -1
-        h -1
-        v -1
-        h  1
-        v -2
-        h -1
-        v -1
-
-        h -1
-        v -1
-        h  2
-
-        h -1
-        v -1
-        h  1
-        v -2
-        h  1
-        v -1
-        h -2
-        v  1
-        h -1
-        v -1
-        h  0
-        v -1
-
-        h  1
-        v -2
-
-        h  1
-        v -2
-        h -1
-        v  1
-        h -1
-        v -2
-        h  1
-        v -2
-        h -1
-        v -1
-        h  1
-        v -1
-        h  1
-        v -1
-        h -1
-        v -1
-        h -2
-        v -1
-        h  1
-        v -1
-        h -1
-        v -1
-        h  1
-        v  1
-        h  1
-        v -2
-        h -1
-        v -2
-
-        H 0
-      " />
-    </svg>
+    <slot name="squares-body" />
 
     {!Astro.props.straight && (
       <svg class={classes.squaresLb} viewBox="0 0 17 31">
@@ -294,7 +202,6 @@ const hasMiddleBody = Astro.slots.has( `squares-body-middle` )
       " />
     </svg>
 
-    <!-- <svg id="squares-rb" viewBox="0 0 9 11"> -->
     <svg class={classes.squaresRb} viewBox="0 0 6 11">
       <path d="
         M 9 0

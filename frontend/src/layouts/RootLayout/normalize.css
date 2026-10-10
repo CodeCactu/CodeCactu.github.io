@@ -68,6 +68,7 @@ input:not( [type="radio"], [type="checkbox"], [hidden] ) {
 }
 
 textarea {
+  display: block;
   width: 100%;
 }
 

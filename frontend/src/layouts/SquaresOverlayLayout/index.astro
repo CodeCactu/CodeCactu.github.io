@@ -1,0 +1,66 @@
+---
+import RootLayout from "../RootLayout/index.astro"
+import SquaresOverlay from "./SquaresOverlay.astro"
+import SquaresLeft from "./SquaresLeft.astro"
+import MenuSwitch from "./MenuSwitch.svelte"
+import Button from "@fet/controls/Button.svelte"
+import classes from "./SquaresOverlayLayout.module.css"
+import cn from "@lib/core/functions/createClassName"
+import Popover from "@fet/flow/Popover.svelte"
+import GameIcon from "@/icons/GameIcon.svelte"
+import CubeIcon from "@/icons/CubeIcon.svelte"
+import HomeIcon from "@/icons/HomeIcon.svelte"
+import BookIcon from "@/icons/BookIcon.svelte"
+import UserPanel from "@fet/auth/UserPanel.svelte"
+
+interface Props {
+  compact?: boolean
+  squaresSurfaceSize?: number
+  squaresBodyClass?: string
+}
+
+const isCompact = Astro.props.compact
+---
+<RootLayout>
+  <SquaresOverlay id="page-content" straight={isCompact}>
+    <Fragment slot="squares-body">
+      <MenuSwitch class={classes.menuSwitch} client:load />
+
+      <div popover data-responsive-popover class={classes.menu} id="menu">
+        <div class={classes.bodyTop}>
+          <UserPanel client:load/>
+        </div>
+
+        <nav class={cn( classes.bodyBottom, classes.nav, `prose` )}>
+          <Button variant="purple" href="/">
+            <HomeIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Home</span>
+            <Popover>Home page</Popover>
+          </Button>
+
+          <Button disabled>
+            <BookIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Soon</span>
+            <Popover>Soon</Popover>
+          </Button>
+
+          <Button variant="yellow" href="/cactu-jam">
+            <GameIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Gamejam</span>
+            <Popover>CactuJam</Popover>
+          </Button>
+
+          <Button variant="brown" disabled>
+            <CubeIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Coming soon</span>
+            <Popover>Coming soon</Popover>
+          </Button>
+        </nav>
+
+        <SquaresLeft />
+      </div>
+
+      <div class={cn( classes.bodyMiddle, Astro.props.squaresBodyClass )}>
+        <slot name="squares-body" />
+      </div>
+    </Fragment>
+
+    <slot />
+  </SquaresOverlay>
+</RootLayout>

@@ -1,5 +1,5 @@
 ---
-import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout.astro"
+import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout/index.astro"
 import classes from "./page.module.css"
 import GamesTable from "./_utils/GamesTable.svelte"
 import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
@@ -19,7 +19,7 @@ const [ games, categories ] = await Promise.all([
 <SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
   <main>
     <div class="prose">
-      <h1>Cactujam!</h1>
+      <h1>CactuJam</h1>
 
       <GamesTable client:load games={games} categories={categories} />
     </div>
@@ -28,11 +28,11 @@ const [ games, categories ] = await Promise.all([
   <Fragment slot="squares-body">
     <section class={classes.preview}>
       <div class="prose">
-        <h2>Strefa podglądu</h2>
+        <h2>Instrukcja</h2>
 
         <ul>
-          <li>
-            Najedź myszką na kafelek gry aby zobaczyć jej opis
+          <li class="mobileHide">
+            Najedź kursorem na kafelek gry aby zobaczyć jej opis
           </li>
 
           <li>
@@ -44,7 +44,7 @@ const [ games, categories ] = await Promise.all([
           </li>
 
           <li>
-            Przeciagnij grę z tabeli ocen nad listę źródłową aby usunąć dany głos
+            Przeciągnij grę z tabeli ocen nad listę źródłową aby usunąć dany głos
           </li>
 
           <li>
@@ -56,7 +56,7 @@ const [ games, categories ] = await Promise.all([
           </li>
 
           <li>
-            Aby oceniać musisz być zalogowany
+            <b>Aby oceniać musisz być zalogowany</b>
           </li>
         </ul>
       </div>

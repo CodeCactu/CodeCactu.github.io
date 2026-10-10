@@ -27,6 +27,14 @@
       display: none;
     }
   }
+
+  @container (width < 600px) {
+    font-size: 80px;
+  }
+
+  @container (width < 400px) {
+    font-size: 60px;
+  }
 }
 
 .singleSign {
@@ -87,10 +95,6 @@
     .noSign {
       left: 100%;
     }
-  }
-
-  @container (width < 450px) {
-    display: none;
   }
 
   .noSign {

@@ -5,6 +5,7 @@ import CactuShadyTrail from "@fet/dynamicBackgrounds/CactuShadyTrail/index.astro
 import CactuBlinkingLines from "@fet/dynamicBackgrounds/CactuBlinkingLines/index.astro"
 import { ClientRouter } from 'astro:transitions'
 import { Font } from "astro:assets"
+import ResponsivePopoverSwitch from "./ResponsivePopoverSwitch.svelte"
 ---
 <html lang="en">
   <head>
@@ -20,6 +21,7 @@ import { Font } from "astro:assets"
 
     <ClientRouter/>
     <ClientConfig />
+    <ResponsivePopoverSwitch client:load />
   </head>
   <body>
     <slot />

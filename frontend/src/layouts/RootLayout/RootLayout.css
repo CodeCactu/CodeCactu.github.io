@@ -59,4 +59,10 @@
     corner-shape: notch;
     border-radius: var( --border-width );
   }
+
+  @media (max-aspect-ratio: 2 / 3) {
+    .mobileHide {
+      display: none;
+    }
+  }
 }

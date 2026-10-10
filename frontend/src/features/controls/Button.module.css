@@ -1,9 +1,3 @@
-@property --_color {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: transparent;
-}
-
 :global( .button ) {
   --_color: var( --color-green );
 
@@ -52,6 +46,35 @@
     border-image: url( "/frame-rotated.png" ) 2;
     opacity: 0.9
   }
+
+  &:has( > .buttonHole:last-child ) {
+    padding-right: 0;
+  }
+
+  .buttonHole {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 1;
+    corner-shape: notch;
+    border-radius: var( --border-width );
+    background-color: white;
+    padding: var( --border-width );
+    overflow: hidden;
+
+    & > img {
+      width: 100%;
+      height: 100%;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: calc( var( --border-width ) * 2 ) solid var( --_color );
+      border-image: url( "/frame-rotated.png" ) 2;
+      pointer-events: none;
+    }
+  }
 }
 
 .isYellow {
@@ -64,4 +87,8 @@
 
 .isBlue {
   --_color: var( --color-blue );
+}
+
+.isPurple {
+  --_color: var( --color-purple );
 }

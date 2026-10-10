@@ -17,21 +17,24 @@
   display: flex;
   gap: var( --_spacing );
   padding: var( --_spacing );
+
+  @media (max-aspect-ratio: 2 / 3) {
+    padding-bottom: 200px;
+  }
 }
 
 .preview {
-  anchor-name: --item-anchor;
   display: grid;
-  width: min( 20vw, 300px );
   place-items: center;
   color: var( --color-neutral-m100 );
 
-  @media (max-aspect-ratio: 4 / 3) {
-    height: 100px;
+  @media (max-aspect-ratio: 4 / 3) and (min-aspect-ratio: 2 / 3) {
+    display: none;
+  }
 
-    & > * {
-      display: none;
-    }
+  @media (min-aspect-ratio: 4 / 3) {
+    anchor-name: --item-anchor;
+    width: min( 20vw, 300px );
   }
 }
 
@@ -45,15 +48,17 @@
     position: fixed;
     left: 0;
     bottom: 0;
-    background-color: black;
-    padding: var( --tileSize );
     z-index: 1;
+    gap: var( --pixelSize );
+    padding: var( --pixelSize );
+    background-color: black;
+    width: 100%;
   }
   .list {
     flex-direction: row;
     overflow: auto;
-    margin-inline: calc( var( --tileSize ) * -1 );
-    padding: var( --tileSize );
-    height: calc( var( --tileSize ) * 2 + var( --_gameTileSize ) );
+    margin-inline: calc( var( --pixelSize ) * -1 );
+    padding: calc( var( --pixelSize ) * 2 );
+    height: calc( var( --pixelSize ) * 4 + var( --_gameTileSize ) );
   }
 }

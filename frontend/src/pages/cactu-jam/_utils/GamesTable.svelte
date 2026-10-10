@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { auth } from "@fet/auth/authRune.svelte";
-  import { type CactuJamCategory } from "@fet/backends/cactu/cactuJamCategory";
+  import { auth } from "@fet/auth/authRune.svelte"
+  import { type CactuJamCategory } from "@fet/backends/cactu/cactuJamCategory"
   import { type CactuJamGame } from "@fet/backends/cactu/cactuJamGame"
   import { loadCactuJamUserVotes, saveCactuJamUserVotes, type CactuJamUserVotes } from "@fet/backends/cactu/cactuJamVotes"
   import TierLadder, { getDragAreasLists, type AssignementSummary, type TierLadderTier } from "@fet/tierLadder/TierLadder.svelte"
-    import { onMount } from "svelte";
+  import { onMount } from "svelte"
 
   let { games, categories }:{
     games: CactuJamGame[]

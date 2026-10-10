@@ -1,5 +1,6 @@
 <script lang="ts" module>
   const DRAG_START_DISTANCE = 5
+  const SCROLL_MEDIA_QUERY = `(max-aspect-ratio: 2 / 3)`
 
   const isDraggingClass = `isDragging`
   const isPreviewClass = `isPreview`
@@ -403,6 +404,15 @@
 
       if (Math.hypot( dx, dy ) < DRAG_START_DISTANCE) return
 
+      const isTargetMediaQuery = window.matchMedia( SCROLL_MEDIA_QUERY ).matches
+      const absDx = Math.abs( dx )
+      const absDy = Math.abs( dy )
+
+      if (isTargetMediaQuery && absDx > absDy) {
+        pointerDownElement = null
+        return
+      }
+
       isDragging = true
 
       draggingPointerId = event.pointerId
@@ -569,9 +579,9 @@
           const orgRect = draggingOriginal.getBoundingClientRect()
           const dragRect = draggindItemRef.getBoundingClientRect()
 
-          await flyElementTo( draggindItemRef, orgRect.left - dragRect.left, orgRect.top - dragRect.top )
-
           draggindItemRef.addEventListener( `transitionend`, () => draggindItemRef.remove(), { once: true } )
+
+          await flyElementTo( draggindItemRef, orgRect.left - dragRect.left, orgRect.top - dragRect.top )
         }
       }
 
