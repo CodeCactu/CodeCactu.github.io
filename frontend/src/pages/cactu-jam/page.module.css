@@ -5,6 +5,10 @@
 :global( main ) {
   display: flex;
 
+  @media (max-aspect-ratio: 2 / 3) {
+    padding-top: calc( var( --tileSize ) * 4 );
+  }
+
   & > :global( .prose ) {
     width: 1000px;
     height: max-content;

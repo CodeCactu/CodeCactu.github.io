@@ -23,16 +23,27 @@
   overflow: visible;
 
   @media (max-aspect-ratio: 2 / 3) {
-    &:not( :popover-open ) {
-      display: none;
-    }
-
     position: fixed;
     left: 0;
     background-color: black;
     grid-template:
       "top"
       "bottom" 1fr;
+
+    transform: translateX( calc( -100% - 130px ) );
+    transition: transform 0.2s ease-out, display 0.2s ease-out allow-discrete;
+
+    &:popover-open {
+      transform: translateX( 0 );
+
+      @starting-style {
+        transform: translateX( calc( -100% - 130px ) );
+      }
+    }
+
+    &:not( :popover-open ) {
+      display: none;
+    }
   }
 
   .bodyTop {

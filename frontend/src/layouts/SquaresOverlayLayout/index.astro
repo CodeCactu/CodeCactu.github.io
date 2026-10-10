@@ -33,22 +33,26 @@ const isCompact = Astro.props.compact
 
         <nav class={cn( classes.bodyBottom, classes.nav, `prose` )}>
           <Button variant="purple" href="/">
-            <HomeIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Home</span>
+            <HomeIcon width="1.5em" height="1.5em" />
+            <span class={cn( isCompact && classes.isCompact )} aria-hidden>Home</span>
             <Popover>Home page</Popover>
           </Button>
 
           <Button disabled>
-            <BookIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Soon</span>
+            <BookIcon width="1.5em" height="1.5em" />
+            <span class={cn( isCompact && classes.isCompact )} aria-hidden>Soon</span>
             <Popover>Soon</Popover>
           </Button>
 
           <Button variant="yellow" href="/cactu-jam">
-            <GameIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Gamejam</span>
+            <GameIcon width="1.5em" height="1.5em" />
+            <span class={cn( isCompact && classes.isCompact )} aria-hidden>Gamejam</span>
             <Popover>CactuJam</Popover>
           </Button>
 
           <Button variant="brown" disabled>
-            <CubeIcon width="1.5em" height="1.5em" /> <span class={cn( isCompact && classes.isCompact )} aria-hidden>Coming soon</span>
+            <CubeIcon width="1.5em" height="1.5em" />
+            <span class={cn( isCompact && classes.isCompact )} aria-hidden>Coming soon</span>
             <Popover>Coming soon</Popover>
           </Button>
         </nav>

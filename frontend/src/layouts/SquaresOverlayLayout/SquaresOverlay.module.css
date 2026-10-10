@@ -7,11 +7,6 @@
   z-index: 1;
   display: grid;
 
-  & > :not( .squaresOverlay, .squaresOverlayBody ) {
-    padding: calc( var( --pixelSize ) * 2 );
-    padding-top: calc( var( --tileSize ) * 4 )
-  }
-
   @media (min-aspect-ratio: 2 / 3) {
     grid-template: "sqBody body" 100dvh / max-content 1fr;
 
@@ -19,21 +14,24 @@
       max-height: 100dvh;
     }
 
-    &.isStraight > :not( .squaresOverlay, .squaresOverlayBody ) {
+    :where( &.isStraight > :not( .squaresOverlay, .squaresOverlayBody ) ) {
       grid-area: body;
       overflow: auto;
       padding-block: var( --tileSize );
-      padding-left: calc( var( --tileSize ) * 6 )
+      padding-inline: calc( var( --tileSize ) * 6 ) var( --tileSize );
     }
   }
 
   @media (max-aspect-ratio: 2 / 3) {
-    grid-template: "body" "sqBody" "sqOver" 0px / 100vw;
+    grid-template: "body" "sqBody" "sqOver" 0px / 100%;
+
+    :where( & > :not( .squaresOverlay, .squaresOverlayBody ) ) {
+      padding: var( --pixelSize );
+    }
   }
 }
 
 .squaresOverlay {
-  /* position: absolute; */
   width: max-content;
   background-color: var( --_squaresFill );
 }
