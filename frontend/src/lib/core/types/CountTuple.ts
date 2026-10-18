@@ -1,5 +1,3 @@
-/* eslint-disable sonarjs/no-commented-code */
-
 export type Tuple<T, L extends number, Arr extends unknown[] = []> =
   | Arr[`length`] extends L
     ? Arr
@@ -32,49 +30,3 @@ export type FilterTuple<T, Pred> =
       ? [ Head, ...FilterTuple<Tail, Pred> ]
       : FilterTuple<Tail, Pred>
     : []
-
-// Primitive tests below
-
-
-// type Opt = { opt:1 }
-// type Obli = { obli:1 }
-// type Full = { obli:1, opt:1 }
-// type Obj = Obli & Partial<Opt>
-
-// const objs = [
-//   { obli:1, opt:1 },
-//   { obli:1, opt:1 },
-//   { obli:1 },
-//   { obli:1, opt:1 },
-//   { obli:1, opt:1 },
-//   { obli:1 },
-//   { obli:1, opt:1 },
-//   { obli:1 },
-// ] as const satisfies readonly Obj[]
-
-// class Temp1<T extends readonly Obj[]> {
-//   items: T
-
-//   constructor( items:T ) {
-//     this.items = items
-//   }
-
-//   getLength(): TupleCount<T, Opt> {
-//     return this.items.length as TupleCount<T, Opt>
-//   }
-//   getNegLength(): NegativeTupleCount<T, Opt> {
-//     return this.items.length as NegativeTupleCount<T, Opt>
-//   }
-//   run( ...items:Tuple<string, TupleCount<T, Opt>> ) {
-
-//   }
-//   negRun( ...items:Tuple<string, NegativeTupleCount<T, Opt>> ) {
-
-//   }
-// }
-
-// const arr = []
-// const temp = new Temp1( objs )
-
-// temp.run()
-// temp.negRun()

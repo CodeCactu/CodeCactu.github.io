@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ObjectsDeepMerge } from "../types/ObjectKeys"
-import { ObjectLeaves, ObjectValueFromKeysChain } from "../types/ObjectKeys"
+import { type ObjectsDeepMerge } from "../types/ObjectKeys"
+import { type ObjectLeaves, type ObjectValueFromKeysChain } from "../types/ObjectKeys"
 
 export function isObj( item:unknown ): item is Record<string, unknown> {
   return (!!item && typeof item === `object` && !Array.isArray( item ))
 }
 
 export function filterObject( object:Record<string, any>, fn?:(k:string, v:unknown) => boolean ) {
-  return Object.fromEntries( Object.entries( object ).filter( ([ k, v ]) => fn?.( k, v ) ?? Boolean( v ) ) )
+  return Object.fromEntries( Object.entries( object ).filter( ([ k, v ]) => fn?.( k, v ) ?? v != undefined ) )
 }
 
 export function deleteObjectKeys<T extends Record<string, unknown>, U extends string[]>( object:T, ...keys:U ): Omit<T, U[number]> {

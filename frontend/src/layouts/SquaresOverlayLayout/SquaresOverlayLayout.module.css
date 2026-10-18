@@ -1,0 +1,70 @@
+.menuSwitch {
+  position: fixed;
+  left: var( --pixelSize );
+  top: var( --pixelSize );
+
+  @media (min-aspect-ratio: 2 / 3) {
+    display: none;
+  }
+}
+
+.menu {
+  position: static;
+  height: 100%;
+  display: grid;
+  grid-template:
+    "top"
+    "bottom" /
+    max-content;
+  z-index: 12;
+  margin: 0;
+  border: none;
+  background-color: unset;
+  overflow: visible;
+
+  @media (max-aspect-ratio: 2 / 3) {
+    position: fixed;
+    left: 0;
+    background-color: black;
+    grid-template:
+      "top"
+      "bottom" 1fr;
+
+    transform: translateX( calc( -100% - 130px ) );
+    transition: transform 0.2s ease-out, display 0.2s ease-out allow-discrete;
+
+    &:popover-open {
+      transform: translateX( 0 );
+
+      @starting-style {
+        transform: translateX( calc( -100% - 130px ) );
+      }
+    }
+
+    &:not( :popover-open ) {
+      display: none;
+    }
+  }
+
+  .bodyTop {
+    grid-area: top;
+    padding: calc( var( --_tileSize ) * 0.5 );
+  }
+
+  .bodyBottom {
+    grid-area: bottom;
+    align-self: flex-end;
+    padding-left: calc( var( --_tileSize ) * 0.5 );
+    padding-bottom: calc( var( --_tileSize ) * 0.5 );
+
+    > :global( .button ) {
+      margin-block: var( --tileSize ) calc( var( --tileSize ) * 0.5 );
+    }
+  }
+}
+
+@media (min-aspect-ratio: 2 / 3) {
+  .isCompact {
+    display: none;
+  }
+}

@@ -1,0 +1,68 @@
+@layer reset, lib, layout;
+
+@import "./normalize.css" layer( reset );
+@import "./prose.css" layer( lib );
+@import "./row.css" layer( lib );
+@import "@lib/core/flow/flow.css" layer( lib );
+@import "@fet/theme/font/cactu.css";
+
+@layer layout {
+  :root {
+    --tileSize: calc( 100vh / 31 );
+    --pixelSize: calc( var( --tileSize ) / 6 );
+
+    --color-white: #fff;
+    --color-green-e100: #59B820;
+    --color-green: #6F9D46;
+    --color-yellow: #d6b816;
+    --color-brown: #c57316;
+    --color-purple: #6e45f3;
+    --color-blue: #4273b3;
+    --color-neutral-m100: #aaa;
+    --_color-dimming: #0005;
+
+    --border-width: calc( var( --pixelSize ) * 1 );
+
+    --font-titleSmall: calc( var( --pixelSize ) * 4 ) / 1.2em var( --fontFamily-lato );
+    --font-body: 14px / 18px var( --fontFamily-lato );
+
+    scrollbar-color: color-mix( var( --color-white ), transparent 50% ) black;
+    scrollbar-width: var( --tileSize );
+  }
+
+  body {
+    background-color: #12131d;
+    background-image: radial-gradient( ellipse at 0 0, #19172a, transparent );
+    color: var( --color-white );
+    font: var( --font-body );
+  }
+
+  #page-content {
+    min-height: 100dvh;
+  }
+
+  #page-content ~ canvas {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: -1;
+  }
+
+  .row, .columns {
+    gap: 24px;
+  }
+}
+
+@layer lib {
+  .notched {
+    corner-shape: notch;
+    border-radius: var( --border-width );
+  }
+
+  @media (max-aspect-ratio: 2 / 3) {
+    .mobileHide {
+      display: none;
+    }
+  }
+}

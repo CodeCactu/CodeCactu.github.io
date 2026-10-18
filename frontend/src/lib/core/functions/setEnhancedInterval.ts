@@ -1,4 +1,4 @@
-import { Promiseable } from "../types"
+import { Awaitable } from "../types"
 
 export type State = `break`
 export type Interval = {
@@ -6,7 +6,7 @@ export type Interval = {
   ms: number
 }
 
-export default function setEnhancedInterval( cb:() => Promiseable<void | State>, times:number | Interval[] ) {
+export default function setEnhancedInterval( cb:() => Awaitable<void | State>, times:number | Interval[] ) {
   const currentInterval = { index:0, count:0 }
   let timeoutId = -1
 

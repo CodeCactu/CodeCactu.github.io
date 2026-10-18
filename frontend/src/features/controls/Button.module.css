@@ -1,0 +1,94 @@
+:global( .button ) {
+  --_color: var( --color-green );
+
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding-inline: calc( var( --tileSize ) / 2 );
+  width: max-content;
+  height: calc( var( --tileSize ) * 2 );
+
+  border: calc( var( --border-width ) * 2 ) solid transparent;
+  border-image: url( "/frame.png" ) 2;
+  border-radius: var( --border-width );
+  corner-shape: notch;
+  text-decoration: none;
+
+  background-image:
+    url( "/tileBgr.png" ),
+    linear-gradient( var( --_color ) );
+  background-repeat: no-repeat;
+  background-size:
+    auto calc( var( --pixelSize ) * 9 ), /* height of image */
+    cover;
+  background-clip:
+    padding-box,
+    border-box;
+  background-origin:
+    padding-box,
+    border-box;
+
+  image-rendering: crisp-edges;
+  font: calc( var( --border-width ) * 4 ) monospace;
+
+  &[disabled] {
+    opacity: 0.5;
+    filter: grayscale( 0.5 );
+    cursor: no-drop;
+  }
+
+  &:not( [disabled] ):hover:not( :active ) {
+    outline: var( --border-width ) solid #fffa;
+    outline-offset: calc( -1 * var( --border-width ) );
+  }
+
+  &:active {
+    border-image: url( "/frame-rotated.png" ) 2;
+    opacity: 0.9
+  }
+
+  &:has( > .buttonHole:last-child ) {
+    padding-right: 0;
+  }
+
+  .buttonHole {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 1;
+    corner-shape: notch;
+    border-radius: var( --border-width );
+    background-color: white;
+    padding: var( --border-width );
+    overflow: hidden;
+
+    & > img {
+      width: 100%;
+      height: 100%;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: calc( var( --border-width ) * 2 ) solid var( --_color );
+      border-image: url( "/frame-rotated.png" ) 2;
+      pointer-events: none;
+    }
+  }
+}
+
+.isYellow {
+  --_color: var( --color-yellow );
+}
+
+.isBrown {
+  --_color: var( --color-brown );
+}
+
+.isBlue {
+  --_color: var( --color-blue );
+}
+
+.isPurple {
+  --_color: var( --color-purple );
+}

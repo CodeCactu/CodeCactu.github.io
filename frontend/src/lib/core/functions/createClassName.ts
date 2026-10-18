@@ -1,4 +1,4 @@
-export default function createClassName( ...classes:unknown[] ) {
+export function createClassName( ...classes:unknown[] ) {
   const classNameString = classes.reduce(
     (str:string, name) => name && typeof name === `string` ? `${str} ${name.trim()}` : str
     , ``,
@@ -7,7 +7,7 @@ export default function createClassName( ...classes:unknown[] ) {
   return classNameString.length ? classNameString : undefined
 }
 
-export function cn( ...classes:unknown[] ) {
+export default function cn( ...classes:unknown[] ) {
   return createClassName( ...classes )
 }
 

@@ -1,6 +1,6 @@
 import logInfo from "@fet/loggers/logInfo"
 
-const CORS_ORIGINS = [ `http://localhost:3000`, `http://192.168.1.100:3000`, `https://cactu.cc` ]
+const CORS_ORIGINS = [ `http://localhost:3000`, `http://localhost:4321`, `https://cactu.cc` ]
 const CORS_HEADERS = {
   "Access-Control-Allow-Methods": `GET, POST, PUT, PATCH, DELETE, OPTIONS`,
   "Access-Control-Allow-Headers": `Content-Type, Authorization, Accept, X-Requested-With, X-Forwarded-For`,

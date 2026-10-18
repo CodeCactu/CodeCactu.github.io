@@ -7,9 +7,9 @@ export class Category {
 
 export const categories:Category[] = [
   new Category( `theme`, 2 ),
-  new Category( `readability`, 5 ),
-  new Category( `impressions`, 5 ),
+  new Category( `readability`, 2 ),
+  new Category( `impressions`, 4 ),
+  new Category( `realisation`, 4 ),
   new Category( `rules`, 2 ),
-  new Category( `realisation`, 5 ),
   new Category( `bonus`, 1 ),
 ]

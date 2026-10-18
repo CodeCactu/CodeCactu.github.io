@@ -20,4 +20,4 @@ ENV HOST=0.0.0.0
 
 EXPOSE 3000
 
-CMD ["bun", "run", "app.ts"]
+CMD [ "bun", "run", "app.ts" ]

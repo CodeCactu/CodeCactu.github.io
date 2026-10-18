@@ -1,0 +1,73 @@
+---
+import SquaresOverlayLayout from "@/layouts/SquaresOverlayLayout/index.astro"
+import classes from "./page.module.css"
+import GamesTable from "./_utils/GamesTable.svelte"
+import { loadCactuJamGames } from "@fet/backends/cactu/cactuJamGame"
+import TierLadderItem from "@fet/tierLadder/TierLadderItem.svelte"
+import { loadCactuJamCategories } from "@fet/backends/cactu/cactuJamCategory"
+
+Astro.cache.set({
+  maxAge: 60 * 60 * 24,
+  swr: 60 * 60,
+})
+
+const [ games, categories ] = await Promise.all([
+  loadCactuJamGames(),
+  loadCactuJamCategories(),
+])
+---
+<SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
+  <main>
+    <div class="prose">
+      <h1>CactuJam</h1>
+
+      <GamesTable client:load games={games} categories={categories} />
+    </div>
+  </main>
+
+  <Fragment slot="squares-body">
+    <section class={classes.preview}>
+      <div class="prose">
+        <h2>Instrukcja</h2>
+
+        <ul>
+          <li class="mobileHide">
+            Najedź kursorem na kafelek gry aby zobaczyć jej opis
+          </li>
+
+          <li>
+            Kliknij na kafelek z grą aby panel gry zachował widoczność
+          </li>
+
+          <li>
+            Przeciągaj gry z listy źródłowej na poszczególne wiersze kategorii
+          </li>
+
+          <li>
+            Przeciągnij grę z tabeli ocen nad listę źródłową aby usunąć dany głos
+          </li>
+
+          <li>
+            Rozdysponuj wszystkie gry we wszystkich kategoriach aby mieć ważny głos
+          </li>
+
+          <li>
+            Każda akcja jest automatycznie zapisywana
+          </li>
+
+          <li>
+            <b>Aby oceniać musisz być zalogowany</b>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class={classes.listArea} data-source-area>
+      <h3>Gry</h3>
+
+      <ol class={classes.list}>
+        {games.map( game => <TierLadderItem client:load assignment={game} />)}
+      </ol>
+    </section>
+  </Fragment>
+</SquaresOverlayLayout>

@@ -1,7 +1,7 @@
 import { prepareConfig } from "@lib/prepareConfig"
 
-export const [ configClient ] = prepareConfig({
+export const [ clientConfig ] = prepareConfig({
   BACKEND_ORIGIN: {
-    rawValue: process.env.NEXT_PUBLIC_BACKEND_ORIGIN,
+    rawValue: typeof process === `undefined` ? undefined : process.env.BACKEND_ORIGIN,
   },
 })

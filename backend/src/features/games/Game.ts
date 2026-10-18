@@ -1,10 +1,11 @@
 import { promises as fs } from "node:fs"
+import logInfo from "@fet/loggers/logInfo"
 import loadDiscordUser, { DiscordUser } from "@fet/discord/loadDiscordUser"
 import getDiscordAvatarUri from "@fet/discord/getDiscordAvatarUri"
 
 type About = {
   name: string
-  id: string
+  id: number | string
 }
 
 export class Game {
@@ -21,6 +22,9 @@ export class Game {
         fs.readFile( `${gamePath}/about.json`, `utf-8` ).then<About>( JSON.parse ),
         fs.readFile( `${gamePath}/discordUser.json`, `utf-8` ).catch( async() => {
           const userStr = JSON.stringify( await loadDiscordUser( id ) )
+
+          logInfo( `Writing`, `${gamePath}/discordUser.json` )
+
           await fs.writeFile( `${gamePath}/discordUser.json`,  userStr )
           return userStr
         } ).then<DiscordUser>( JSON.parse ),
@@ -34,6 +38,7 @@ export class Game {
         },
         thumbnailUri: !isThumbnailed ? null : `/uploads/games/${id}/thumbnail.png`,
         ...about,
+        id: `${about.id}`,
       }
     } ) )
 

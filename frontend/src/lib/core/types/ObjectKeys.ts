@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-commented-code */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* UTILS */
@@ -99,82 +98,33 @@ type ObjectFilterPickerByInclude<T extends Record<string, unknown>, U> = ObjectF
 /* EXPORTED ABSTRACTION */
 
 
-// type Obj = { a:1, b:"two", next:{ c:3 }, otherNest:{ c:() => void } }
+// example: type Obj = { a:1, b:"two", next:{ c:3 }, otherNest:{ c:() => void } }
 
-// type ObjectPaths<Obj> = "a" | "b" | "nest" | "otherNest" | "nest.c" | "otherNest.c"
+// example: type ObjectPaths<Obj> = "a" | "b" | "nest" | "otherNest" | "nest.c" | "otherNest.c"
 export type ObjectPaths<TObj, ValueFilter = never> = Paths<TObj, ValueFilter>;
 
-// type ObjectLeaves<Obj> = "a" | "b" | "nest.c" | "otherNest.c"
+// example: type ObjectLeaves<Obj> = "a" | "b" | "nest.c" | "otherNest.c"
 export type ObjectLeaves<TObj, ValueFilter = never, ExcludeFilter extends boolean = false> = Leaves<TObj, ValueFilter, ExcludeFilter>
 
-// type ObjectLeavesValues<Obj> = {"a":1, "b":'two', "nest.c":3, "otherNest.c":()=>void }
+// example: type ObjectLeavesValues<Obj> = {"a":1, "b":'two', "nest.c":3, "otherNest.c":()=>void }
 export type ObjectLeavesValues<TObj, ValueFilter = never> = LeavesValues<TObj, ValueFilter>
 
-// type ObjectWithDefinedValues<Obj, number> = never
-// type ObjectWithDefinedValues<Obj, number | string | () => void> = Obj
+// example: type ObjectWithDefinedValues<Obj, number> = never
+// example: type ObjectWithDefinedValues<Obj, number | string | () => void> = Obj
 export type ObjectWithDefinedValues<TObj, Values = string | number> = DefinedValues<TObj, Values>
 
-// type RecursiveObject<string | number> = Record<string, string | number | Record<string, string | number | Record<...>>>
+// example: type RecursiveObject<string | number> = Record<string, string | number | Record<string, string | number | Record<...>>>
 export type RecursiveObject<Value> = Recurention<Value>
 
-// type ObjectValueFromKeysChain<Obj, "next.c""> = 3
+// example: type ObjectValueFromKeysChain<Obj, "next.c""> = 3
 export type ObjectValueFromKeysChain<TObj extends Record<string, any>, KeysChain extends string> = ValueFromKeysChain<TObj, KeysChain>
 
-// type DeepMergeTwoTypes<Obj, { otherNest:"otherNest", d:4 }> = { a:1, b:"two", next:{ c:3 }, otherNest:"otherNest", d:4 }
+// example: type DeepMergeTwoTypes<Obj, { otherNest:"otherNest", d:4 }> = { a:1, b:"two", next:{ c:3 }, otherNest:"otherNest", d:4 }
 export type ObjectsDeepMerge<T, U> = DeepMergeTwoTypes<T, U>
 
-// type FilterObject<Obj, number> = { a:1 }
+// example: type FilterObject<Obj, number> = { a:1 }
 export type FilterObject<T extends Record<string, unknown>, U> = ObjectFilterPicker<T, U>
 
-// type FilterObject<Obj, number> = { a:1 }
+// example: type FilterObject<Obj, number> = { a:1 }
 export type FilterObjectByInclude<T extends Record<string, unknown>, U> = ObjectFilterPickerByInclude<T, U>
 
-
-
-/* PRIMITIVE TESTS */
-
-
-// type SomeType = { z: `z val` }
-// type Obj = {
-//   a: {
-//     aa: {
-//       aaa: 1
-//       aab: 22
-//       aac: (aaca:number) => string
-//     }
-//     ab: 333
-//     ac: SomeType
-//     x: 1
-//   }
-//   b: () => void
-//   c: 4444
-//   d: boolean
-//   e: SomeType
-//   f: 55555
-//   g: `gggggg`
-// }
-// type ObjExt = {
-//   a: {
-//     ab: 666666
-//     ad: `ad`
-//   }
-//   f: BigInt
-//   g: 7777777
-// }
-
-// type RealObj = {
-//   // export const { allEnvs, publicEnvs } = prepareEnvs({
-//   DEVELOPMENT_MODE: {
-//     description: `Indicate, if current runtime is in dev mode (true/false)`
-//     public: true
-//   }
-//   SOMETHING: {
-//     description: `Smthng`
-//   }
-// }
-
-// type Merged = ObjectsDeepMerge<Obj, ObjExt>
-// type Result = ObjectValueFromKeysChain<Obj, `a.aa.aab`>// | number, ((...params) => any) | SomeType, true>
-// type Filter = FilterObject<RealObj, {public: true}>
-// type F = {x: 1; y: 2} extends {x: 1} ? 1 : 2
-// const result = {} as Filter

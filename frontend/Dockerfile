@@ -1,24 +1,29 @@
-FROM oven/bun:alpine AS builder
+FROM oven/bun:1 AS build
+
 WORKDIR /app
 
-COPY ./src/ ./src/
-COPY ./public/ ./public/
-COPY ./next.config.ts ./tsconfig.json ./package.json ./package-lock.json ./.env ./
+COPY package.json bun.lock ./
 
-RUN \
-     bun install --frozen-lockfile \
-  && bun run build \
-  && rm -f ./.env* \
-  && mv ./public ./.next/standalone/public \
-  && mv ./.next/static ./.next/standalone/.next/static
+RUN bun install --frozen-lockfile
+
+COPY . .
+
+RUN bun run build
 
 
 
-FROM oven/bun:alpine AS runner
+FROM oven/bun:1-slim AS runtime
+
 WORKDIR /app
 
-COPY --from=builder /app/.next/standalone ./
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+COPY --from=build /app/dist ./dist
+
+USER bun
 
 EXPOSE 3000
 
-CMD ["bun", "run", "server.js"]
+CMD [ "bun", "dist/server/entry.mjs" ]

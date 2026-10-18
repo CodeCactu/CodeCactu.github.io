@@ -1,0 +1,24 @@
+.prose {
+  --prose-margin: 10px;
+  --prose-blocks-margin: calc( var( --tileSize ) * 2 );
+
+  font: var( --font-body );
+
+  > * + * {
+    margin-top: var( --prose-margin );
+  }
+
+  :is( &, & > astro-island ) > :where( article ) {
+    margin-top: var( --prose-blocks-margin );
+  }
+
+  > h3 {
+    font: var( --font-titleSmall );
+  }
+
+  > ul > li {
+    margin-top: var( --prose-margin );
+    margin-left: 20px;
+    list-style: square;
+  }
+}

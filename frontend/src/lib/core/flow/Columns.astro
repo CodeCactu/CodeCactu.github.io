@@ -1,0 +1,12 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = {
+  style?: HTMLAttributes<`div`>[`style`]
+}
+
+const { style } = Astro.props
+---
+<div class="columns" style={style}>
+  <slot/>
+</div>

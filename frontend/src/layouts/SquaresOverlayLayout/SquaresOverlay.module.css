@@ -1,0 +1,132 @@
+.squaresOverlayWrapper {
+  --_tileSize: var( --tileSize );
+  --_squaresBSize: calc( var( --_tileSize ) * 6 );
+  --_squaresFill: black;
+
+  position: relative;
+  z-index: 1;
+  display: grid;
+
+  @media (min-aspect-ratio: 2 / 3) {
+    grid-template: "sqBody body" 100dvh / max-content 1fr;
+
+    & > * {
+      max-height: 100dvh;
+    }
+
+    :where( &.isStraight > :not( .squaresOverlay, .squaresOverlayBody ) ) {
+      grid-area: body;
+      overflow: auto;
+      padding-block: var( --tileSize );
+      padding-inline: calc( var( --tileSize ) * 6 ) var( --tileSize );
+    }
+  }
+
+  @media (max-aspect-ratio: 2 / 3) {
+    grid-template: "body" "sqBody" "sqOver" 0px / 100%;
+
+    :where( & > :not( .squaresOverlay, .squaresOverlayBody ) ) {
+      padding: var( --pixelSize );
+    }
+  }
+}
+
+.squaresOverlay {
+  width: max-content;
+  background-color: var( --_squaresFill );
+}
+
+.squaresOverlayBody {
+  grid-area: sqBody;
+  position: relative;
+  display: flex;
+
+  &:not( :has( > .squaresLb ) ) {
+    background-color: var( --_squaresFill );
+  }
+
+  @media (max-aspect-ratio: 2 / 3) {
+    background-color: var( --_squaresFill );
+    margin-top: var( --_squaresBSize );
+    overflow-x: clip;
+  }
+}
+
+.squaresWrapper {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  overflow-x: clip;
+  z-index: 11;
+
+  @media (width < 600px) {
+    position: absolute;
+    inset: 0;
+
+    svg:not( .squaresB ) {
+      display: none;
+    }
+  }
+}
+
+.squaresOverlayBody,
+.squaresOverlay {
+  & > svg {
+    position: fixed;
+    fill: var( --_squaresFill );
+    pointer-events: none;
+  }
+  .squaresL,
+  .squaresLb {
+    position: absolute;
+    bottom: 0;
+    height: calc( var( --_tileSize ) * 31 );
+  }
+  .squaresL {
+    left: 100%;
+    touch-action: none;
+    z-index: -1;
+  }
+  .squaresLb {
+    left: 0;
+    z-index: -1;
+
+    @media (min-aspect-ratio: 2 / 3) {
+      :has( > .squaresL ):has( ~ & ) > .squaresL {
+        display: none;
+      }
+    }
+
+    @media (max-aspect-ratio: 2 / 3) {
+      display: none;
+    }
+  }
+
+  .squaresLt {
+    left: 0;
+    top: 0;
+    display: none;
+    height: calc( var( --_tileSize ) * 16 );
+  }
+  .squaresRb {
+    right: 0;
+    bottom: 0;
+    height: calc( var( --_tileSize ) * 11 );
+  }
+  .squaresRt {
+    right: 0;
+    top: 0;
+    height: calc( var( --_tileSize ) * 4 );
+  }
+  .squaresB {
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
+    bottom: calc( 100% - 1px );
+    height: calc( var( --_squaresBSize ) - 1px );
+
+    @media (min-aspect-ratio: 2 / 3) {
+      display: none;
+    }
+  }
+}
