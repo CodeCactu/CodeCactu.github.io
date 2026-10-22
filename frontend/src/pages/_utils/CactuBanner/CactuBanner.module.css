@@ -81,7 +81,7 @@
   transform: unset;
   align-self: flex-end;
   color: #5da234;
-  line-height: 0.45em;
+  line-height: 0.65em;
 
   @container (width >= 600px) {
     padding-right: 0.5em;

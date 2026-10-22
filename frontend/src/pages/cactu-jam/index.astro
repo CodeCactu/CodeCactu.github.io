@@ -19,7 +19,10 @@ const [ games, categories ] = await Promise.all([
 <SquaresOverlayLayout compact squaresSurfaceSize={20} squaresBodyClass={classes.gamesArea}>
   <main>
     <div class="prose">
-      <h1>CactuJam</h1>
+      <h1>
+        <span style="color:var( --color-green )">Cactu</span>
+        <span style="color:var( --color-yellow )">Jam</span>
+      </h1>
 
       <GamesTable client:load games={games} categories={categories} />
     </div>

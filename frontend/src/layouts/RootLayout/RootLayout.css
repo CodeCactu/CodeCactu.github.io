@@ -13,7 +13,7 @@
 
     --color-white: #fff;
     --color-green-e100: #59B820;
-    --color-green: #6F9D46;
+    --color-green: #5da234;
     --color-yellow: #d6b816;
     --color-brown: #c57316;
     --color-purple: #6e45f3;
@@ -23,6 +23,9 @@
 
     --border-width: calc( var( --pixelSize ) * 1 );
 
+    --font-display: calc( var( --tileSize ) * 2 ) / 1em cactu;
+    --font-displaySmall: calc( var( --tileSize ) * 1 ) / 1em cactu;
+    --font-family-cactu: 0.19em;
     --font-titleSmall: calc( var( --pixelSize ) * 4 ) / 1.2em var( --fontFamily-lato );
     --font-body: 14px / 18px var( --fontFamily-lato );
 
@@ -51,6 +54,21 @@
 
   .row, .columns {
     gap: 24px;
+  }
+}
+
+@layer layout {
+  h1 {
+    font: var( --font-display );
+    letter-spacing: var( --font-family-cactu );
+    color: var( --color-green );
+  }
+
+  main h3,
+  .font-displaySmall {
+    font: var( --font-displaySmall );
+    letter-spacing: var( --font-family-cactu );
+    color: var( --color-blue );
   }
 }
 
