@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cactu zine</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Caveat:wght@600;700&family=Young+Serif&family=Silkscreen&display=block">
+<link rel="stylesheet" href="tokens.css">
+<script>
+  // Set before the first layout, so the page inside a frame never reserves space for a scrollbar
+  document.documentElement.classList.toggle( `isFramed`, window !== top )
+</script>
+<style>
+  /*
+    The same page as index.html in another style: outside the worlds everything is a printed zine
+    (paper grain, risograph inks, tape, handwriting), and only the worlds stay pixel art.
+    Torn holes in the paper show the worlds behind it. Desktop view only.
+  */
+
+  :root {
+    --pink: #ff48b0;
+    --blue: #0078bf;
+    --riso-yellow: #ffe800;
+    --riso-green: #00a95c;
+    --ink: #1d1a17;
+
+    --font-serif: 400 1em / 1.05 "Young Serif", serif;
+    --font-hand: 700 1em / 1 Caveat, cursive;
+
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  * { corner-shape:round }
+  .isFramed { scrollbar-width:none }
+
+  body { background:var( --grain ), var( --paper ); font-size:16px }
+  h1, h2, h3 { font:var( --font-serif ); letter-spacing:0 }
+  .hand { font:var( --font-hand ) }
+
+  /* ---- Risograph ink: two layers of colour printed slightly out of register ---- */
+
+  .riso { position:relative; isolation:isolate }
+  .riso::before { content:""; position:absolute; inset:0; z-index:-1; background:var( --_ink-a ); mix-blend-mode:multiply; translate:-4px 3px; border-radius:inherit; mask:var( --_shape, none ) }
+  .riso::after { content:""; position:absolute; inset:0; z-index:-1; background:var( --_ink-b ); mix-blend-mode:multiply; translate:5px -4px; border-radius:inherit; opacity:0.6 }
+
+  /* ---- Tape ---- */
+
+  .taped { position:relative }
+  .taped::before { content:""; position:absolute; left:calc( 50% - 38px ); top:-14px; width:76px; height:26px; background:#fff3a0b0; rotate:var( --_tape-tilt, -4deg ); box-shadow:0 1px 2px #0002 }
+
+  /* ================= NAVIGATION: tabs sticking out of the left edge ================= */
+
+  .spine { position:fixed; inset:0 auto 0 0; z-index:20; display:flex; flex-direction:column; align-items:flex-start; gap:10px; width:120px; padding:22px 0 }
+
+  .spineLogo { display:block; width:56px; height:66px; margin:0 0 18px 28px; background:var( --green ); mask:url( "Banner-logo.svg" ) center / contain no-repeat; filter:drop-shadow( 3px -2px 0 var( --pink ) ) }
+
+  .tab { display:flex; align-items:center; gap:10px; padding:12px 18px 12px 20px; border-radius:0 14px 14px 0; background:var( --_ink ); color:white; font:var( --font-serif ); font-size:16px; text-decoration:none; translate:-14px 0; transition:translate 0.2s; box-shadow:0 3px 0 #0002 }
+  .tab:hover, .tab.isActive { translate:0 0 }
+  .tab .icon { width:20px; height:20px }
+  .tab.isDisabled { background:none; color:var( --ink-faint ); border:2px dashed currentColor; border-left:0; translate:-14px 0; cursor:default }
+  .tab.isDisabled small { font:var( --font-hand ); font-size:16px }
+
+  .spineAccount { display:flex; flex-direction:column; align-items:center; gap:6px; margin:auto 0 0 22px; padding:0; border:0; background:none; cursor:pointer }
+  .spineAccount .avatar { --_size:60px; padding:5px; border-radius:50%; background:white; rotate:-6deg; box-shadow:0 3px 8px #0003 }
+  .spineAccount .avatar canvas { border-radius:50% }
+  .spineAccount .hand { font-size:20px; color:var( --blue ) }
+
+  /* ================= HERO: a cast list and a hole torn in the page ================= */
+
+  .hero { display:grid; grid-template-columns:330px 1fr; gap:40px; height:min( 76vh, 800px ); margin-left:120px; padding:36px 40px 0 20px }
+
+  .cast > h2 { font-size:38px }
+  .cast > .hand { display:block; margin:2px 0 18px; font-size:24px; color:var( --blue ) }
+
+  .rosterList { list-style:none; display:flex; flex-direction:column; gap:6px }
+  .rosterItem { display:flex; align-items:center; gap:14px; padding:6px 8px; cursor:pointer }
+  .rosterItem b { position:relative; display:inline-block; font:var( --font-serif ); font-size:22px; font-weight:400 }
+  .rosterItem small { display:block; font:var( --font-hand ); font-size:19px; color:var( --ink-soft ) }
+  .rosterItem .tag { margin-left:8px; font:var( --font-hand ); font-size:16px; color:var( --pink ); vertical-align:3px }
+  .rosterItem.isLocked { opacity:0.45; cursor:default }
+  .rosterItem.isLocked .pixelLabel { display:flex; align-items:center; gap:4px; font:var( --font-hand ); font-size:17px; text-transform:none }
+  .rosterItem.isLocked .pixelLabel svg { width:13px }
+
+  /* A highlighter stroke in the character's colour behind the selected name */
+  .rosterItem.isSelected b::before { content:""; position:absolute; inset:45% -6px -2px -4px; z-index:-1; background:var( --character ); opacity:0.45; mix-blend-mode:multiply; rotate:-1.5deg; border-radius:3px }
+  .rosterItem:not( .isLocked ):hover b::before { content:""; position:absolute; inset:45% -6px -2px -4px; z-index:-1; background:var( --character ); opacity:0.25; rotate:-1.5deg }
+
+  .portrait { display:grid; place-items:center; width:54px; height:58px; flex-shrink:0; padding:5px 5px 9px; background:white; rotate:-3deg; box-shadow:0 2px 5px #0002 }
+  .rosterItem:nth-child( even ) .portrait { rotate:3deg }
+  .portrait img { width:100%; image-rendering:pixelated }
+  .portrait.isUnknown { color:var( --ink-faint ); font:var( --font-hand ); font-size:26px }
+
+  /* The torn window: a slightly larger white paper edge behind the hole, both cut along the same kind of tear */
+  .tear { position:relative; filter:drop-shadow( 0 10px 14px #0002 ) }
+  .tear::before { content:""; position:absolute; inset:0; background:#fffdf6; clip-path:var( --_outer ) }
+  .tear > .hole { position:absolute; inset:0; border-radius:0; clip-path:var( --_inner ) }
+  .tear > .hole::after { box-shadow:inset 0 0 0 1px #0002, inset 0 18px 26px -12px #0006, inset 16px 0 24px -14px #0005 }
+
+  .heroTear { height:100% }
+  .heroNote { position:absolute; left:-30px; bottom:-34px; z-index:3; font:var( --font-hand ); font-size:30px; color:var( --pink ); rotate:-4deg }
+
+  /* ================= CONTENT ================= */
+
+  .content { margin:110px 64px 0 calc( 120px + 20px ) }
+  .content > section { margin-bottom:120px }
+  .content > section > h2 { font-size:46px; margin-bottom:34px }
+  .content > section > h2 .hand { margin-left:14px; font-size:30px; color:var( --blue ); vertical-align:6px }
+
+  /* CactuJam: a two-colour riso poster */
+  .jamPoster { display:grid; grid-template-columns:minmax( 0, 1fr ) minmax( 0, 1fr ); gap:64px; align-items:center; padding:56px 60px; border-radius:6px; --_ink-a:#fff08a; --_ink-b:#ffc9e4 }
+  .jamPoster .stamp { display:inline-block; padding:6px 14px; border:3px solid var( --pink ); border-radius:6px; color:var( --pink ); font:var( --font-hand ); font-size:24px; rotate:-5deg }
+  .jamPoster h2 { margin-top:16px; font-size:86px; line-height:0.95 }
+  .jamPoster h2 span { color:var( --blue ); mix-blend-mode:multiply }
+  .jamPoster .theme { margin:10px 0 28px; font:var( --font-hand ); font-size:44px; color:var( --ink ) }
+  .jamPoster .phaseSteps { display:flex; gap:8px }
+  .jamPoster .phaseSteps span { flex:1; height:10px; border-radius:5px; background:#0000001c }
+  .jamPoster .phaseSteps span.isDone { background:var( --blue ) }
+  .jamPoster .phaseSteps span.isNow { background:linear-gradient( 90deg, var( --blue ) 60%, #0000001c 60% ) }
+  .jamPoster .phaseNames { display:flex; justify-content:space-between; margin-top:8px; font:var( --font-hand ); font-size:19px }
+
+  /* A sticker-like button with a hard ink shadow */
+  .zineButton { display:inline-flex; align-items:center; gap:12px; margin-top:30px; padding:14px 26px; border:3px solid var( --ink ); border-radius:999px; background:white; color:var( --ink ); font:var( --font-serif ); font-size:20px; text-decoration:none; box-shadow:5px 5px 0 var( --ink ); rotate:-2deg; transition:translate 0.15s, box-shadow 0.15s }
+  .zineButton:hover { translate:-2px -2px; box-shadow:7px 7px 0 var( --ink ) }
+  .zineButton:active { translate:3px 3px; box-shadow:2px 2px 0 var( --ink ) }
+  .zineButton:focus-visible { outline:3px dashed var( --blue ); outline-offset:6px }
+  .zineButton .hand { color:var( --pink ); font-size:22px }
+
+  /* Games as taped polaroids */
+  .cartridges { display:grid; grid-template-columns:repeat( 3, 150px ); gap:30px 22px; justify-content:center }
+  .cartridge { position:relative; padding:10px 10px 30px; background:white; rotate:var( --_tilt ); box-shadow:0 4px 10px #0002; transition:rotate 0.2s, translate 0.2s; cursor:pointer }
+  .cartridge:hover { rotate:0deg; translate:0 -6px }
+  .cartridge::before { content:""; position:absolute; left:calc( 50% - 30px ); top:-12px; width:60px; height:22px; background:#bfe6ffb0; rotate:3deg }
+  .cartridge .thumb { width:100%; height:auto; aspect-ratio:1; border-radius:0 }
+  .cartridge .pixelLabel { position:absolute; left:12px; bottom:6px; font:var( --font-hand ); font-size:19px; text-transform:none; color:var( --ink ) }
+
+  /* News: taped notes */
+  .notes { display:grid; grid-template-columns:repeat( 4, 1fr ); gap:34px }
+  .note { padding:30px 22px 24px; background:var( --_note ); rotate:var( --_tilt ); box-shadow:0 6px 14px #0002; transition:rotate 0.2s }
+  .note:hover { rotate:0deg }
+  .note .hand { font-size:22px; color:var( --blue ) }
+  .note h3 { margin:6px 0 8px; font-size:23px }
+
+  /* Community: more torn windows into the worlds */
+  .portals { display:grid; grid-template-columns:repeat( 3, 1fr ); gap:40px }
+  .portal { color:var( --ink ); text-decoration:none }
+  .portalTear { height:200px; transition:translate 0.2s, rotate 0.2s }
+  .portal:nth-child( 1 ) .portalTear { rotate:-1deg }
+  .portal:nth-child( 3 ) .portalTear { rotate:1deg }
+  .portal:hover .portalTear { translate:0 -6px; rotate:0deg }
+  .portal h3 { margin-top:18px; font-size:26px }
+  .portal p { color:var( --ink-soft ) }
+  .portal .hand { display:block; margin-top:8px; font-size:22px; color:var( --riso-green ) }
+
+  /* Footer: a hand-drawn line with Ranfisz walking on it */
+  .footer { position:relative; display:flex; justify-content:space-between; margin:0 -64px 0 -20px; padding:34px 64px 46px 20px; font:var( --font-hand ); font-size:22px; color:var( --ink-soft ) }
+  .footer::before { content:""; position:absolute; inset:0 0 auto; height:12px; background:url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='12'%3E%3Cpath d='M0 6 Q15 0 30 6 T60 6 T90 6 T120 6' fill='none' stroke='%231d1a17' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" ) repeat-x }
+  .walker { position:absolute; bottom:calc( 100% - 8px ); left:0; image-rendering:pixelated }
+
+  /* Account popover reused from the main demo, restyled as a paper card */
+  .accountPopover { position:fixed; left:130px; bottom:20px; z-index:21; width:340px; padding:22px; background:#fffdf6; box-shadow:0 18px 40px #0003; rotate:-1deg }
+</style>
+</head>
+<body>
+
+<div class="desktop" id="desktop" hidden>
+  <nav class="spine">
+    <a class="spineLogo" href="#" aria-label="Cactu"></a>
+    <a class="tab isActive" href="#" style="--_ink:var( --pink )"><span data-icon="home"></span>Start</a>
+    <a class="tab" href="#" style="--_ink:var( --blue )"><span data-icon="gamepad"></span>Jam</a>
+    <span class="tab isDisabled"><span data-icon="book"></span>Wiki <small>wkrótce</small></span>
+    <span class="tab isDisabled"><span data-icon="cube"></span>Mine<small>wkrótce</small></span>
+
+    <button class="spineAccount" id="railAccount">
+      <span class="avatar"><canvas data-avatar></canvas></span>
+      <span class="hand">poziom 3</span>
+    </button>
+  </nav>
+
+  <div class="accountPopover" id="accountPopover" hidden>
+    <h3 style="font-size:24px">evolveye</h3>
+    <p class="hand" style="font-size:22px; color:var( --blue )">240 / 400 XP do poziomu 4</p>
+  </div>
+
+  <header class="hero">
+    <aside class="cast">
+      <h2>Ekipa</h2>
+      <span class="hand">kogo dziś odwiedzasz?</span>
+      <ul class="rosterList" id="roster"></ul>
+    </aside>
+    <div class="tear heroTear" data-tear>
+      <div class="hole heroHole" id="desktopWorld"><figure class="banner" role="img" aria-label="Cactu"></figure></div>
+      <span class="heroNote">↖ to nasz świat!</span>
+    </div>
+  </header>
+
+  <div class="content">
+    <section>
+      <div class="jamPoster riso">
+        <div>
+          <span class="stamp">głosowanie · jeszcze 2 dni</span>
+          <h2>CactuJam <span>#5</span></h2>
+          <p class="theme">„Wszystko się powtarza”</p>
+          <div class="phaseSteps"><span class="isDone"></span><span class="isDone"></span><span class="isNow"></span><span></span></div>
+          <div class="phaseNames"><span>zgłoszenia</span><span>granie</span><span>głosowanie</span><span>wyniki</span></div>
+          <a class="zineButton" href="#">Graj i oceniaj <span class="hand">+40 XP</span></a>
+        </div>
+        <div class="cartridges" data-cartridges="6"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Co słychać <span class="hand">świeże wieści</span></h2>
+      <div class="notes">
+        <article class="note taped" style="--_tilt:-2deg; --_note:#fff6c8"><span class="hand">12 paź</span><h3>Wyniki CactuJam #4</h3><p>Wygrała gra o kaktusie, który bał się wody.</p></article>
+        <article class="note taped" style="--_tilt:1.5deg; --_note:#ffe0ef; --_tape-tilt:5deg"><span class="hand">3 paź</span><h3>Nowa postać: Ranfisz</h3><p>Wędrowiec z pustyni dołącza do ekipy.</p></article>
+        <article class="note taped" style="--_tilt:-1deg; --_note:#dff0ff"><span class="hand">28 wrz</span><h3>Wieczór na Discordzie</h3><p>Pogaduchy, granie i plany na jam.</p></article>
+        <article class="note taped" style="--_tilt:2deg; --_note:#e2f6e6; --_tape-tilt:-7deg"><span class="hand">20 wrz</span><h3>Startuje CactuWiki</h3><p>Poradniki o wszystkim, pisane przez ekipę.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Gdzie nas znaleźć <span class="hand">wpadnij!</span></h2>
+      <div class="portals">
+        <a class="portal" href="#"><div class="tear portalTear" data-tear><div class="hole" data-portal="evolveye"></div></div><h3>Discord</h3><p>Rozmowy o wszystkim, wspólne granie i ogłoszenia jamów.</p><span class="hand">128 osób online</span></a>
+        <a class="portal" href="#"><div class="tear portalTear" data-tear><div class="hole" data-portal="mszak"></div></div><h3>Nasze rzeczy</h3><p>Gry, muzyka, rysunki i inne rzeczy robione przez członków Cactu.</p><span class="hand">34 projekty</span></a>
+        <a class="portal" href="#"><div class="tear portalTear" data-tear><div class="hole" data-portal="ranfisz"></div></div><h3>Poprzednie jamy</h3><p>Archiwum tematów, gier i wyników.</p><span class="hand">4 edycje</span></a>
+      </div>
+    </section>
+
+    <footer class="footer"><canvas class="walker" id="walker"></canvas><span>© CodeCactu</span><span>Discord · GitHub · YouTube</span><span>Polski · English</span></footer>
+  </div>
+</div>
+
+<script src="cactu-font.js"></script>
+<script src="world.js"></script>
+<script>
+  // The zine's pointer trail: round ink dots that shrink away, instead of the pixel cells of index.html
+  function createPointerTrail( color ) {
+    const canvas = document.createElement( `canvas` )
+    const ctx = canvas.getContext( `2d` )
+    const dots = []
+    const trail = { color }
+
+    canvas.style.cssText = `position:fixed; inset:0; z-index:-1; pointer-events:none; mix-blend-mode:multiply`
+    document.body.prepend( canvas )
+
+    const resize = () => {
+      canvas.width = innerWidth
+      canvas.height = innerHeight
+    }
+
+    resize()
+    addEventListener( `resize`, resize )
+    addEventListener( `pointermove`, event => {
+      const last = dots[ 0 ]
+      if (last && Math.hypot( last.x - event.clientX, last.y - event.clientY ) < 14) return
+
+      dots.unshift({ x:event.clientX, y:event.clientY, createdAt:performance.now() })
+    } )
+
+    requestAnimationFrame( function frame( time ) {
+      while (dots.length && time - dots.at( -1 ).createdAt > 1000) dots.pop()
+
+      ctx.clearRect( 0, 0, canvas.width, canvas.height )
+      ctx.fillStyle = trail.color
+
+      for (const dot of dots) {
+        ctx.beginPath()
+        ctx.arc( dot.x, dot.y, 6 * (1 - (time - dot.createdAt) / 1000), 0, Math.PI * 2 )
+        ctx.fill()
+      }
+
+      requestAnimationFrame( frame )
+    } )
+
+    return trail
+  }
+</script>
+<script src="page.js"></script>
+<script>
+  // Tears follow their element's size, so they are cut again when it changes
+  for (const element of document.querySelectorAll( `[data-tear]` )) new ResizeObserver( () => tear( element ) ).observe( element )
+
+  function tear( element ) {
+    const { width, height } = element.getBoundingClientRect()
+    if (!width) return
+
+    const seed = element.dataset.tearSeed ??= String( Math.random() * 1000 )
+
+    element.style.setProperty( `--_outer`, tearPolygon( width, height, 0, 5, Number( seed ) ) )
+    element.style.setProperty( `--_inner`, tearPolygon( width, height, 7, 7, Number( seed ) + 7 ) )
+  }
+
+  // A rectangle whose edges zigzag irregularly, like paper torn by hand; `inset` pulls it in, `depth` is how ragged it is
+  function tearPolygon( width, height, inset, depth, seed ) {
+    let state = Math.floor( seed * 9301 ) % 233280
+    const random = () => (state = (state * 9301 + 49297) % 233280) / 233280
+    const points = []
+    const edge = (length, toPoint) => {
+      for (let along = 0; along < length; along += 9 + random() * 14) points.push( toPoint( along, inset + random() * depth ) )
+    }
+
+    edge( width, (along, offset) => [ along, offset ] )
+    edge( height, (along, offset) => [ width - offset, along ] )
+    edge( width, (along, offset) => [ width - along, height - offset ] )
+    edge( height, (along, offset) => [ offset, height - along ] )
+
+    return `polygon( ${points.map( ([ x, y ]) => `${x.toFixed( 1 )}px ${y.toFixed( 1 )}px` ).join( `, ` )} )`
+  }
+</script>
+</body>
+</html>

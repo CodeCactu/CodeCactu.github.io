@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cactu</title>
+<!-- The chosen favicon (project/brand/smooth): PNG only, so the 16 px tab gets the version drawn on the 16 grid -->
+<link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="favicon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=block">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Version 3: only the header (hero, navigation, cast panel) so far; the rest of the page comes later -->
+
+<canvas class="trail" id="trail" aria-hidden="true"></canvas>
+
+<!--
+  The logo in the void's top left corner, with its pixel sky's coloured lines (brand.svg, exported as
+  cactu-logo-dark-lines-spread.svg). While the page scrolls the wordmark and the sky scroll away (.brandHead shows the logo
+  without its signet, brand-word.svg), and the sticky signet in the rail stays over the logo's own; phones show the whole logo
+-->
+<a class="brandHead" href="index.html" data-page aria-label="Cactu, start">
+  <img class="brandWord" src="brand-word.svg" alt="">
+  <img class="brandWhole" src="brand.svg" alt="">
+</a>
+
+<main class="page">
+  <!--
+    The rail: the void's left column, as tall as the page, so what sticks in it stops above the footer. The signet sticks at
+    its top, the main navigation right below it, and the account at the window's bottom; the hero scrolls past under them
+  -->
+  <div class="rail">
+    <a class="signet" href="index.html" data-page aria-label="Cactu, start"><img src="signet.svg" alt=""></a>
+
+    <nav class="mainNav" aria-label="Główne">
+      <span class="label navHeading">Strony</span>
+      <ul class="navList">
+        <li><a class="navItem isActive" href="index.html" data-page aria-current="page"><span data-icon="home"></span><span>Start</span></a></li>
+        <li><a class="navItem" href="jam.html" data-page><span data-icon="gamepad"></span><span>CactuJam</span><span class="navLive">trwa</span></a></li>
+      </ul>
+      <span class="label navHeading">Wkrótce</span>
+      <ul class="navList isSoonList">
+        <li><span class="navItem isSoon" aria-disabled="true"><span data-icon="book"></span><span>CactuWiki</span></span></li>
+        <li><span class="navItem isSoon" aria-disabled="true"><span data-icon="cube"></span><span>Minecraft</span></span></li>
+      </ul>
+    </nav>
+
+    <button class="railAccount" type="button">
+      <span class="avatar"><canvas id="avatar"></canvas></span>
+      <span><b>evolveye</b><span class="label">Poziom 3</span><span class="pills" data-xp="6"></span></span>
+    </button>
+  </div>
+
+  <header class="hero">
+    <h1 class="visuallyHidden">Cactu</h1>
+
+    <div class="field heroField" id="heroField" data-field="hero" data-seed="11">
+      <div class="world isSwitching" id="heroWorld"></div>
+    </div>
+
+    <!-- The cast, in a pocket of void carved into the hero's right side: pick a character to see its world -->
+    <aside class="castPanel" id="castPanel" aria-labelledby="castTitle">
+      <header><h2 id="castTitle" class="cactu">Postacie</h2></header>
+      <ul class="roster" id="roster"></ul>
+    </aside>
+
+    <a class="nowChip" href="jam.html" data-page><span class="dot"></span>Trwa CactuJam #5: głosowanie jeszcze 2 dni<span class="arrow">→</span></a>
+  </header>
+</main>
+
+<!-- A stand-in for the footer to come: the rail's sticky navigation and account stop above it -->
+<footer class="pageFooter"><span class="label">Stopka (wkrótce)</span></footer>
+
+<script src="cactu-font.js"></script>
+<script src="world.js"></script>
+<script src="brand.js"></script>
+<script src="utils.js"></script>
+<script src="cast.js"></script>
+<script src="curves.js"></script>
+<script src="shell.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

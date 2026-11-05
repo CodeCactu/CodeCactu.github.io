@@ -1,0 +1,231 @@
+/* Design tokens and small shared components of the light theme */
+
+/* Registered so the page tint can animate when the hero character changes */
+@property --paper { syntax:"<color>"; inherits:true; initial-value:#f2eee4 }
+
+:root {
+  /* The page tint follows the selected character; the other surfaces are derived from it */
+  --paper: #f2eee4;
+  --paper-deep: color-mix( in oklab, var( --paper ) 93%, black );
+  --card: color-mix( in oklab, var( --paper ) 35%, white );
+  --line: color-mix( in oklab, var( --paper ) 85%, black );
+  --dot: color-mix( in oklab, var( --paper ) 89%, black );
+
+  /* The selected character's colour, for small accents */
+  --accent: #3e8a2b;
+
+  /* Textures: a dithered fade (full, 3/4, 1/2, 1/4 density) and a stepped skyline, both used as masks */
+  --dither-fade: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h4v3h-4z M0 3h1v2h-1z M2 3h1v2h-1z M1 5h1v1h-1z M3 5h1v1h-1z M0 6h1v1h-1z M2 7h1v1h-1z'/%3E%3C/svg%3E");
+  --skyline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='40' shape-rendering='crispEdges'%3E%3Cpath d='M0 40 V30 H10 V30 H20 V20 H30 V20 H40 V20 H50 V10 H60 V10 H70 V20 H80 V20 H90 V30 H100 V30 H110 V30 H120 V20 H130 V10 H140 V0 H150 V0 H160 V10 H170 V20 H180 V30 H190 V30 H200 V40 Z'/%3E%3C/svg%3E");
+
+  --ink: #23211c;
+  --ink-soft: #6b6559;
+  --ink-faint: #a49d8e;
+
+  --green: #3e8a2b;    --green-tint: #e1ecd2;
+  --yellow: #dcaa12;   --yellow-tint: #f6eac0;   --yellow-ink: #634b04;
+  --purple: #6e45f3;   --purple-tint: #e6dffd;
+  --brown: #a6642c;    --brown-tint: #efe0cf;
+  --red: #c2452b;      --red-tint: #f6ddd5;
+
+  /* Corners are notched like pixel art: a radius here is the size of the cut-out step */
+  --radius-large: 6px;
+  --radius: 4px;
+  --radius-small: 3px;
+
+  --font-display: 800 1em / 1.1 "Bricolage Grotesque", sans-serif;
+  --font-ui: 700 15px / 1.3 "Atkinson Hyperlegible", sans-serif;
+  --font-body: 15px / 1.5 "Atkinson Hyperlegible", sans-serif;
+  --font-pixel: 400 10px / 1 Silkscreen, monospace;
+
+  transition: --paper 0.7s;
+}
+
+/* Browsers without corner-shape get sharp corners rather than rounded ones */
+@supports not (corner-shape: notch) {
+  :root { --radius-large:0; --radius:0; --radius-small:0 }
+}
+
+* { box-sizing:border-box; margin:0; padding:0; corner-shape:notch }
+[hidden] { display:none !important }
+
+/* A faint dot grid, one dot per 10px cell. The pointer trail lights up the same cells */
+body {
+  min-height: 100dvh;
+  background: var( --paper ) radial-gradient( var( --dot ) 1px, transparent 1.4px ) fixed;
+  background-size: 10px 10px;
+  color: var( --ink );
+  font: var( --font-body );
+}
+
+h1, h2, h3 { font:var( --font-display ); letter-spacing:-0.01em }
+
+/* ---- Textures ---- */
+
+.pointerTrail { position:fixed; inset:0; z-index:-1; pointer-events:none }
+
+/* A dithered stroke right under a heading, as wide as its text, in the character's colour */
+.accented { width:fit-content }
+
+.accented::after {
+  content: "";
+  display: block;
+  height: 10px;
+  margin-top: 3px;
+  background: var( --accent );
+  mask: var( --dither-fade ) 0 0 / 8px 16px repeat-x;
+}
+
+/* A band of colour that dissolves into the surface below it */
+.ditherBand { position:relative }
+
+.ditherBand::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 16px;
+  background: var( --_band, var( --accent ) );
+  opacity: 0.5;
+  mask: var( --dither-fade ) 0 0 / 8px 16px repeat-x;
+  pointer-events: none;
+}
+
+/* Stepped pixel terrain rising from the top of a surface, a nod to the edges of the old site */
+.skyline { position:relative; background:var( --_surface, var( --paper-deep ) ) }
+
+.skyline::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 100%;
+  height: 40px;
+  background: var( --_surface, var( --paper-deep ) );
+  mask: var( --skyline ) 0 100% / 200px 40px repeat-x;
+}
+.muted { color:var( --ink-soft ) }
+.icon { width:22px; height:22px; flex-shrink:0 }
+
+/* Small uppercase labels set in a pixel font: the link between the UI and the pixel worlds */
+.pixelLabel { font:var( --font-pixel ); letter-spacing:0.04em; text-transform:uppercase; color:var( --ink-soft ) }
+
+/* ---- Surfaces: flat colour with a pixel bevel, the frame of the current site buttons (light top-left, dark bottom-right) ---- */
+
+.card, .bevel {
+  border: 4px solid transparent;
+  border-image: url( "../../../frontend/public/frame.png" ) 2;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var( --line );
+  image-rendering: pixelated;
+}
+
+.card { background:var( --card ) }
+
+/* Buttons also carry the drifting code lines of the old site; they slide on hover and the bevel flips when pressed */
+.button {
+  --_background: var( --ink );
+  --_color: var( --card );
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding-inline: 14px 16px;
+  border: 4px solid transparent;
+  border-image: url( "../../../frontend/public/frame.png" ) 2;
+  border-radius: 2px;
+  background: url( "../../../frontend/public/tileBgr.png" ) 0 50% / 256px 18px repeat-x padding-box, var( --_background ) border-box;
+  color: var( --_color );
+  font: var( --font-ui );
+  text-decoration: none;
+  image-rendering: pixelated;
+  cursor: pointer;
+  transition: background-position 0.8s, filter 0.15s;
+}
+
+.button:hover { background-position:-128px 50%, 0 0; filter:brightness( 1.06 ) }
+.button:active { border-image-source:url( "../../../frontend/public/frame-rotated.png" ); translate:0 1px; filter:brightness( 0.96 ) }
+.button:focus-visible { outline:2px solid var( --ink ); outline-offset:3px }
+.button:is( [disabled], .isDisabled ) { opacity:0.5; filter:grayscale( 0.6 ); cursor:not-allowed; pointer-events:none }
+.button.isYellow { --_background:var( --yellow ); --_color:var( --ink ) }
+
+.xpReward { padding:3px 6px; border-radius:var( --radius-small ); background:#0000001a; font:var( --font-pixel ) }
+
+.chip {
+  --_color: var( --yellow-ink );
+  --_background: var( --yellow-tint );
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var( --radius );
+  background: var( --_background );
+  color: var( --_color );
+  font: 700 13px "Atkinson Hyperlegible";
+  white-space: nowrap;
+}
+
+.segmented { display:flex; padding:3px; border-radius:var( --radius ); background:var( --paper-deep ) }
+.segmented span { flex:1; padding:7px 12px; border-radius:var( --radius-small ); text-align:center; font:var( --font-ui ); font-size:14px; color:var( --ink-soft ) }
+.segmented span.isOn { background:var( --card ); color:var( --ink ) }
+
+/* ---- XP: a bar of pixel blocks ---- */
+
+.xpBar { display:flex; gap:2px; height:var( --_height, 10px ) }
+.xpBar i { flex:1; background:var( --paper-deep ) }
+.xpBar i.isFull { background:var( --green ) }
+
+/* ---- Pixel images ---- */
+
+.avatar { position:relative; flex-shrink:0; width:var( --_size, 44px ); height:var( --_size, 44px ) }
+.avatar canvas { width:100%; height:100%; border-radius:var( --radius ); image-rendering:pixelated }
+
+.avatar .level {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  min-width: 22px;
+  padding: 4px 4px 3px;
+  border: 2px solid var( --card );
+  border-radius: var( --radius );
+  background: var( --green );
+  color: white;
+  font: var( --font-pixel );
+  text-align: center;
+}
+
+.thumb { width:var( --_size, 56px ); height:var( --_size, 56px ); border-radius:var( --radius ); image-rendering:pixelated; flex-shrink:0 }
+
+/* ---- Logo: drawn in pixels by the world; in the page it is an invisible, labelled slot ---- */
+
+.banner { position:absolute; left:0; top:0; z-index:1 }
+
+/* Pixel images outside the worlds, scaled by whole pixels in fillPixelArt() */
+.pixelArt { display:block; image-rendering:pixelated }
+
+/* ---- Holes: windows into another world, sunk below the page ---- */
+
+.hole {
+  position: relative;
+  overflow: hidden;
+  border-radius: var( --_radius, var( --radius-large ) );
+  background: var( --paper-deep );
+  isolation: isolate;
+}
+
+.hole > canvas { position:absolute; image-rendering:pixelated; z-index:0; transition:opacity 0.35s }
+.hole.isSwitching > canvas { opacity:0 }
+
+/* The page casts a soft shadow into the hole; the world also shades its own edges in pixels */
+.hole::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px #0000002e,
+    inset 0 14px 22px -10px #1b163059,
+    inset 14px 0 22px -12px #1b163040,
+    inset 0 -10px 18px -12px #1b163033;
+  pointer-events: none;
+}

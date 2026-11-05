@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CactuJam #5 · Cactu</title>
+<!-- The chosen favicon (project/brand/smooth): PNG only, so the 16 px tab gets the version drawn on the 16 grid -->
+<link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="favicon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&family=Tiny5&display=block">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="jam.css">
+</head>
+<body class="isSubpage">
+
+<!--
+  CactuJam, version 3: the jam's voting page in the home page's frame (the logo, the rail, the void). A low band of the
+  character's world at the top, with the jam's title in a pocket of void bitten into it; below, three columns: the
+  instruction (the anchor of a game's card), the source list of games and the categories' tier tables.
+  Demo switches: ?guest starts logged out, ?empty starts without votes, ?character=<id> as on the home page
+-->
+
+<canvas class="trail" id="trail" aria-hidden="true"></canvas>
+
+<a class="brandHead" href="index.html" data-page aria-label="Cactu, start">
+  <img class="brandWord" src="brand-word.svg" alt="">
+  <img class="brandWhole" src="brand.svg" alt="">
+</a>
+
+<main class="page">
+  <div class="rail">
+    <a class="signet" href="index.html" data-page aria-label="Cactu, start"><img src="signet.svg" alt=""></a>
+
+    <nav class="mainNav" aria-label="Główne">
+      <span class="label navHeading">Strony</span>
+      <ul class="navList">
+        <li><a class="navItem" href="index.html" data-page><span data-icon="home"></span><span>Start</span></a></li>
+        <li><a class="navItem isActive" href="jam.html" data-page aria-current="page"><span data-icon="gamepad"></span><span>CactuJam</span><span class="navLive">trwa</span></a></li>
+      </ul>
+      <span class="label navHeading">Wkrótce</span>
+      <ul class="navList isSoonList">
+        <li><span class="navItem isSoon" aria-disabled="true"><span data-icon="book"></span><span>CactuWiki</span></span></li>
+        <li><span class="navItem isSoon" aria-disabled="true"><span data-icon="cube"></span><span>Minecraft</span></span></li>
+      </ul>
+    </nav>
+
+    <!-- Logged in: the account; logged out: a login button (in this demo it switches between the two) -->
+    <button class="railAccount" id="account" type="button">
+      <span class="avatar"><canvas id="avatar"></canvas></span>
+      <span class="accountUser"><b>evolveye</b><span class="label">Poziom 3</span><span class="pills" data-xp="6"></span></span>
+      <span class="accountGuest"><b>Zaloguj się</b><span class="label">przez Discord</span></span>
+    </button>
+  </div>
+
+  <header class="jamHead">
+    <div class="field jamBand" id="jamBand" data-seed="5">
+      <div class="world isSwitching" id="jamWorld"></div>
+    </div>
+
+    <!--
+      The title lies in a pocket of void bitten into the band's bottom left; the band's shape is cut around it. Only two
+      things: the name and how long the voting lasts. The world above stays a picture, with nothing on it
+    -->
+    <div class="jamTitle" id="jamTitle">
+      <!-- The cactu font has no #: it is drawn, at the letters' cap height and stroke -->
+      <h1 class="cactu">cactujam<svg class="hash" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.1 1.15v9.7M7.9 1.15v9.7M1.15 4.1h9.7M1.15 7.9h9.7" /></svg><span class="visuallyHidden">#</span>5</h1>
+      <p class="jamPhase" title="Głosowanie do 5 listopada, 23:59"><span class="dot"></span><span>Głosowanie trwa jeszcze <b>2 dni</b></span></p>
+    </div>
+  </header>
+
+  <!--
+    The edition's terms (made up for the demo, like the games), known from the jam's start (its announcement): what the games were made for, when, and with what.
+    The voter judges by them (the theme category, the assets in the audiovisual one), so they lie just above the tables
+  -->
+  <section class="jamBrief" aria-label="Zasady edycji">
+    <dl>
+      <div><dt class="label">Temat</dt><dd><b>Latarnia morska</b></dd></div>
+      <div><dt class="label">Tematy dodatkowe</dt><dd><b>mgła</b>, <b>kot</b> <span class="briefNote">· przynajmniej jeden do wyboru</span></dd></div>
+      <div><dt class="label">Czas trwania</dt><dd><time datetime="2026-03-13T20:00">13.03.2026, 20:00</time> – <time datetime="2026-03-16T04:00">16.03, 04:00</time> <span class="briefNote">· 56 h</span></dd></div>
+      <div class="briefAssets"><dt class="label">Assety</dt><dd>Własne lub na licencji pozwalającej na użycie, z informacją w grze o autorze, licencji i linku do każdego cudzego. Własne są premiowane (np. wyższą wagą ocen za oprawę audiowizualną). AI dozwolone</dd></div>
+    </dl>
+  </section>
+
+  <div class="voting" id="voting">
+    <!-- The instruction, and the anchor of a game's card: the card opens over it -->
+    <aside class="guide" id="guide" aria-labelledby="guideTitle">
+      <h2 id="guideTitle" class="cactu">instrukcja</h2>
+
+      <ol class="steps">
+        <li>Kliknij grę, aby zobaczyć jej opis</li>
+        <li>Przeciągaj gry z listy na wiersze kategorii; w wierszu im dalej w prawo, tym wyżej</li>
+        <li>Przeciągnij grę z tabeli z powrotem na listę, aby cofnąć głos</li>
+        <li>Rozdaj wszystkie gry we wszystkich kategoriach, aby głos był ważny</li>
+      </ol>
+
+      <!-- Logged in: how far the vote is, and that every move is saved -->
+      <section class="progress" id="progress" aria-live="polite">
+        <div class="progressHead"><span class="label">Twój głos</span><b id="progressCount">0 / 42</b></div>
+        <span class="pills progressPills" id="progressPills"></span>
+        <p class="progressState" id="progressState"></p>
+        <p class="saved" id="saved"><span data-icon="check"></span>Każda zmiana zapisuje się sama</p>
+      </section>
+
+      <!-- Logged out: voting needs an account -->
+      <section class="loginNote" id="loginNote">
+        <p><b>Aby oceniać, musisz być zalogowany.</b> Gry i ich opisy możesz przeglądać bez konta.</p>
+        <button class="button" id="loginButton" type="button">Zaloguj się przez Discord</button>
+      </section>
+    </aside>
+
+    <!-- The source list: every game once; drag a game from here onto a category's row -->
+    <section class="source" id="source" data-source aria-labelledby="sourceTitle">
+      <header>
+        <h2 id="sourceTitle" class="cactu">gry</h2>
+        <span class="label" id="sourceCount"></span>
+      </header>
+      <ul class="sourceList" id="sourceList"></ul>
+      <p class="sourceDrop" aria-hidden="true">Upuść, aby cofnąć głos</p>
+    </section>
+
+    <div class="ladders" id="ladders"></div>
+  </div>
+
+  <!-- A game's card: opens over the instruction (anchored to it), or as a sheet on phones -->
+  <article class="gameCard" id="gameCard" popover aria-labelledby="gameCardTitle"></article>
+</main>
+
+<footer class="pageFooter"><span class="label">Stopka (wkrótce)</span></footer>
+
+<script src="cactu-font.js"></script>
+<script src="world.js"></script>
+<script src="brand.js"></script>
+<script src="utils.js"></script>
+<script src="cast.js"></script>
+<script src="curves.js"></script>
+<script src="shell.js"></script>
+<script src="jam.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Design references (screenshots with other people's data)
+/references/
+
+# Regenerable demo screenshots (tools/shoot.sh)
+/demo/screenshots/
+
+# Generated brand exports (demo/tools/export-brand.py recreates them)
+/brand/

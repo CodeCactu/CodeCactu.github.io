@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cactu: marka gładka</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=block">
+<style>
+  /*
+    The smooth brand, as the frontend draws it (frontend/src/pages/_utils/CactuBanner): the vector signet, the wordmark in the
+    cactu font, and small marks around them that used to be ASCII characters (grass //\, faces ┣o━o┫ and the ending [-]).
+    This page shows the logo as it is and proposes smooth marks in the style of the cactu letters instead of the ASCII ones.
+    The logo pieces live in lib/smooth/ (copied from the frontend); the cactu font comes from lib/cactu-font.js
+  */
+
+  :root {
+    --dark: #16152c;
+    --light: #f2eee4;
+    --ink: #ecebf5;
+    --ink-soft: #a9a6c8;
+    --line: #ffffff14;
+    --green: #5da234;
+    --green-dark: #3e721d;
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { padding:56px 64px 96px; background:#0b0a14; color:var( --ink ); font:16px / 1.55 "Atkinson Hyperlegible", sans-serif }
+  h1, h2, h3 { font-family:cactu, "Atkinson Hyperlegible", sans-serif; font-weight:400; letter-spacing:0.08em; line-height:1.1 }
+  h1 { font-size:48px }
+  h2 { font-size:30px; margin-bottom:8px }
+  h3 { font-size:20px; margin:32px 0 14px }
+  p { max-width:80ch; color:var( --ink-soft ) }
+  code { font:500 13px "JetBrains Mono", monospace; color:var( --ink ) }
+  section { margin-top:72px }
+  section > p { margin-bottom:24px }
+
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:24px }
+
+  /* The picks side by side, in equal columns */
+  .picks { display:grid; grid-template-columns:repeat( 2, minmax( 0, 1fr ) ); gap:24px; max-width:1240px }
+  .picks .swatch { min-height:0; padding:24px 20px }
+  figure { display:flex; flex-direction:column; gap:12px }
+  figcaption { max-width:44ch; color:var( --ink-soft ); font-size:14px }
+  figcaption b { color:var( --ink ) }
+
+  /* Swatches: the logo on the brand's dark navy and on the light paper */
+  .swatch { display:grid; place-items:center; min-height:180px; padding:40px 48px; border-radius:20px; background:var( --dark ); box-shadow:inset 0 0 0 1px var( --line ) }
+  .swatch.isLight { background:var( --light ) }
+  .swatch.isSmall { min-width:200px; min-height:150px; padding:28px }
+
+  /* ---- The logo, composed like the frontend's banner (sizes in em of the wordmark) ---- */
+
+  .logo {
+    --_signet: 1.4em;
+    --_mark: #8a88aa;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    font: 400 var( --size, 120px ) / 1 cactu;
+    letter-spacing: 0.19em;
+  }
+
+  .isLight .logo { --_mark:#444 }
+
+  .logo .signet { position:relative; width:var( --_signet ); aspect-ratio:294 / 345; padding-bottom:1.5%; margin-bottom:-1.5% }
+  .logo .signet > img { display:block; width:100% }
+  .logo .word { align-self:flex-end; padding-right:0.5em; color:var( --green ); line-height:0.45em }
+
+  /* Marks around the logo: three by the cactus's foot, two above the wordmark, one at its end */
+  .logo .mark { position:absolute; display:block; color:var( --_mark ) }
+  .logo .mark svg, .logo .mark img { display:block; width:100%; height:100% }
+
+  /* The ASCII marks are images in their original #444, which disappears on the dark navy: lightened there */
+  .swatch:not( .isLight ) .logo .mark img { filter:brightness( 2.1 ) }
+  .logo .isGrass { width:calc( var( --_signet ) * 0.35 ); aspect-ratio:100 / 45; z-index:-1 }
+  .logo .isGrass.is1 { bottom:23%; left:calc( var( --_signet ) * 0.5 ) }
+  .logo .isGrass.is2 { bottom:4%; left:calc( var( --_signet ) * 0.03 ); z-index:1 }
+  .logo .isGrass.is3 { bottom:0; left:calc( var( --_signet ) * 0.97 ); translate:-100% 0; z-index:1 }
+  .logo .isAbove { width:0.8em; aspect-ratio:168 / 137; bottom:0.75em }
+  .logo .isAbove.is1 { left:calc( var( --_signet ) + 0.51em ) }
+  .logo .isAbove.is2 { left:calc( var( --_signet ) + 1.895em ) }
+  .logo .isEnding { right:0; bottom:0.13em; width:0.5em; aspect-ratio:100 / 66 }
+
+  /* The proposals' own colours */
+  .logo .isGreen { color:var( --green-dark ) }
+  .isLight .logo .isGreen { color:#4f8a2a }
+  .logo .isYellow { color:#e5be4b }
+  .logo .isGray { color:var( --_mark ) }
+
+  /* The cursor blinks like a terminal's */
+  .cursorBlink { animation:blink 1.1s steps( 1 ) infinite }
+  @keyframes blink { 50% { opacity:0 } }
+  @media (prefers-reduced-motion: reduce) { .cursorBlink { animation:none } }
+
+  /* ---- Hybrid: the smooth logo with pixel decorations drawn on a canvas over it ---- */
+  .hybrid { position:relative; isolation:isolate; padding:var( --pad, 40px ) }
+  .hybrid canvas { position:absolute; left:0; top:0; z-index:-1; image-rendering:pixelated; pointer-events:none }
+
+  /* The pixel dots end the wordmark, so it leaves them room instead of the ASCII ending's */
+  .hybrid .word { padding-right:var( --ending, 0.5em ) }
+
+  .favicon { position:relative; display:grid; place-items:center; width:var( --box ); height:var( --box ) }
+  .favicon canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated }
+  .favicon img { position:relative; height:calc( var( --box ) * var( --cactus, 0.62 ) ); width:auto }
+  .favicon.isOld img { width:var( --box ); height:var( --box ) }
+  .faviconSizes { display:flex; align-items:flex-end; gap:20px }
+
+  /* ---- Lockups ---- */
+  .stacked { display:flex; flex-direction:column; align-items:center; gap:0.25em; font:400 var( --size, 80px ) / 0.45 cactu; letter-spacing:0.19em; color:var( --green ) }
+  .stacked img { width:1.4em }
+  .stacked span { padding-left:0.19em }
+  .icon { display:grid; place-items:center; width:var( --box ); height:var( --box ); border-radius:calc( var( --box ) * 0.24 ); background:var( --dark ); box-shadow:inset 0 0 0 1px var( --line ) }
+  .icon img { width:auto; height:calc( var( --box ) * 0.68 ) }
+  .isLight .icon { background:white }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>cactu: marka gładka</h1>
+  <p style="margin-top:14px">Logo ze strony: sygnet i napis w foncie cactu (wektorowe, z <code>frontend/src/pages/_utils/CactuBanner</code>). Dookoła niego były znaki ASCII: trawa <code>//\</code>, buźki <code>┣o━o┫</code> i zakończenie <code>[-]</code>. Pasowały do kodowego klimatu, ale nie do gładkiego stylu: są cienkie, kanciaste i szare. Niżej propozycje znaków narysowanych tak jak litery cactu: grube kreski z okrągłymi końcami, okrągłe kropki, ciasne wewnętrzne narożniki.</p>
+</header>
+
+<section>
+  <h2>Wybrane</h2>
+  <p>Ulubione zakończenia i favicony obok siebie, w tej samej wielkości, żeby łatwo je porównać.</p>
+  <h3>Zakończenia</h3>
+  <div class="picks" id="pickedEndings"></div>
+  <h3>Favicony</h3>
+  <div class="picks" id="pickedFavicons"></div>
+</section>
+
+<section>
+  <h2>Obecne logo</h2>
+  <p>Tak jak na stronie, z ASCII. Na ciemnym tle znaki są rozjaśnione, bo oryginalny szary (<code>#444</code>) na nim znika.</p>
+  <div class="row" id="current"></div>
+</section>
+
+<section>
+  <h2>Gładki rdzeń, pikselowe niebo</h2>
+  <p>Logo całej społeczności, takie jak strona: kaktus i napis są gładkie, bo muszą być czytelne w każdym rozmiarze, a dookoła nich pikselowe niebo. Linie i gwiazdy są dokładnie te z ulubionego logo pikselowego (<code>lib/brand.js</code>: <code>STATIC_LINES</code> i <code>STARS</code>), bez ziemi; na końcu napisu jego cieniowane kropki, zebrane w kwadrat 2 × 2 jak ćwiartki faviconu. Leżą za logo, jak na pikselowej chmurze, na siatce pikseli dopasowanej do wielkości logo, więc zawsze są ostre. W małych rozmiarach znikają i zostaje sam rdzeń.</p>
+  <div class="row" id="hybrids"></div>
+</section>
+
+<section>
+  <h2>Zakończenie napisu</h2>
+  <p>Cztery cieniowane kropki w kolorach faviconu, w różnych układach: w ramce, w rombie i w rzędzie tuż przy „u”. Wszystkie na środku wysokości liter, chyba że opis mówi inaczej.</p>
+  <div id="pixelEndings"></div>
+</section>
+
+<section>
+  <h2>Favicon</h2>
+  <p>Obecny favicon: gładki kaktus na ciemnym kole, cztery kolory w rogach i szary pierścień z krzyżem. Propozycje łączą to samo: gładki kaktus w środku, piksele dookoła. Siatka ma 16 pikseli, więc w 16 px każdy piksel jest dokładnie jednym pikselem ekranu.</p>
+  <div class="row" id="favicons"></div>
+  <h3>Kwadratowy pierścień</h3>
+  <p>Pierścień z wariantu „Pierścień” w kształcie ramki z wariantu „Linie”: kwadrat ze ściętymi rogami. Każdy kawałek pierścienia jest cieniowany jak piksele logo: jaśniejszy u góry i z lewej, ciemniejszy u dołu i z prawej.</p>
+  <div class="row" id="faviconExperiments"></div>
+</section>
+
+<section>
+  <h2>Zamiast ASCII</h2>
+  <p>Każdy znak osobno, w tym samym miejscu co jego wersja ASCII, po trzy pomysły. Reszta logo bez zmian.</p>
+  <h3>Trawa przy kaktusie</h3>
+  <div class="row" id="grasses"></div>
+  <h3>Nad napisem</h3>
+  <div class="row" id="aboves"></div>
+  <h3>Zakończenie napisu</h3>
+  <div class="row" id="endings"></div>
+</section>
+
+<section>
+  <h2>Złożone propozycje</h2>
+  <p>Trzy zestawy znaków, każdy z innym charakterem. Kod: klamry jak szczeliny w kaktusie i migający kursor. Ekipa: postacie zaglądające zza liter i cztery kolory starego faviconu. Ogród: iskry i kiełek, roślinnie i ciepło.</p>
+  <div class="row" id="sets"></div>
+</section>
+
+<section>
+  <h2>Bez dodatków</h2>
+  <p>Do miejsc, gdzie znaki byłyby za małe albo przeszkadzały: poziomo, pionowo i sam sygnet jako ikona.</p>
+  <div class="row" id="lockups"></div>
+</section>
+
+<script src="lib/cactu-font.js"></script>
+<script src="lib/world.js"></script>
+<script src="lib/brand.js"></script>
+<script>
+  // Proposal marks, in the viewBoxes of the ASCII marks they replace, drawn with round-capped strokes like the cactu letters
+  const MARKS = {
+    grass: {
+      ascii: { name:`ASCII`, note:`Obecne <code>//\\</code>.`, image:`lib/smooth/Banner-grass.svg`, tone:`isGray` },
+      blades: { name:`Źdźbła`, note:`Trzy kreski jak w ASCII, ale grube i zaokrąglone, w ciemnej zieleni kaktusa.`, tone:`isGreen`, svg:`<svg viewBox="0 0 33 15"><path d="M6 13.4 L10 4 M16.5 13.4 V2.4 M27 13.4 L23 4" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg>` },
+      leaves: { name:`Listki`, note:`Kępki z dwóch listków, jak kiełkujące nasiona.`, tone:`isGreen`, svg:`<svg viewBox="0 0 33 15"><path d="M9 15 C3 13 2 7 6 3 C9 7 10 11 9 15 Z M11 15 C11 10 14 6 19 5 C19 10 16 14 11 15 Z M24 15 C22 11 23 6 27 3 C30 7 29 12 24 15 Z" fill="currentColor"/></svg>` },
+      pebbles: { name:`Kamyki`, note:`Okrągłe kamienie zamiast trawy: kropki jak w kaktusie, spokojniejsze.`, tone:`isGray`, svg:`<svg viewBox="0 0 33 15"><ellipse cx="7" cy="11" rx="5.4" ry="3.8" fill="currentColor"/><ellipse cx="17.5" cy="12.2" rx="3.4" ry="2.6" fill="currentColor"/><ellipse cx="27" cy="11.4" rx="4.2" ry="3.2" fill="currentColor"/></svg>` },
+    },
+    above: {
+      ascii: { name:`ASCII`, note:`Obecne buźki <code>┣o━o┫</code>.`, image:`lib/smooth/Banner-floating_face.svg`, tone:`isGray` },
+      braces: { name:`Klamry`, note:`<code>{ }</code> narysowane jak szczeliny między ramionami a pniem kaktusa: kod i sygnet w jednym znaku.`, tone:`isGreen`, svg:`<svg viewBox="0 0 55 45"><path d="M24 8 C17 8 17 12 17 16 V19 C17 22 15 24 11 24 C15 24 17 26 17 29 V32 C17 36 17 40 24 40 M31 8 C38 8 38 12 38 16 V19 C38 22 40 24 44 24 C40 24 38 26 38 29 V32 C38 36 38 40 31 40" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+      eyes: { name:`Oczy`, note:`Ktoś z ekipy zagląda zza liter i patrzy na kaktus. Na stronie oczy mogą mrugać i śledzić kursor.`, tone:`isGray`, svg:`<svg viewBox="0 0 55 45"><circle cx="17" cy="31" r="9" fill="#ffffff"/><circle cx="38" cy="31" r="9" fill="#ffffff"/><circle cx="14" cy="32" r="4.2" fill="#16152c"/><circle cx="35" cy="32" r="4.2" fill="#16152c"/><circle cx="15.4" cy="30.4" r="1.3" fill="#ffffff"/><circle cx="36.4" cy="30.4" r="1.3" fill="#ffffff"/></svg>` },
+      sparkles: { name:`Iskry`, note:`Czteroramienne gwiazdki o miękkich ramionach: pomysł, zabawa, coś się dzieje.`, tone:`isYellow`, svg:`<svg viewBox="0 0 55 45"><path d="M24 6 Q26 22 42 24 Q26 26 24 42 Q22 26 6 24 Q22 22 24 6 Z" fill="currentColor"/><path d="M44 4 Q45 11 52 12 Q45 13 44 20 Q43 13 36 12 Q43 11 44 4 Z" fill="currentColor"/></svg>` },
+    },
+    ending: {
+      ascii: { name:`ASCII`, note:`Obecne <code>[-]</code>.`, image:`lib/smooth/Banner-no_sign.svg`, tone:`isGray` },
+      dots: { name:`Kropki`, note:`Cztery kolory starego faviconu, te same co kropki na końcu logo pikselowego.`, tone:`isGray`, svg:`<svg viewBox="0 0 27 18"><circle cx="3" cy="15" r="2.7" fill="#e15125"/><circle cx="10" cy="15" r="2.7" fill="#1673b8"/><circle cx="17" cy="15" r="2.7" fill="#7134ff"/><circle cx="24" cy="15" r="2.7" fill="#f2be25"/></svg>` },
+      cursor: { name:`Kursor`, note:`Migający kursor terminala: napis „pisze się” dalej. Zaokrąglony jak litery.`, tone:`isGreen`, svg:`<svg viewBox="0 0 27 18"><rect class="cursorBlink" x="5" y="0" width="10" height="18" rx="2.4" fill="currentColor"/></svg>` },
+      sprout: { name:`Kiełek`, note:`Mały kiełek wyrastający z ostatniej litery: społeczność rośnie.`, tone:`isGreen`, svg:`<svg viewBox="0 0 27 18"><path d="M9 18 V9" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M9 10 C3 10 1 6 1 2 C6 2 9 5 9 10 Z M9 8 C9 3 13 0 19 0 C19 5 15 8 9 8 Z" fill="currentColor"/></svg>` },
+    },
+  }
+
+  const SETS = [
+    { name:`Kod`, grass:`blades`, above:`braces`, ending:`cursor` },
+    { name:`Ekipa`, grass:`blades`, above:`eyes`, ending:`dots` },
+    { name:`Ogród`, grass:`leaves`, above:`sparkles`, ending:`sprout` },
+  ]
+
+  // The cactu font is embedded in lib/cactu-font.js (as CACTU_FONT_URL), so it also loads from file://
+  new FontFace( `cactu`, `url(${CACTU_FONT_URL})` ).load().then( font => document.fonts.add( font ) ).then( () => document.fonts.ready ).then( () => {
+    fill()
+    if (new URLSearchParams( location.search ).has( `export` )) exportFinal()
+  } )
+
+  // The favicon's corners, by quarter: top left, top right, bottom left, bottom right
+  const FAVICON_QUARTERS = [ `#e15125`, `#1673b8`, `#7134ff`, `#f2be25` ]
+
+  // The four colours of the favicon, for the favicons' pixel decorations
+  const PIX = {
+    accents: [ `#e15125`, `#1673b8`, `#7134ff`, `#f2be25` ],
+    star: `#fff4c8`,
+    dark: `#212226`,
+  }
+
+
+  // Endings of the wordmark, in the favicon's four colours (top left red, top right blue, bottom left purple, bottom right yellow)
+  /*
+    Variants of the wordmark's ending, grouped. Every variant is four shaded dots in the favicon's colours:
+      layout   grid (2 × 2), diamond (top, right, bottom, left) or row
+      spacing  distance between neighbouring dots (grid, row), offset  distance of each dot from the centre (diamond)
+      dot      dot size in pixels (7 by default), frame  dark, outline or cross (a dark frame with notched corners), or
+               rotated (a dark square turned by 45°)
+      star     a small star in the middle, near  pixels from the "u" (the rest start after the letters' spacing)
+      align    middle (default) or bottom of the letters
+  */
+  const ENDING_GROUPS = [
+    {
+      id: `framed`, name:`W ramce`, note:`Kwadrat kropek w małej ramce ze ściętymi rogami, jak kwadratowy favicon.`,
+      variants: [
+        { name:`W ramce`, note:`Obecna: ciemna ramka z jaśniejszą krawędzią u góry i z lewej.`, layout:`grid`, spacing:8, frame:`dark` },
+        { name:`Sama krawędź`, note:`Bez wypełnienia, sam obrys ramki: lżejsza, kropki na tle nieba.`, layout:`grid`, spacing:8, frame:`outline` },
+        { name:`Z krzyżem`, note:`Kropki rozdzielone jasnym krzyżem, jak ćwiartki w faviconie.`, layout:`grid`, spacing:9, frame:`cross` },
+        { name:`Ciasna`, note:`Kropki stykają się, ramka mniejsza: zwarty znaczek.`, layout:`grid`, spacing:7, frame:`dark`, padding:2 },
+      ],
+    },
+    {
+      id: `diamond`, name:`Romb`, note:`Kropki obrócone o 45°: góra, prawo, dół, lewo.`,
+      variants: [
+        { name:`Romb`, note:`Obecny: kropki szeroko.`, layout:`diamond`, offset:9 },
+        { name:`Ciasny romb`, note:`Kropki stykają się po skosie: jeden zwarty znak, jak krzyżyk z gamepada.`, layout:`diamond`, offset:6 },
+        { name:`Z gwiazdką`, note:`W środku rombu mała pikselowa gwiazdka, jak te na niebie logo.`, layout:`diamond`, offset:8, star:true },
+        { name:`Romb w ramce`, note:`Romb w ramce ze ściętymi rogami: połączenie obu ulubionych.`, layout:`diamond`, offset:6, frame:`dark` },
+      ],
+    },
+    {
+      id: `row`, name:`Kropki w rzędzie`, note:`Zwarty rząd tuż przy „u”, z większymi przerwami między kropkami niż wcześniej.`,
+      variants: [
+        { name:`Przerwa 3`, note:`Kropki co 3 piksele, zaraz za „u”.`, layout:`row`, spacing:10, near:4 },
+        { name:`Przerwa 5`, note:`Szerzej: każda kropka osobno, ale wciąż jeden rząd.`, layout:`row`, spacing:12, near:4 },
+        { name:`Mniejsze kropki`, note:`Kropki 5 pikseli, przerwa 4: delikatniej, bardziej jak interpunkcja.`, layout:`row`, dot:5, spacing:9, near:4 },
+        { name:`Na linii liter`, note:`Rząd na dole liter, jak kropka na końcu zdania.`, layout:`row`, spacing:11, near:4, align:`bottom` },
+      ],
+    },
+  ]
+
+  // The liked ones (W ramce, Romb, Z gwiazdką, Na linii liter) combined
+  ENDING_GROUPS.unshift( {
+    id: `combined`, name:`Połączenia`, note:`Ulubione układy połączone ze sobą: ramka, romb, gwiazdka i stanie na linii liter.`,
+    variants: [
+      { name:`Ramka z gwiazdką`, note:`Kwadrat kropek w ramce, a między kropkami gwiazdka.`, layout:`grid`, spacing:10, frame:`dark`, star:`small` },
+      { name:`Romb w ramce z gwiazdką`, note:`Romb z gwiazdką w środku, zamknięty w ramce ze ściętymi rogami.`, layout:`diamond`, offset:8, frame:`dark`, star:`small` },
+      { name:`Romb z dużą gwiazdką`, note:`W środku rombu większa gwiazda z poświatą, jak największe gwiazdy na niebie logo.`, layout:`diamond`, offset:8, star:`big` },
+      { name:`Romb z dużą gwiazdką w ramce`, note:`Ten sam romb z gwiazdą w ramce obróconej o 45°: kwadrat postawiony na rogu, jak romb kropek.`, layout:`diamond`, offset:8, star:`big`, frame:`rotated`, padding:5 },
+      { name:`Romb na linii liter`, note:`Dolna kropka rombu stoi na linii liter, romb wyrasta nad nią.`, layout:`diamond`, offset:8, star:`small`, align:`bottom` },
+      { name:`Ramka na linii liter`, note:`Ramka stoi na linii liter, jak ostatni znak napisu.`, layout:`grid`, spacing:8, frame:`dark`, align:`bottom` },
+      { name:`Rząd na linii z gwiazdką`, note:`Kropki jak kropka na końcu zdania, a nad ostatnią mała gwiazdka.`, layout:`row`, spacing:11, near:4, align:`bottom`, star:`afterTop` },
+    ],
+  } )
+
+  // The ending of the main logos
+  const MAIN_ENDING = { layout:`grid`, spacing:8 }
+
+  const FAVICON_EXPERIMENTS = [
+    { id:`squareRing`, name:`Kwadratowy pierścień`, note:`Pierścień grubości 2 pikseli w kształcie ramki, przecięty krzyżem, na ciemnym kwadracie ze ściętymi rogami.` },
+    { id:`squareRingThin`, name:`Cienki`, note:`Pierścień grubości jednego piksela: więcej miejsca dla kaktusa, lżejszy w 16 px.` },
+    { id:`squircle`, name:`Zaokrąglony kwadrat`, note:`Pośrodku między kołem a kwadratem: pierścień o kształcie „squircle”, wciąż pikselowy.` },
+    { id:`squircleSoft`, name:`Zaokrąglony, łagodniej`, note:`To samo z delikatniejszym cieniowaniem: krawędzie tylko lekko jaśniejsze i ciemniejsze.` },
+    { id:`squircleBare`, name:`Bez szarego kwadratu`, note:`Bez ciemnego kwadratu dookoła: sam pierścień, w środku ciemny jak tło kaktusa.` },
+    { id:`squircleOpen`, name:`Sam pierścień`, note:`Bez kwadratu i bez wypełnienia: kaktus w kolorowym pierścieniu prosto na tle karty.` },
+    { id:`squircleFine24`, name:`Łagodniej, drobniejsze piksele (24)`, note:`„Zaokrąglony, łagodniej” na siatce 24 × 24: piksele o jedną trzecią mniejsze. W 16 px wraca do siatki 16.` },
+    { id:`squircleFine32`, name:`Łagodniej, drobniejsze piksele (32)`, note:`Na siatce 32 × 32: piksele o połowę mniejsze, krzyż i schodki pierścienia cieńsze. W 16 px wraca do siatki 16.` },
+    { id:`blendedFine24`, name:`Przejścia, drobniejsze piksele (24)`, note:`„Przejścia” na siatce 24 × 24. W 16 px wraca do siatki 16.` },
+    { id:`blendedFine32`, name:`Przejścia, drobniejsze piksele (32)`, note:`„Przejścia” na siatce 32 × 32: drobne schodki i krótkie, drobne przejścia kolorów. W 16 px wraca do siatki 16.` },
+    { id:`ringWhole`, name:`Ciągły`, note:`Bez krzyża: jeden pierścień zmieniający kolor, a nie cztery osobne kawałki.` },
+    { id:`ringThinWhole`, name:`Cienki ciągły`, note:`Ciągły pierścień grubości jednego piksela, bez cieniowania: najlżejszy.` },
+    { id:`ringBlended`, name:`Przejścia`, note:`Ciągły, a kolory przechodzą jeden w drugi przez ditheringowe piksele.` },
+  ]
+
+  const FAVICONS = [
+    { id:`ring`, name:`Pierścień`, note:`Jak obecny: ciemne koło, a na nim pierścień z czterech pikselowych łuków w kolorach rogów.` },
+    { id:`lines`, name:`Linie`, note:`Cztery linie kodu w kolorach faviconu po bokach kaktusa.` },
+  ]
+
+  // The user's picks, by the names they have in the groups below
+  // A name, or [ name, `light`, light star ] for the light background (the star's colour from LIGHT_STARS)
+  const PICKED_ENDINGS = [ `W ramce`, `Ramka z gwiazdką`, `Romb z dużą gwiazdką`, [ `Romb z dużą gwiazdką`, `light`, `navy` ], [ `Romb z dużą gwiazdką`, `light`, `outlined` ], [ `Romb z dużą gwiazdką`, `light`, `green` ], [ `Romb z dużą gwiazdką`, `light`, `gold` ], `Romb z dużą gwiazdką w ramce`, `Z gwiazdką`, `Romb w ramce`, `Na linii liter` ]
+  const PICKED_FAVICONS = [ `squircleFine32`, `blendedFine32`, `blendedFine24` ]
+
+  function fill() {
+    const current = { grass:`ascii`, above:`ascii`, ending:`ascii` }
+    const variants = ENDING_GROUPS.flatMap( group => group.variants )
+
+    for (const pick of PICKED_ENDINGS) {
+      const [ name, theme, lightStar ] = Array.isArray( pick ) ? pick : [ pick ]
+      const starNames = { navy:`granatowa gwiazda`, outlined:`biała gwiazda z obwódką`, green:`zielona gwiazda`, gold:`złota gwiazda` }
+      const caption = theme === `light` ? `<b>${name}</b>, na jasnym tle${lightStar ? `: ${starNames[ lightStar ]}` : ``}` : `<b>${name}</b>`
+      appendHybrid( `pickedEndings`, 88, caption, theme === `light`, { ...variants.find( variant => variant.name === name ), lightStar } )
+    }
+
+    for (const id of PICKED_FAVICONS) {
+      const { name } = FAVICON_EXPERIMENTS.find( favicon => favicon.id === id )
+      const icons = [ 128, 64, 32, 16 ].map( size => `<div class="favicon" data-kind="${id}" style="--box:${size}px"><canvas></canvas><img src="lib/smooth/signet.svg" alt=""></div>` ).join( `` )
+      append( `pickedFavicons`, `<div class="faviconSizes">${icons}</div>`, `<b>${name}</b>` )
+      append( `pickedFavicons`, `<div class="faviconSizes">${icons}</div>`, `${name}, na jasnym tle`, true )
+    }
+
+    append( `current`, logo( current, 120 ), `Na ciemnym tle marki` )
+    append( `current`, logo( current, 120 ), `Na jasnym tle`, true )
+
+    appendHybrid( `hybrids`, 150, `<b>Niebo</b>: duże, np. nagłówek strony albo baner` )
+    appendHybrid( `hybrids`, 150, `Na jasnym tle`, true )
+    appendHybrid( `hybrids`, 96, `Średnie: każdy piksel to 2 px` )
+    appendHybrid( `hybrids`, 56, `Małe: tu dodatki już tylko przeszkadzają, więc ich nie ma` )
+
+    for (const group of ENDING_GROUPS) {
+      document.getElementById( `pixelEndings` ).insertAdjacentHTML( `beforeend`, `<h3>${group.name}</h3><p>${group.note}</p><div class="row" id="ending-${group.id}"></div>` )
+      for (const variant of group.variants) appendHybrid( `ending-${group.id}`, 104, `<b>${variant.name}</b>: ${variant.note}`, false, variant )
+    }
+
+    const sizes = [ 128, 64, 32, 16 ]
+    const oldIcons = sizes.map( size => `<div class="favicon isOld" style="--box:${size}px"><img src="../../frontend/public/favicon.svg" alt=""></div>` ).join( `` )
+    append( `favicons`, `<div class="faviconSizes">${oldIcons}</div>`, `<b>Obecny</b> favicon.svg` )
+
+    for (const { id, name, note } of FAVICONS) {
+      append( `favicons`, `<div class="faviconSizes">${sizes.map( size => `<div class="favicon" data-kind="${id}" style="--box:${size}px"><canvas></canvas><img src="lib/smooth/signet.svg" alt=""></div>` ).join( `` )}</div>`, `<b>${name}</b>: ${note}` )
+    }
+
+    for (const { id, name, note } of FAVICON_EXPERIMENTS) {
+      append( `faviconExperiments`, `<div class="faviconSizes">${sizes.map( size => `<div class="favicon" data-kind="${id}" style="--box:${size}px"><canvas></canvas><img src="lib/smooth/signet.svg" alt=""></div>` ).join( `` )}</div>`, `<b>${name}</b>: ${note}` )
+    }
+
+    for (const favicon of document.querySelectorAll( `.favicon[data-kind]` )) drawFavicon( favicon )
+
+    for (const [ kind, id ] of [ [ `grass`, `grasses` ], [ `above`, `aboves` ], [ `ending`, `endings` ] ]) {
+      for (const [ markId, { name, note } ] of Object.entries( MARKS[ kind ] )) {
+        append( id, logo( { ...current, [ kind ]:markId }, 72 ), `<b>${name}</b>: ${note}` )
+      }
+    }
+
+    for (const set of SETS) {
+      const parts = [ MARKS.grass[ set.grass ].name, MARKS.above[ set.above ].name, MARKS.ending[ set.ending ].name ].join( ` + ` ).toLowerCase()
+      append( `sets`, logo( set, 104 ), `<b>${set.name}</b>: ${parts}` )
+      append( `sets`, logo( set, 104 ), `${set.name}, na jasnym tle`, true )
+    }
+
+    append( `lockups`, logo( {}, 96 ), `<b>Poziomo</b>: sygnet i napis` )
+    append( `lockups`, `<div class="stacked" style="--size:72px"><img src="lib/smooth/signet.svg" alt=""><span>cactu</span></div>`, `<b>Pionowo</b>: na kwadratowe miejsca, np. awatar serwera` )
+
+    const icons = [ 96, 48, 24 ].map( size => `<div class="icon" style="--box:${size}px"><img src="lib/smooth/signet.svg" alt=""></div>` ).join( `` )
+    append( `lockups`, `<div class="row" style="align-items:center">${icons}</div>`, `<b>Sam sygnet</b>: ikona, favicon (96, 48 i 24 px)` )
+    append( `lockups`, `<div class="row" style="align-items:center">${icons}</div>`, `Ikony na jasnym tle`, true )
+  }
+
+  // The logo with the chosen marks; marks left out are not drawn
+  function logo( { grass, above, ending }, size ) {
+    const mark = (kind, id, className) => {
+      if (!id) return ``
+      const { image, svg, tone } = MARKS[ kind ][ id ]
+      return `<span class="mark ${className} ${tone}">${image ? `<img src="${image}" alt="">` : svg}</span>`
+    }
+
+    return `
+      <div class="logo" style="--size:${size}px" role="img" aria-label="Cactu">
+        <div class="signet"><img src="lib/smooth/signet.svg" alt="">${[ 1, 2, 3 ].map( index => mark( `grass`, grass, `isGrass is${index}` ) ).join( `` )}</div>
+        <div class="word">cactu</div>
+        ${mark( `above`, above, `isAbove is1` )}${mark( `above`, above, `isAbove is2` )}${mark( `ending`, ending, `isEnding` )}
+      </div>`
+  }
+
+  /* ---- Pixel decorations ---- */
+
+  /*
+    The cactu letters' ink, in em of the wordmark, measured on the rendered page: in the logo's layout (as in the frontend's
+    banner) their bottom lies 0.1em below the cactus's foot, and they are 0.547em tall. Measured, because the browser's text
+    metrics and canvas text place this font differently from the page
+  */
+  const CACTU_INK = { belowFoot:0.1, height:0.547 }
+
+  /*
+    The ending's star on the light background, where the sky's pale star disappears: navy (with a soft glow), white with a
+    navy outline, the cactus's dark green, or gold. Given as `lightStar` on a pick
+  */
+  const LIGHT_STARS = {
+    navy: { star:`#16152c`, glow:mixHex( `#16152c`, `#f2eee4`, 0.6 ) },
+    outlined: { star:`#ffffff`, outline:`#16152c` },
+    green: { star:`#3e721d`, glow:mixHex( `#5da234`, `#f2eee4`, 0.35 ) },
+    gold: { star:`#b8860b`, glow:mixHex( `#f2be25`, `#f2eee4`, 0.3 ) },
+  }
+
+  // The sky's star colours, as in the pixel logo
+  const SKY_COLORS = {
+    dark: PLATE_COLORS.dark,
+    light: PLATE_COLORS.light,
+  }
+
+  // Below this size the pixel sky only clutters the logo, so the smooth core stands alone
+  const SKY_MIN_SIZE = 72
+
+  function appendHybrid( id, size, caption, isLight = false, ending = MAIN_ENDING ) {
+    append( id, `<div class="hybrid" style="--pad:${Math.round( size * 0.4 )}px">${logo( {}, size )}</div>`, caption, isLight )
+    const wrapper = document.getElementById( id ).lastElementChild.querySelector( `.hybrid` )
+
+    // Measured once the cactus is decoded: before that its image has no height
+    wrapper.querySelector( `.signet > img` ).decode().then( () => drawSky( wrapper, size, isLight, ending ) )
+  }
+
+  /**
+   * The pixel logo's sky behind the smooth logo, on a canvas whose pixels are a whole number of CSS px (about a 48th of the
+   * wordmark's size, the proportion of the pixel logo): its coloured lines (STATIC_LINES) and its stars (STARS) at the same
+   * places of the box (but no stars behind the cactus), and its ending (drawEnding): four round dots in the favicon's colours, shaded like
+   * the pixel letters, centred on the letters. The wordmark is aligned so its letters stand on the cactus's line
+   */
+  function drawSky( wrapper, size, isLight, ending = MAIN_ENDING ) {
+    if (size < SKY_MIN_SIZE) return
+
+    const unit = Math.max( 1, Math.round( size / 48 ) )
+    const lettersHeight = Math.round( size * CACTU_INK.height / unit )
+    const endingWidth = endingSize( ending ).width
+    const letterSpacing = size * 0.19 / unit
+    const room = ending.near === undefined ? endingWidth + 2 : Math.max( 2, Math.ceil( ending.near + endingWidth - letterSpacing ) + 2 )
+    wrapper.style.setProperty( `--ending`, `${room * unit}px` )
+
+    const box = wrapper.getBoundingClientRect()
+    const signet = wrapper.querySelector( `.signet > img` ).getBoundingClientRect()
+    const wordElement = wrapper.querySelector( `.word` )
+    const word = wordElement.getBoundingClientRect()
+
+    // The letters are moved up onto the cactus's line, and the dots go to their middle (CACTU_INK)
+    const lift = size * CACTU_INK.belowFoot
+    const lettersMiddle = signet.bottom - size * CACTU_INK.height / 2
+
+    wordElement.style.translate = `0 ${-lift}px`
+    const cols = Math.ceil( box.width / unit )
+    const rows = Math.ceil( box.height / unit )
+    const canvas = document.createElement( `canvas` )
+    const ctx = canvas.getContext( `2d` )
+    const colors = SKY_COLORS[ isLight ? `light` : `dark` ]
+
+    canvas.width = cols
+    canvas.height = rows
+    canvas.style.width = `${cols * unit}px`
+    canvas.style.height = `${rows * unit}px`
+    wrapper.append( canvas )
+
+    // The lines, as the pixel logo draws them: a row of `length` pixels with a 3 pixel tall body inside its ends
+    for (const { x, y, length, color } of STATIC_LINES) {
+      const left = Math.round( x * cols )
+      const top = Math.round( y * rows )
+      ctx.fillStyle = color
+      ctx.fillRect( left, top, length, 1 )
+      ctx.fillRect( left + 1, top - 1, length - 2, 3 )
+    }
+
+    // The stars: single pixels, small crosses and bigger crosses with a glow; none behind or right next to the cactus
+    const cactus = { left:(signet.left - box.left) / unit - 4, right:(signet.right - box.left) / unit + 4, top:(signet.top - box.top) / unit - 4, bottom:(signet.bottom - box.top) / unit + 4 }
+
+    for (const { x, y, size:starSize } of STARS) {
+      const centerX = Math.round( x * cols )
+      const centerY = Math.round( y * rows )
+      if (centerX >= cactus.left && centerX <= cactus.right && centerY >= cactus.top && centerY <= cactus.bottom) continue
+
+      if (starSize >= 5) {
+        ctx.fillStyle = colors.starGlow
+        ctx.fillRect( centerX - 2, centerY, 5, 1 )
+        ctx.fillRect( centerX, centerY - 2, 1, 5 )
+      }
+
+      ctx.fillStyle = colors.star
+      ctx.fillRect( centerX, centerY, 1, 1 )
+      if (starSize >= 3) {
+        ctx.fillRect( centerX - 1, centerY, 3, 1 )
+        ctx.fillRect( centerX, centerY - 1, 1, 3 )
+      }
+    }
+
+    // The ending, centred on the letters' height
+    // Where the last letter's ink ends: the word's box, less the room and the letters' trailing spacing
+    const textEnd = (word.right - box.left) / unit - room - letterSpacing
+    const left = Math.round( ending.near === undefined ? textEnd + letterSpacing + 2 : textEnd + ending.near )
+    drawEnding( ctx, ending, left, (lettersMiddle - box.top) / unit, lettersHeight, colors )
+  }
+
+  // The size of an ending in pixels: its dots' block, and its frame around them
+  function endingSize( { layout, spacing = 8, offset = 9, dot = 7, frame, padding = 3, star } ) {
+    const block = layout === `diamond` ? 2 * offset + dot : layout === `row` ? 3 * spacing + dot : spacing + dot
+    return { block, width:block + (frame ? 2 * (padding + 1) : 0) + (star === `afterTop` ? 5 : 0) }
+  }
+
+  /**
+   * The wordmark's ending at `left`, centred on `middle` (or standing on the letters' bottom), in canvas pixels: four round
+   * dots in the favicon's colours, shaded like the pixel letters, laid out and framed as the variant says
+   */
+  function drawEnding( ctx, variant, left, middle, lettersHeight, colors = SKY_COLORS.dark ) {
+    const { layout, spacing = 8, offset = 9, dot:dotSize = 7, frame, padding = 3, star, align } = variant
+    const { block, width } = endingSize( variant )
+    const radius = dotSize / 2
+    const dot = createMask( dotSize, dotSize, (px, py) => (px + 0.5 - radius) ** 2 + (py + 0.5 - radius) ** 2 <= (radius + 0.1) ** 2 )
+    const shadeOf = color => ({ outline:mixHex( color, `#000000`, 0.6 ), light:mixHex( color, `#ffffff`, 0.35 ), base:color, shade:mixHex( color, `#000000`, 0.25 ) })
+    const paintDot = (quarter, x, y) => paintSprite( ctx, dot, shadeOf( FAVICON_QUARTERS[ quarter ] ), Math.round( x ), Math.round( y ), SHADINGS.word )
+
+    // The block's box: centred on the letters, or for a row on their bottom
+    const height = frame ? width : layout === `row` ? dotSize : block
+    const centerY = align === `bottom` ? middle + lettersHeight / 2 - height / 2 : middle
+    const centerX = left + (width - (star === `afterTop` ? 5 : 0)) / 2
+    const blockLeft = centerX - block / 2
+    const blockTop = centerY - (layout === `row` ? dotSize : block) / 2
+
+    // A dark frame with notched corners and a rim lit at the top and left; `outline` keeps only the rim, `cross` adds a lit
+    // cross between the dots
+    if (frame) {
+      const frameLeft = Math.round( centerX - width / 2 )
+      const frameTop = Math.round( centerY - width / 2 )
+      const middleOf = Math.floor( width / 2 )
+
+      for (let y = 0; y < width; y++) for (let x = 0; x < width; x++) {
+        // A square turned by 45°: a pixel rhombus whose rim is bevelled face by face, like a gem lit from the top left: the
+        // upper left face lightest, the upper right and lower left in between, the lower right darkest
+        if (frame === `rotated`) {
+          const dx = x - (width - 1) / 2
+          const dy = y - (width - 1) / 2
+          const distance = Math.abs( dx ) + Math.abs( dy )
+          const radius = (width - 1) / 2
+
+          // The four tips are cut flat, `cut` pixels in from each point
+          const cut = 2
+          const reach = Math.max( Math.abs( dx ), Math.abs( dy ) )
+          if (distance > radius || reach > radius - cut) continue
+
+          // Two pixels deep, so the diagonal rim reads as one line, not a row of dots; the cut tips get the same rim
+          const isEdge = distance > radius - 2 || reach > radius - cut - 2
+          const face = dy < 0 ? (dx < 0 ? `#4a457c` : `#38345f`) : dy > 0 ? (dx > 0 ? `#26233f` : `#38345f`) : dx < 0 ? `#4a457c` : `#26233f`
+          put( ctx, isEdge ? face : PIX.dark, frameLeft + x, frameTop + y )
+          continue
+        }
+
+        const isCorner = (x === 0 || x === width - 1) && (y === 0 || y === width - 1)
+        if (isCorner) continue
+
+        const isRim = x === 0 || y === 0 || x === width - 1 || y === width - 1
+        const isCross = frame === `cross` && (x === middleOf || y === middleOf)
+        if (isRim) put( ctx, x === 0 || y === 0 ? `#4a457c` : `#2a2747`, frameLeft + x, frameTop + y )
+        else if (isCross) put( ctx, `#4a457c`, frameLeft + x, frameTop + y )
+        else if (frame !== `outline`) put( ctx, PIX.dark, frameLeft + x, frameTop + y )
+      }
+    }
+
+    // Each dot's top left corner, by quarter (top left red, top right blue, bottom left purple, bottom right yellow)
+    const at = {
+      grid: quarter => [ blockLeft + (quarter % 2) * spacing, blockTop + Math.floor( quarter / 2 ) * spacing ],
+      // Going round: red on top, blue right, purple left, yellow below
+      diamond: quarter => [ [ centerX, centerY - offset ], [ centerX + offset, centerY ], [ centerX - offset, centerY ], [ centerX, centerY + offset ] ][ quarter ].map( value => value - radius ),
+      // In a row: red, blue, purple, yellow
+      row: quarter => [ blockLeft + quarter * spacing, blockTop ],
+    }[ layout ]
+
+    for (const quarter of [ 0, 1, 2, 3 ]) {
+      const [ x, y ] = at( quarter )
+      paintDot( quarter, x, y )
+    }
+
+    // A star like the stars of the sky (in its theme's colours): a small cross in the middle, a big one with a glow, or above
+    // the row's end
+    if (star) {
+      const [ x, y ] = star === `afterTop` ? [ Math.round( blockLeft + block + 3 ), Math.round( centerY - dotSize - 2 ) ] : [ Math.round( centerX - 0.5 ), Math.round( centerY - 0.5 ) ]
+      const light = colors === SKY_COLORS.light && variant.lightStar && LIGHT_STARS[ variant.lightStar ]
+      const starColor = light ? light.star : colors.star
+      const glowColor = light ? light.glow : colors.starGlow
+      const arm = star === `big` ? 2 : 1
+
+      // An outline: every pixel next to the star (including its glow's reach) that is not part of it
+      if (light?.outline) {
+        const isStar = (dx, dy) => (dy === 0 && Math.abs( dx ) <= arm) || (dx === 0 && Math.abs( dy ) <= arm)
+        ctx.fillStyle = light.outline
+        for (let dy = -arm - 1; dy <= arm + 1; dy++) for (let dx = -arm - 1; dx <= arm + 1; dx++) {
+          if (isStar( dx, dy )) continue
+          if ([ [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ] ].some( ([ ox, oy ]) => isStar( dx + ox, dy + oy ) )) ctx.fillRect( x + dx, y + dy, 1, 1 )
+        }
+      }
+
+      if (star === `big` && glowColor) {
+        ctx.fillStyle = glowColor
+        ctx.fillRect( x - 2, y, 5, 1 )
+        ctx.fillRect( x, y - 2, 1, 5 )
+      }
+
+      // Outlined, the whole big star is the star's colour; otherwise its middle cross
+      ctx.fillStyle = starColor
+      if (light?.outline) {
+        ctx.fillRect( x - arm, y, arm * 2 + 1, 1 )
+        ctx.fillRect( x, y - arm, 1, arm * 2 + 1 )
+      } else {
+        ctx.fillRect( x - 1, y, 3, 1 )
+        ctx.fillRect( x, y - 1, 1, 3 )
+      }
+    }
+  }
+
+  /**
+   * A favicon on a 16 × 16 pixel grid (so at 16 px every pixel is one screen pixel), the smooth cactus over it.
+   * ring: a dark disc ringed by four pixel arcs in the favicon's colours; lines: a dark rounded square with four code lines
+   * by the cactus
+   */
+  function drawFavicon( favicon ) {
+    const canvas = favicon.querySelector( `canvas` )
+    const ctx = canvas.getContext( `2d` )
+    const kind = favicon.dataset.kind
+    const box = parseFloat( favicon.style.getPropertyValue( `--box` ) )
+
+    canvas.width = 16
+    canvas.height = 16
+
+    // "Zaokrąglony, łagodniej" on a finer grid (smaller pixels); at 16 px it falls back to the 16 grid, the finest that stays sharp
+    if (kind === `squircleFine24` || kind === `squircleFine32` || kind === `blendedFine24` || kind === `blendedFine32`) {
+      const isBlended = kind.startsWith( `blended` )
+      drawFineSquircle( canvas, box < 24 ? 16 : kind.endsWith( `24` ) ? 24 : 32, { isWhole:isBlended, isBlended } )
+      favicon.style.setProperty( `--cactus`, 0.5 )
+      return
+    }
+
+    if (kind === `ring`) {
+      for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+        const distance = Math.hypot( x + 0.5 - 8, y + 0.5 - 8 )
+        if (distance > 8) continue
+
+        const isRing = distance > 6.6 && x !== 7 && x !== 8 && y !== 7 && y !== 8
+        const quarter = (y < 8 ? 0 : 2) + (x < 8 ? 0 : 1)
+        put( ctx, isRing ? [ PIX.accents[ 0 ], PIX.accents[ 1 ], PIX.accents[ 2 ], PIX.accents[ 3 ] ][ quarter ] : PIX.dark, x, y )
+      }
+
+      favicon.style.setProperty( `--cactus`, 0.56 )
+      return
+    }
+
+    // The square favicon's frame: dark, its corners' single pixels left out (notched)
+    const roundedSquare = fill => {
+      ctx.fillStyle = fill
+      ctx.fillRect( 0, 0, 16, 16 )
+      for (const [ x, y ] of [ [ 0, 0 ], [ 15, 0 ], [ 0, 15 ], [ 15, 15 ] ]) ctx.clearRect( x, y, 1, 1 )
+    }
+
+    /*
+      A squared ring on the dark notched square: pixels whose distance from the centre (by `metric`) lies between `inner` and
+      `outer`, cut by the two pixel cross, with notched corners, in the favicon's colours by quarter. Each piece is lit where
+      it faces up or left and shaded where it faces down or right
+    */
+    /*
+      A colour going round the ring: each quarter's colour at its middle (45°, 135°…), and between two quarters the two
+      colours mixed in dithered steps, so the ring changes colour gradually instead of at the cross
+    */
+    const blendedAround = (x, y) => {
+      // Clockwise from the top right, each colour at the middle of its quarter: blue (45°), yellow (135°), purple (225°), red (315°)
+      const order = [ FAVICON_QUARTERS[ 1 ], FAVICON_QUARTERS[ 3 ], FAVICON_QUARTERS[ 2 ], FAVICON_QUARTERS[ 0 ] ]
+      const turn = ((Math.atan2( x + 0.5 - 8, -(y + 0.5 - 8) ) / (Math.PI * 2) + 1) % 1) * 4 - 0.5
+      const index = Math.floor( turn )
+      const between = turn - index
+      const from = order[ (index + 4) % 4 ]
+      const to = order[ (index + 5) % 4 ]
+
+      // Solid most of the way; only a short stretch where two colours meet is dithered between them
+      if (between < 0.35) return from
+      if (between > 0.65) return to
+      return BAYER[ (y % 4) * 4 + (x % 4) ] / 16 < (between - 0.35) / 0.3 ? to : from
+    }
+
+    const squaredRing = (inner, outer, metric, light = 0.3, shade = 0.28, { isWhole = false, isBlended = false } = {}) => {
+      const isRing = (x, y) => {
+        if (x < 0 || y < 0 || x > 15 || y > 15) return false
+        if (!isWhole && (x === 7 || x === 8 || y === 7 || y === 8)) return false
+        const distance = metric( Math.abs( x + 0.5 - 8 ), Math.abs( y + 0.5 - 8 ) )
+        return distance > inner && distance <= outer
+      }
+
+      for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+        if (!isRing( x, y )) continue
+        const base = isBlended ? blendedAround( x, y ) : FAVICON_QUARTERS[ (y < 8 ? 0 : 2) + (x < 8 ? 0 : 1) ]
+        const color = !isRing( x, y - 1 ) || !isRing( x - 1, y ) ? mixHex( base, `#ffffff`, light ) : !isRing( x, y + 1 ) || !isRing( x + 1, y ) ? mixHex( base, `#000000`, shade ) : base
+        put( ctx, color, x, y )
+      }
+    }
+
+    // Square distance with the ring's own corners notched off (Chebyshev, minus the outermost corner pixels)
+    const notchedSquare = (dx, dy) => Math.max( dx, dy ) + (dx > 6 && dy > 6 ? 1 : 0)
+    const squircle = (dx, dy) => (dx ** 4 + dy ** 4) ** 0.25
+
+    // The squircle softer: less light, and without the dark square around it (filled inside, or not at all)
+    // Less like four separate tool heads: the ring whole, thinner, or with its colours blending round it
+    if (kind === `ringWhole` || kind === `ringThinWhole` || kind === `ringBlended`) {
+      for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (squircle( Math.abs( x + 0.5 - 8 ), Math.abs( y + 0.5 - 8 ) ) <= 7.2) put( ctx, PIX.dark, x, y )
+      if (kind === `ringWhole`) squaredRing( 5.2, 7.2, squircle, 0.12, 0.2, { isWhole:true } )
+      if (kind === `ringThinWhole`) squaredRing( 6.2, 7.2, squircle, 0, 0, { isWhole:true } )
+      if (kind === `ringBlended`) squaredRing( 5.2, 7.2, squircle, 0.1, 0.16, { isWhole:true, isBlended:true } )
+      favicon.style.setProperty( `--cactus`, kind === `ringThinWhole` ? 0.58 : 0.5 )
+      return
+    }
+
+    if (kind === `squircleSoft` || kind === `squircleBare` || kind === `squircleOpen`) {
+      if (kind === `squircleSoft`) roundedSquare( PIX.dark )
+      if (kind === `squircleBare`) {
+        for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (squircle( Math.abs( x + 0.5 - 8 ), Math.abs( y + 0.5 - 8 ) ) <= 7.2) put( ctx, PIX.dark, x, y )
+      }
+      squaredRing( 5.2, 7.2, squircle, 0.12, 0.2 )
+      favicon.style.setProperty( `--cactus`, 0.5 )
+      return
+    }
+
+    if (kind === `squareRing` || kind === `squareRingThin` || kind === `squircle`) {
+      roundedSquare( PIX.dark )
+      if (kind === `squareRing`) squaredRing( 5, 7, notchedSquare )
+      if (kind === `squareRingThin`) squaredRing( 6, 7, notchedSquare )
+      if (kind === `squircle`) squaredRing( 5.2, 7.2, squircle )
+      favicon.style.setProperty( `--cactus`, kind === `squareRingThin` ? 0.56 : 0.5 )
+      return
+    }
+
+    // A rounded square: the corners' single pixels left out
+    ctx.fillStyle = PIX.dark
+    ctx.fillRect( 0, 0, 16, 16 )
+    for (const [ x, y ] of [ [ 0, 0 ], [ 15, 0 ], [ 0, 15 ], [ 15, 15 ] ]) ctx.clearRect( x, y, 1, 1 )
+
+    ;[ [ 1, 4, 3 ], [ 12, 6, 3 ], [ 1, 10, 3 ], [ 12, 12, 3 ] ].forEach( ([ x, y, length ], index) => {
+      ctx.fillStyle = PIX.accents[ index ]
+      ctx.fillRect( x, y, length, 1 )
+    } )
+
+    favicon.style.setProperty( `--cactus`, 0.66 )
+  }
+
+  /**
+   * The soft squircle favicon on a `grid` × `grid` canvas: the dark square with notched corners, and a squircle ring in the
+   * favicon's colours, cut by a two pixel cross, its edges softly lit at the top left and shaded at the bottom right. The
+   * shape keeps its proportions on every grid; the cross, the corner cuts and the shading are drawn in the grid's own pixels,
+   * so the frame and the ring share one resolution
+   */
+  function drawFineSquircle( canvas, grid, { isWhole = false, isBlended = false } = {} ) {
+    const ctx = canvas.getContext( `2d` )
+    const scale = grid / 16
+    const middle = grid / 2
+    const notch = Math.max( 1, Math.round( scale ) )
+    const squircle = (dx, dy) => (dx ** 4 + dy ** 4) ** 0.25
+
+    canvas.width = grid
+    canvas.height = grid
+
+    // The dark square, its corners cut diagonally out of this grid's own pixels (one on the 16 grid, a small step of three on
+    // finer grids), so the frame is drawn at the same resolution as the ring
+    for (let y = 0; y < grid; y++) for (let x = 0; x < grid; x++) {
+      const corner = Math.min( x, grid - 1 - x ) + Math.min( y, grid - 1 - y )
+      if (corner >= notch) put( ctx, PIX.dark, x, y )
+    }
+
+    const isRing = (x, y) => {
+      if (x < 0 || y < 0 || x >= grid || y >= grid) return false
+      if (!isWhole && (Math.abs( x + 0.5 - middle ) < 1 || Math.abs( y + 0.5 - middle ) < 1)) return false
+      const distance = squircle( Math.abs( x + 0.5 - middle ), Math.abs( y + 0.5 - middle ) )
+      return distance > 5.2 * scale && distance <= 7.2 * scale
+    }
+
+    for (let y = 0; y < grid; y++) for (let x = 0; x < grid; x++) {
+      if (!isRing( x, y )) continue
+      const base = isBlended ? blendedAt( x, y, middle ) : FAVICON_QUARTERS[ (y < middle ? 0 : 2) + (x < middle ? 0 : 1) ]
+      const [ light, shade ] = isBlended ? [ 0.1, 0.16 ] : [ 0.12, 0.2 ]
+      const color = !isRing( x, y - 1 ) || !isRing( x - 1, y ) ? mixHex( base, `#ffffff`, light ) : !isRing( x, y + 1 ) || !isRing( x + 1, y ) ? mixHex( base, `#000000`, shade ) : base
+      put( ctx, color, x, y )
+    }
+  }
+
+  /**
+   * A colour going round a ring centred on `middle`: each quarter's colour in its middle, and only a short stretch where two
+   * colours meet dithered between them (in the grid's own pixels)
+   */
+  function blendedAt( x, y, middle ) {
+    // Clockwise from the top right, each colour at the middle of its quarter: blue (45°), yellow (135°), purple (225°), red (315°)
+    const order = [ FAVICON_QUARTERS[ 1 ], FAVICON_QUARTERS[ 3 ], FAVICON_QUARTERS[ 2 ], FAVICON_QUARTERS[ 0 ] ]
+    const turn = ((Math.atan2( x + 0.5 - middle, -(y + 0.5 - middle) ) / (Math.PI * 2) + 1) % 1) * 4 - 0.5
+    const index = Math.floor( turn )
+    const between = turn - index
+    const from = order[ (index + 4) % 4 ]
+    const to = order[ (index + 5) % 4 ]
+
+    if (between < 0.35) return from
+    if (between > 0.65) return to
+    return BAYER[ (y % 4) * 4 + (x % 4) ] / 16 < (between - 0.35) / 0.3 ? to : from
+  }
+
+  function put( ctx, color, x, y ) {
+    ctx.fillStyle = color
+    ctx.fillRect( x, y, 1, 1 )
+  }
+
+  function append( id, content, caption, isLight = false ) {
+    document.getElementById( id ).insertAdjacentHTML( `beforeend`, `<figure><div class="swatch ${isLight ? `isLight` : ``}">${content}</div><figcaption>${caption}</figcaption></figure>` )
+  }
+
+  /* ---- Export (brand-smooth.html?export): the chosen logo and favicon as data, read by tools/export-brand.py ---- */
+
+  // The final choice: the logo ending and the favicon
+  const FINAL = { ending:`Romb z dużą gwiazdką`, lightStar:`navy`, favicon:`squircleFine32`, size:96 }
+
+  /**
+   * Draws the chosen logo on the dark and the light background exactly as the page does, then writes everything an exporter
+   * needs into <pre id="export">: each logo's box, its cactus's and wordmark's places, its pixel sky as runs of colour, and
+   * the favicon's pixels on its 32 and 16 grids
+   */
+  function exportFinal() {
+    const area = document.body.appendChild( Object.assign( document.createElement( `div` ), { id:`exportArea` } ) )
+    const variant = ENDING_GROUPS.flatMap( group => group.variants ).find( item => item.name === FINAL.ending )
+
+    for (const theme of [ `dark`, `light` ]) {
+      area.insertAdjacentHTML( `beforeend`, `<div class="row" id="export-${theme}"></div>` )
+      appendHybrid( `export-${theme}`, FINAL.size, theme, theme === `light`, { ...variant, lightStar:FINAL.lightStar } )
+    }
+
+    // Each logo is ready once its sky canvas is drawn (after the cactus image decodes)
+    const isReady = () => [ ...area.querySelectorAll( `.hybrid` ) ].every( wrapper => wrapper.querySelector( `canvas` ) )
+    const wait = () => isReady() ? write() : setTimeout( wait, 100 )
+    wait()
+
+    function write() {
+      const logos = [ ...area.querySelectorAll( `.hybrid` ) ].map( (wrapper, index) => {
+        const box = wrapper.getBoundingClientRect()
+        const signet = wrapper.querySelector( `.signet > img` ).getBoundingClientRect()
+        const word = wrapper.querySelector( `.word` ).getBoundingClientRect()
+        const canvas = wrapper.querySelector( `canvas` )
+        const unit = canvas.offsetWidth / canvas.width
+
+        return {
+          theme: index ? `light` : `dark`,
+          background: index ? `#f2eee4` : `#16152c`,
+          size: FINAL.size,
+          width: box.width,
+          height: box.height,
+          unit,
+          signet: { left:signet.left - box.left, top:signet.top - box.top, width:signet.width, height:signet.height },
+          wordLeft: word.left - box.left,
+          letterSpacing: FINAL.size * 0.19,
+          pixels: runsOf( canvas ),
+        }
+      } )
+
+      const favicon = {}
+      for (const grid of [ 32, 16 ]) {
+        const canvas = document.createElement( `canvas` )
+        drawFineSquircle( canvas, grid )
+        favicon[ grid ] = runsOf( canvas )
+      }
+
+      document.body.insertAdjacentHTML( `beforeend`, `<pre id="export">${JSON.stringify( { logos, favicon, cactus:0.5 } )}</pre>` )
+    }
+  }
+
+  // A canvas's opaque pixels as horizontal runs of one colour: [ x, y, length, `#rrggbb` ]
+  function runsOf( canvas ) {
+    const { data, width, height } = canvas.getContext( `2d` ).getImageData( 0, 0, canvas.width, canvas.height )
+    const hex = index => `#${[ 0, 1, 2 ].map( offset => data[ index + offset ].toString( 16 ).padStart( 2, `0` ) ).join( `` )}`
+    const runs = []
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; ) {
+        const index = (y * width + x) * 4
+        if (data[ index + 3 ] < 128) { x++; continue }
+
+        const color = hex( index )
+        let length = 1
+        while (x + length < width && data[ index + length * 4 + 3 ] >= 128 && hex( index + length * 4 ) === color) length++
+        runs.push([ x, y, length, color ])
+        x += length
+      }
+    }
+
+    return runs
+  }
+</script>
+</body>
+</html>

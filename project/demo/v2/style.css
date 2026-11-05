@@ -1,0 +1,440 @@
+/* Cactu home page, version 2: the night version with pixel fields, character worlds and the cast panel */
+
+/*
+  v1 at night, in the spirit of the current site: a black void with pieces of pixel sky whose edges are stepped
+  and irregular, and the drifting code lines as texture. The pieces are pixel art (one unit = 3 px, drawn in buildField);
+  the type stays smooth. Colours: the brand's fixed dark navy (BRAND_DARK in main.js) is the base of the whole page; the
+  selected character adds its light (edges, glows, highlights) and its own night in the skies and grounds of its worlds.
+  The logo is the favourite brand.html setting: g=moundLayers p=aligned f=fit e=dots d=grass+lines+stars t=dark m=bracesArc
+*/
+
+/* Registered, so the page fades between the characters' colours */
+@property --void { syntax:"<color>"; inherits:true; initial-value:#09090f }
+@property --glow { syntax:"<color>"; inherits:true; initial-value:#5b8ff0 }
+
+:root {
+  --rail: 208px;
+
+  --void: #09090f;
+  --glow: #5b8ff0;
+  --ink: #ecebf5;
+  --ink-soft: #a9a6c8;
+  --ink-faint: #9592ba;
+  --line: #ffffff14;
+  --card: color-mix( in oklab, var( --void ) 88%, var( --glow ) );
+
+  --green: #5da234;   --green-light: #8fd14a;
+  --yellow: #e5be4b;  --yellow-ink: #2a1d05;
+  --red: #ca5b35;
+  --blue: #4273b3;
+  --purple: #7a55ff;
+
+  /* The brand font (loaded from cactu-font.js) for headings and names; the few glyphs it lacks, like # and braces, fall back */
+  --font-cactu: 400 1em / 1 cactu, "Bricolage Grotesque", sans-serif;
+  --cactu-spacing: 0.09em;
+
+  /* The drifting code lines of the old site, in the page's pixels: light and dark dashes that show on any colour */
+  --code-lines: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16' width='192' height='48' shape-rendering='crispEdges'%3E%3Crect x='2' y='3' width='5' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='14' y='2' width='3' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='30' y='4' width='7' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='46' y='3' width='4' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='56' y='12' width='5' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='8' y='12' width='4' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='24' y='13' width='3' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='40' y='11' width='6' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='60' y='7' width='2' height='1' fill='%23fff' fill-opacity='.1'/%3E%3Crect x='20' y='5' width='4' height='1' fill='%23000' fill-opacity='.12'/%3E%3Crect x='52' y='6' width='6' height='1' fill='%23000' fill-opacity='.12'/%3E%3Crect x='4' y='8' width='3' height='1' fill='%23000' fill-opacity='.12'/%3E%3Crect x='35' y='8' width='3' height='1' fill='%23000' fill-opacity='.12'/%3E%3Crect x='12' y='10' width='2' height='1' fill='%23000' fill-opacity='.12'/%3E%3Crect x='27' y='10' width='3' height='1' fill='%23000' fill-opacity='.12'/%3E%3C/svg%3E");
+  --font-display: 800 1em / 1 "Bricolage Grotesque", sans-serif;
+  --font-pixel: 400 10px / 1.2 Silkscreen, monospace;
+
+  transition: --void 0.8s, --glow 0.8s;
+}
+
+* { box-sizing:border-box; margin:0; padding:0 }
+[hidden] { display:none !important }
+
+html {
+  background:
+    radial-gradient( 90% 60% at 80% -10%, color-mix( in oklab, var( --glow ) 5%, transparent ), transparent 70% ) fixed,
+    radial-gradient( 70% 50% at 0% 100%, color-mix( in oklab, var( --glow ) 3.5%, transparent ), transparent 70% ) fixed,
+    linear-gradient( 160deg, color-mix( in oklab, var( --glow ) 2%, var( --void ) ), var( --void ) 55%, color-mix( in oklab, var( --glow ) 1.5%, var( --void ) ) ) fixed;
+  scrollbar-color: color-mix( in oklab, var( --glow ) 25%, var( --void ) ) var( --void );
+}
+
+html.isFlat { background:var( --void ) }
+
+body { color:var( --ink ); font:16px / 1.55 "Atkinson Hyperlegible", sans-serif; overflow-x:hidden }
+
+h1, h2, h3 { font:var( --font-display ); letter-spacing:-0.02em }
+a { color:inherit }
+:focus-visible { outline:2px solid var( --glow ); outline-offset:4px }
+
+.cactu { font:var( --font-cactu ); letter-spacing:var( --cactu-spacing ) }
+.visuallyHidden { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset( 50% ) }
+.pixelLabel { font:var( --font-pixel ); letter-spacing:0.06em; text-transform:uppercase; color:var( --ink-faint ) }
+.icon { width:24px; height:24px; flex-shrink:0 }
+
+/* The void reacts to the pointer: cells of the unit grid light up and shrink away */
+.trail { position:fixed; inset:0; z-index:0; pointer-events:none }
+
+/* ================= FIELDS: pieces of pixel art with stepped edges ================= */
+
+.field { position:relative; isolation:isolate }
+.fieldCanvas { position:absolute; left:0; top:0; z-index:-1; image-rendering:pixelated; pointer-events:none }
+.field:is( [data-field="window"], [data-field="hero"] ) > .fieldCanvas { z-index:3 }
+
+/* Windows show a living pixel world, cut to the field's shape */
+.world { position:absolute; inset:0; overflow:hidden }
+.world > canvas { position:absolute; image-rendering:pixelated; transition:opacity 0.35s }
+.world.isSwitching > canvas { opacity:0 }
+.banner { position:absolute; left:0; top:0; z-index:1; margin:0 }
+.banner canvas { display:block; image-rendering:pixelated }
+
+/* Characters live on the top edges of fields and walk up and down their steps */
+.walker { position:absolute; left:0; z-index:4; image-rendering:pixelated; pointer-events:none }
+
+/* ================= RAIL ================= */
+
+/*
+  A column as tall as the page, so what is in it can stick: the signet stays at the top, and the dock (navigation and
+  account) starts in the void at the hero's bottom left corner and sticks under the signet once the page scrolls up to it.
+  The hero's stepped left edge keeps out of the way of both
+*/
+body { position:relative }
+
+.rail { position:absolute; inset:0 auto 0 0; z-index:10; width:var( --rail ); padding:22px 0 0 24px; pointer-events:none }
+.rail > * { pointer-events:auto }
+
+.railLogo { position:sticky; top:22px; display:block; width:fit-content }
+.railLogo canvas { display:block; image-rendering:pixelated; transition:translate 0.2s }
+.railLogo:hover canvas { translate:0 -3px }
+
+.dock { position:sticky; top:var( --dock-top, 150px ); display:flex; flex-direction:column; gap:22px; width:fit-content; margin-top:var( --dock-offset, 40px ) }
+.railLinks { display:flex; flex-direction:column; align-items:flex-start; gap:14px }
+
+/*
+  The bevelled buttons of the current site, drawn with the page's 3px pixels: notched corners, a light top left edge and a
+  dark bottom right one, an outline that goes around the notches (four shadows of the notched shape) and one pixel of
+  depth below. The code lines of the old site drift across them. Each is as wide as its words, so the column stays ragged.
+
+  States, all in whole pixels:
+  hover   the button brightens and its code lines slide
+  focus   a pixel frame in the focus colour, notched like the button, a pixel of void away from it
+  active  it sinks onto its depth and its bevel flips, as if pressed into the page
+*/
+.navButton {
+  --_pixel: 3px;
+  --_x: 0px;
+  --_y: 0px;
+  --_depth: var( --_pixel );
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 18px 0 14px;
+  color: var( --_fg, white );
+  font: 700 16px "Atkinson Hyperlegible", sans-serif;
+  text-decoration: none;
+  translate: var( --_x ) var( --_y );
+  filter: drop-shadow( var( --_pixel ) 0 0 var( --_outline, #07070f ) ) drop-shadow( calc( var( --_pixel ) * -1 ) 0 0 var( --_outline, #07070f ) ) drop-shadow( 0 var( --_pixel ) 0 var( --_outline, #07070f ) ) drop-shadow( 0 calc( var( --_pixel ) * -1 ) 0 var( --_outline, #07070f ) ) drop-shadow( 0 var( --_depth ) 0 #00000080 );
+  transition: translate 0.15s ease-out;
+}
+
+.navButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var( --code-lines ) 0 50% / 192px 48px repeat-x, var( --_bg );
+  box-shadow: inset var( --_pixel ) var( --_pixel ) 0 var( --_light, color-mix( in oklab, var( --_bg ) 62%, white ) ), inset calc( var( --_pixel ) * -1 ) calc( var( --_pixel ) * -1 ) 0 var( --_dark, color-mix( in oklab, var( --_bg ) 65%, black ) );
+  clip-path: polygon( var( --_pixel ) 0, calc( 100% - var( --_pixel ) ) 0, calc( 100% - var( --_pixel ) ) var( --_pixel ), 100% var( --_pixel ), 100% calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) 100%, var( --_pixel ) 100%, var( --_pixel ) calc( 100% - var( --_pixel ) ), 0 calc( 100% - var( --_pixel ) ), 0 var( --_pixel ), var( --_pixel ) var( --_pixel ) );
+  image-rendering: pixelated;
+  transition: background-position 0.35s ease-out, filter 0.15s ease-out;
+}
+
+/* The focus frame: a ring of pixels around the button, its corners notched too */
+.navButton::after {
+  content: "";
+  position: absolute;
+  inset: calc( var( --_pixel ) * -3 );
+  border: var( --_pixel ) solid var( --_focus, var( --yellow ) );
+  clip-path: polygon( var( --_pixel ) 0, calc( 100% - var( --_pixel ) ) 0, calc( 100% - var( --_pixel ) ) var( --_pixel ), 100% var( --_pixel ), 100% calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) 100%, var( --_pixel ) 100%, var( --_pixel ) calc( 100% - var( --_pixel ) ), 0 calc( 100% - var( --_pixel ) ), 0 var( --_pixel ), var( --_pixel ) var( --_pixel ) );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.navButton:hover::before { background-position:-24px 50%, 0 0; filter:brightness( 1.15 ) saturate( 1.1 ) }
+.navButton:focus-visible { outline:none }
+.navButton:focus-visible::after { opacity:1 }
+
+.rail .navButton.isActive { --_x:8px }
+
+.navButton:active { --_y:var( --_pixel ); --_depth:0px }
+.navButton:active::before { filter:brightness( 0.9 ); background-position:-24px 50%, 0 0; box-shadow:inset var( --_pixel ) var( --_pixel ) 0 var( --_dark, color-mix( in oklab, var( --_bg ) 65%, black ) ), inset calc( var( --_pixel ) * -1 ) calc( var( --_pixel ) * -1 ) 0 var( --_light, color-mix( in oklab, var( --_bg ) 62%, white ) ) }
+
+/* Coming soon: no states, it is not a link yet */
+.navButton.isSoon { --_bg:var( --_dim ); color:#ffffffb0; cursor:default }
+.navButton.isSoon { --_x:0px; --_y:0px }
+.navButton.isSoon::before { background-position:0 50%, 0 0; filter:none }
+.navButton.isSoon small { font:var( --font-pixel ); font-size:8px; color:#ffffffa0 }
+.navButton.isSoon span:last-child { display:flex; flex-direction:column; line-height:1.1 }
+
+.railAccount { display:flex; align-items:center; gap:12px; margin-left:-8px; padding:8px; border:0; background:none; clip-path:polygon( 3px 0, calc( 100% - 3px ) 0, calc( 100% - 3px ) 3px, 100% 3px, 100% calc( 100% - 3px ), calc( 100% - 3px ) calc( 100% - 3px ), calc( 100% - 3px ) 100%, 3px 100%, 3px calc( 100% - 3px ), 0 calc( 100% - 3px ), 0 3px, 3px 3px ); color:inherit; font:inherit; text-align:left; cursor:pointer }
+.railAccount:hover { background:#ffffff0c }
+.railAccount canvas { width:44px; height:44px; clip-path:polygon( 3px 0, calc( 100% - 3px ) 0, calc( 100% - 3px ) 3px, 100% 3px, 100% calc( 100% - 3px ), calc( 100% - 3px ) calc( 100% - 3px ), calc( 100% - 3px ) 100%, 3px 100%, 3px calc( 100% - 3px ), 0 calc( 100% - 3px ), 0 3px, 3px 3px ); image-rendering:pixelated }
+.railAccount b { display:block; font:var( --font-cactu ); letter-spacing:var( --cactu-spacing ); font-size:17px }
+.xpBlocks { display:flex; gap:2px; margin-top:5px }
+.xpBlocks i { width:8px; height:8px; background:color-mix( in oklab, var( --glow ) 18%, var( --void ) ) }
+.xpBlocks i.isFull { background:var( --green-light ) }
+
+/* ================= PAGE ================= */
+
+.page { position:relative; z-index:1; margin-left:var( --rail ) }
+
+/*
+  Hero: the night world, flush with the top and right of the window. On the left the void bites into it in a slanted
+  staircase around the signet and the dock; below, the characters hang from its ground as tabs (drawn in buildHero)
+*/
+.hero { position:relative; margin-left:calc( var( --rail ) * -1 ) }
+.heroField { height:max( 600px, min( 90vh, 960px ) ) }
+
+/*
+  What is happening now: a dark pixel button (built on .navButton) next to the top of the cast panel, in the colours of the
+  night with the jam's yellow: a faint bevel, a pale outline around the notches, and a pixel that pulses like a live dot
+*/
+.nowChip {
+  --_bg: color-mix( in oklab, var( --void ) 82%, var( --glow ) );
+  --_fg: var( --ink );
+  --_light: #ffffff1a;
+  --_dark: #00000070;
+  --_outline: #ffffff2e;
+
+  position: absolute;
+  top: 40px;
+  right: calc( 40px + var( --panel-width ) + 18px );
+  z-index: 6;
+  gap: 12px;
+  height: 46px;
+  padding-inline: 16px 18px;
+}
+
+.nowChip .dot { width:9px; height:9px; background:var( --yellow ); box-shadow:0 0 0 0 #e5be4b80; animation:pulse 2s steps( 4 ) infinite }
+.nowChip .arrow { color:var( --yellow ); transition:translate 0.2s }
+.nowChip:hover .arrow { translate:4px 0 }
+@keyframes pulse { 70% { box-shadow:0 0 0 9px #e5be4b00 } 100% { box-shadow:0 0 0 0 #e5be4b00 } }
+
+/*
+  The cast: a pixel panel standing on the right side of the hero. Its frame stays still and only the list inside scrolls,
+  so any number of characters fits; the order is shuffled on every visit. The selected character's row is lit in its colour
+*/
+.hero { --panel-width:312px }
+.castPanel { position:absolute; top:40px; right:40px; bottom:84px; z-index:6; display:flex; flex-direction:column; width:var( --panel-width ); padding:18px 12px 14px }
+.castPanel header { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:0 10px 12px }
+.castPanel h2 { font:var( --font-cactu ); font-size:24px; letter-spacing:var( --cactu-spacing ) }
+
+.roster {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 4px;
+  overflow-y: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix( in oklab, var( --glow ) 45%, transparent ) transparent;
+  mask-image: linear-gradient( transparent, #000 12px, #000 calc( 100% - 18px ), transparent );
+}
+
+/* Rows have the page's notched pixel corners */
+.member {
+  --_pixel: 3px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 10px 6px 6px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  clip-path: polygon( var( --_pixel ) 0, calc( 100% - var( --_pixel ) ) 0, calc( 100% - var( --_pixel ) ) var( --_pixel ), 100% var( --_pixel ), 100% calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) 100%, var( --_pixel ) 100%, var( --_pixel ) calc( 100% - var( --_pixel ) ), 0 calc( 100% - var( --_pixel ) ), 0 var( --_pixel ), var( --_pixel ) var( --_pixel ) );
+  transition: background 0.2s;
+}
+
+.member:focus-visible { outline:none; background:#ffffff14; box-shadow:inset 0 0 0 3px var( --glow ) }
+.member:not( .isSelected, .isLocked ):hover { background:#ffffff10 }
+.member:not( .isSelected, .isLocked ):hover .portrait { translate:0 -3px }
+.member:not( .isLocked ):active { background:#ffffff1c }
+.member:not( .isLocked ):active .portrait { translate:0 3px }
+.member b { display:block; margin-bottom:3px; font:var( --font-cactu ); font-size:15px; letter-spacing:var( --cactu-spacing ) }
+.member small { display:block; color:var( --ink-faint ); font-size:12px; line-height:1.3 }
+.member.isSelected { background:color-mix( in oklab, var( --character ) 24%, transparent ); box-shadow:inset 3px 0 0 var( --character ) }
+.member.isSelected b { color:color-mix( in oklab, var( --character ) 65%, white ) }
+.member.isSelected small { color:var( --ink-soft ) }
+.member.isLocked { cursor:default }
+.member.isLocked b { color:var( --ink-faint ) }
+
+.portrait { --_pixel:3px; display:grid; place-items:center; width:46px; height:46px; flex-shrink:0; background:#00000040; clip-path:inherit; transition:translate 0.2s }
+.portrait img { width:76%; image-rendering:pixelated }
+.member.isSelected .portrait { background:color-mix( in oklab, var( --character ) 35%, #0006 ) }
+.portrait.isUnknown { color:var( --ink-faint ); font:var( --font-cactu ); font-size:18px; background:repeating-linear-gradient( 45deg, #ffffff0c 0 3px, transparent 3px 6px ) }
+
+/* ---- Sections ---- */
+
+.section { margin-top:150px }
+.sectionHead { margin:0 0 40px 72px }
+.sectionHead h2 { display:flex; align-items:center; gap:0.35em; font:var( --font-cactu ); font-size:clamp( 36px, 4.4vw, 58px ); letter-spacing:var( --cactu-spacing ) }
+
+/* Headings sit in curly brackets, the cuts between the cactus's arms and its trunk */
+.brace { color:var( --green ); font:700 1.1em / 1 "Bricolage Grotesque", sans-serif; translate:0 -0.06em }
+
+/* ---- CactuJam: a bright yellow piece of land in the void ---- */
+
+.jamField { margin-top:170px; padding:110px 72px 120px }
+.jam { display:grid; grid-template-columns:minmax( 0, 1fr ) minmax( 0, 1fr ); gap:64px; align-items:center; color:var( --yellow-ink ) }
+.jam .pixelLabel { color:#4d3605 }
+.jam h2 { display:flex; align-items:baseline; flex-wrap:wrap; gap:0 0.3em; margin-top:16px; font-size:clamp( 52px, 6.4vw, 96px ) }
+  .jam h2 .number { color:#fff8e2; font:var( --font-cactu ); letter-spacing:var( --cactu-spacing ); -webkit-text-stroke:3px var( --yellow-ink ); paint-order:stroke fill }
+.jamTheme { margin:18px 0 32px; font:700 26px / 1.2 "Bricolage Grotesque"; color:#5a3f06 }
+
+/* Phases as rows of pixel blocks: the ones you read are smooth, the ones that fill are pixels */
+.phases { display:grid; grid-template-columns:repeat( 4, 1fr ); gap:14px; max-width:560px }
+.phase .blocks { display:flex; gap:3px }
+.phase .blocks i { flex:1; height:12px; background:#00000020 }
+.phase .blocks i.isFull { background:var( --yellow-ink ) }
+.phase .pixelLabel { display:block; margin-top:8px; font-size:9px }
+.phase.isNow .pixelLabel { color:var( --yellow-ink ) }
+
+.jamActions { display:flex; align-items:center; gap:18px; margin-top:36px; flex-wrap:wrap }
+.jamActions .navButton { --_bg:var( --yellow-ink ); --_fg:var( --yellow ); --_focus:var( --yellow-ink ); height:56px; padding-inline:20px }
+.xpPill { padding:7px 13px; background:#fff8e2; color:var( --yellow-ink ); font-weight:700; font-size:14px; box-shadow:inset -3px -3px 0 #e6cf98; clip-path:polygon( 3px 0, calc( 100% - 3px ) 0, calc( 100% - 3px ) 3px, 100% 3px, 100% calc( 100% - 3px ), calc( 100% - 3px ) calc( 100% - 3px ), calc( 100% - 3px ) 100%, 3px 100%, 3px calc( 100% - 3px ), 0 calc( 100% - 3px ), 0 3px, 3px 3px ) }
+
+/*
+  Games are cartridges with pixel screens, scattered on the land: drawn like the buttons, with notched corners, a bevel and
+  a stepped outline in the land's dark brown, plus a hard pixel shadow. They sit at slightly different heights instead of
+  being tilted, which would break the pixel grid
+*/
+.cartridges { display:grid; grid-template-columns:repeat( 3, minmax( 0, 150px ) ); gap:30px 24px; justify-content:center }
+
+.cartridge {
+  --_pixel: 3px;
+  --_outline: #5a3d0c;
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px 12px 12px;
+  color: #e2def4;
+  text-decoration: none;
+  translate: 0 var( --_offset, 0 );
+  filter: drop-shadow( var( --_pixel ) 0 0 var( --_outline ) ) drop-shadow( calc( var( --_pixel ) * -1 ) 0 0 var( --_outline ) ) drop-shadow( 0 var( --_pixel ) 0 var( --_outline ) ) drop-shadow( 0 calc( var( --_pixel ) * -1 ) 0 var( --_outline ) ) drop-shadow( 6px 6px 0 #5a3d0c59 );
+  transition: translate 0.15s ease-out;
+}
+
+.cartridge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #24203a;
+  box-shadow: inset var( --_pixel ) var( --_pixel ) 0 #3a3558, inset calc( var( --_pixel ) * -1 ) calc( var( --_pixel ) * -1 ) 0 #16131f;
+  clip-path: polygon( var( --_pixel ) 0, calc( 100% - var( --_pixel ) ) 0, calc( 100% - var( --_pixel ) ) var( --_pixel ), 100% var( --_pixel ), 100% calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) 100%, var( --_pixel ) 100%, var( --_pixel ) calc( 100% - var( --_pixel ) ), 0 calc( 100% - var( --_pixel ) ), 0 var( --_pixel ), var( --_pixel ) var( --_pixel ) );
+}
+
+.cartridge::after { content:""; position:absolute; inset:-12px; border:3px solid var( --yellow-ink ); clip-path:polygon( var( --_pixel ) 0, calc( 100% - var( --_pixel ) ) 0, calc( 100% - var( --_pixel ) ) var( --_pixel ), 100% var( --_pixel ), 100% calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) calc( 100% - var( --_pixel ) ), calc( 100% - var( --_pixel ) ) 100%, var( --_pixel ) 100%, var( --_pixel ) calc( 100% - var( --_pixel ) ), 0 calc( 100% - var( --_pixel ) ), 0 var( --_pixel ), var( --_pixel ) var( --_pixel ) ); opacity:0; pointer-events:none }
+.cartridge:hover { translate:0 calc( var( --_offset, 0px ) - 9px ) }
+.cartridge:hover::before { background:#2e2948 }
+.cartridge:hover canvas { filter:brightness( 1.12 ) }
+.cartridge:focus-visible { outline:none }
+.cartridge:focus-visible::after { opacity:1 }
+.cartridge:active { translate:0 calc( var( --_offset, 0px ) + 3px ) }
+.cartridge:active::before { box-shadow:inset 3px 3px 0 #16131f, inset -3px -3px 0 #3a3558 }
+
+/* The screen sits in a dark pixel frame */
+.cartridge canvas { width:100%; aspect-ratio:1; box-shadow:0 0 0 3px #14121f; image-rendering:pixelated }
+.cartridge span { padding-left:3px; font-size:13px; font-weight:700 }
+
+/* ---- News: smooth notes on a piece of the selected character's sky ---- */
+
+.newsField { margin-right:40px; padding:84px 72px 96px }
+.notes { display:grid; grid-template-columns:repeat( 4, minmax( 0, 1fr ) ); gap:22px }
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 24px 26px;
+  transition: translate 0.2s;
+}
+
+.note:hover { translate:0 -6px }
+
+/* The drifting code line of the old site, in the page's pixels */
+.note::before { content:""; width:45px; height:6px; margin-bottom:8px; background:var( --_color ); box-shadow:3px 3px 0 #00000059 }
+.note h3 { font-size:22px; line-height:1.15 }
+.note p { color:var( --ink-soft ); font-size:15px }
+
+/* ---- Community: small windows into the characters' worlds ---- */
+
+.portals { display:grid; grid-template-columns:repeat( 3, minmax( 0, 1fr ) ); gap:40px; margin:0 40px 0 72px }
+.portal { display:flex; flex-direction:column; text-decoration:none }
+.portalField { height:230px; transition:translate 0.2s }
+.portal:hover .portalField { translate:0 -6px }
+.portal:focus-visible { outline:none }
+.portal:focus-visible .portalField { outline:3px solid var( --_color ); outline-offset:6px }
+.portal:active .portalField { translate:0 -2px }
+.portal h3 { display:flex; align-items:center; gap:12px; margin-top:22px; font:var( --font-cactu ); font-size:28px; letter-spacing:var( --cactu-spacing ) }
+.portal h3::after { content:"→"; color:var( --_color ); font:var( --font-display ); transition:translate 0.2s }
+.portal:hover h3::after { translate:6px 0 }
+.portal p { margin-top:10px; color:var( --ink-soft ) }
+.portal .pixelLabel { margin-top:12px; color:var( --_color ) }
+
+/* ---- Footer: the selected character's ground at night, with its plants and things on it ---- */
+
+/* As wide as the window: the ground also runs under the navigation column */
+.footerField { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; min-height:320px; margin:180px 0 0 calc( var( --rail ) * -1 ); padding:0 40px 36px; color:var( --ink-soft ) }
+.footerField b { font:var( --font-cactu ); letter-spacing:var( --cactu-spacing ); font-size:26px; color:var( --ink ) }
+.footerField span, .footerField nav { display:flex; align-items:baseline; gap:12px 20px; flex-wrap:wrap }
+.footerField a { color:var( --ink ); text-underline-offset:4px; text-decoration-thickness:2px; text-decoration-color:color-mix( in oklab, var( --glow ) 60%, transparent ) }
+.footerField a:hover { color:var( --glow ) }
+.footerField a[aria-current] { text-decoration:none; color:var( --ink-soft ) }
+
+/* ================= SMALLER SCREENS ================= */
+
+@media (max-width: 1280px) {
+  .notes { grid-template-columns:repeat( 2, minmax( 0, 1fr ) ) }
+  .jam { grid-template-columns:1fr }
+}
+
+@media (max-width: 820px) {
+  :root { --rail:0px }
+
+  .rail { position:fixed; inset:auto 0 0; display:flex; align-items:center; width:auto; height:76px; padding:0 12px; background:var( --void ); border-top:1px solid var( --line ) }
+  .railLogo, .railAccount div { display:none }
+  .dock { position:static; flex:1; flex-direction:row; align-items:center; justify-content:space-between; width:auto; margin:0 }
+  .railAccount { margin:0; padding:0 }
+  .railLinks { flex-direction:row; gap:8px }
+  .navButton { height:46px; padding:0 10px; font-size:13px }
+  .navButton.isSoon { display:none }
+  .rail .navButton.isActive { --_x:0px }
+
+  .page { padding-bottom:76px }
+  .heroField { height:max( 480px, 78vh ) }
+  .castPanel { top:auto; left:16px; right:16px; bottom:24px; width:auto; padding:8px }
+  .castPanel header { display:none }
+  .roster { flex-direction:row; overflow:auto hidden; mask-image:linear-gradient( 90deg, transparent, #000 12px, #000 calc( 100% - 18px ), transparent ) }
+  .member { width:auto; flex-shrink:0; padding:4px }
+  .member > span:last-child { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset( 50% ) }
+  .nowChip { display:none }
+  .sectionHead { margin-left:24px }
+  .jamField, .newsField { margin-right:0; padding:72px 28px 84px }
+  .notes, .portals { grid-template-columns:1fr }
+  .portals { margin:0 24px }
+  .cartridges { grid-template-columns:repeat( 3, minmax( 0, 1fr ) ); gap:12px }
+  .footerField { flex-direction:column; align-items:flex-start; padding:0 24px 32px }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nowChip .dot { animation:none }
+}

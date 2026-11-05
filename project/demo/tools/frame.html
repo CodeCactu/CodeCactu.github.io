@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- Shows a demo view in an iframe of a fixed size, so headless screenshots get a stable viewport: frame.html?page=v1/index.html&view=desktop&width=390&height=844 -->
+<meta charset="utf-8">
+<style>* { margin:0 } html { overflow:hidden } iframe { display:block; border:0 }</style>
+<iframe id="view"></iframe>
+<script>
+  const params = new URLSearchParams( location.search )
+  const view = document.getElementById( `view` )
+
+  view.style.width = `${params.get( `width` ) ?? innerWidth}px`
+  view.style.height = `${params.get( `height` ) ?? innerHeight}px`
+  const page = params.get( `page` ) ?? `v2/index.html`
+  const scroll = Number( params.get( `scroll` ) ?? 0 )
+
+  params.delete( `width` )
+  params.delete( `height` )
+  params.delete( `page` )
+  params.delete( `scroll` )
+  view.src = `../${page}?${params}`
+
+  // Headless Edge does not always finish CSS fades inside frames, so screenshots skip them
+  view.addEventListener( `load`, () => {
+    view.contentDocument.head.insertAdjacentHTML( `beforeend`, `<style>*, *::after { transition:none !important }</style>` )
+    setTimeout( () => view.contentWindow.scrollTo( 0, scroll ), 3000 )
+  } )
+</script>

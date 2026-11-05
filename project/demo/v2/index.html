@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cactu</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Silkscreen&display=block">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas class="trail" id="trail"></canvas>
+
+<nav class="rail" aria-label="Główne">
+  <a class="railLogo" href="#" aria-label="Cactu, start"><canvas id="signet"></canvas></a>
+
+  <div class="dock" id="dock">
+    <div class="railLinks">
+      <a class="navButton isActive" href="#" style="--_bg:var( --purple )" aria-current="page"><span data-icon="home"></span><span>Start</span></a>
+      <a class="navButton" href="#jam" style="--_bg:var( --yellow ); --_fg:var( --yellow-ink )"><span data-icon="gamepad"></span><span>CactuJam</span></a>
+      <span class="navButton isSoon" style="--_dim:#33452c"><span data-icon="book"></span><span>CactuWiki<small>wkrótce</small></span></span>
+      <span class="navButton isSoon" style="--_dim:#4c3626"><span data-icon="cube"></span><span>Minecraft<small>wkrótce</small></span></span>
+    </div>
+
+    <button class="railAccount" type="button">
+      <canvas id="avatar"></canvas>
+      <div><b>evolveye</b><span class="pixelLabel">Poziom 3</span><span class="xpBlocks" data-xp="6"></span></div>
+    </button>
+  </div>
+</nav>
+
+<main class="page">
+  <header class="hero">
+    <h1 class="visuallyHidden">Cactu</h1>
+
+    <div class="field heroField" id="heroField" data-field="hero" data-q="4" data-depth="3" data-seed="11">
+      <div class="world" id="heroWorld"><figure class="banner" role="img" aria-label="Logo Cactu"></figure></div>
+    </div>
+
+    <aside class="field castPanel" id="castPanel" data-field="fill" data-palette="panel" data-q="2" data-depth="1" data-seed="61" aria-labelledby="castTitle">
+      <header><h2 id="castTitle">ekipa</h2><span class="pixelLabel" id="castCount">wybierz świat</span></header>
+      <ul class="roster" id="roster"></ul>
+    </aside>
+
+    <a class="navButton nowChip" href="#jam"><span class="dot"></span>Trwa CactuJam #5: głosowanie jeszcze 2 dni<span class="arrow">→</span></a>
+  </header>
+
+  <section class="field jamField" id="jam" data-field="fill" data-palette="jam" data-edges="top left bottom" data-q="4" data-depth="4" data-seed="5" data-walker="evolveye">
+    <div class="jam">
+      <div>
+        <span class="pixelLabel">Trwa głosowanie · jeszcze 2 dni</span>
+        <h2><span class="cactu">cactujam</span><span class="number">#5</span></h2>
+        <p class="jamTheme">Temat: „Wszystko się powtarza”</p>
+
+        <div class="phases">
+          <div class="phase"><span class="blocks" data-blocks="10"></span><span class="pixelLabel">Zgłoszenia</span></div>
+          <div class="phase"><span class="blocks" data-blocks="10"></span><span class="pixelLabel">Granie</span></div>
+          <div class="phase isNow"><span class="blocks" data-blocks="6"></span><span class="pixelLabel">Głosowanie</span></div>
+          <div class="phase"><span class="blocks" data-blocks="0"></span><span class="pixelLabel">Wyniki</span></div>
+        </div>
+
+        <div class="jamActions">
+          <a class="navButton" href="#"><span data-icon="gamepad"></span><span>Graj i oceniaj</span></a>
+          <span class="xpPill">+40 XP</span>
+        </div>
+      </div>
+
+      <div class="cartridges" id="cartridges"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sectionHead"><h2><span class="brace">{</span> co słychać <span class="brace">}</span></h2></div>
+
+    <div class="field newsField" data-field="fill" data-palette="sky" data-edges="top right bottom left" data-q="4" data-depth="3" data-seed="23">
+      <div class="notes">
+        <article class="field note" data-field="fill" data-palette="card" data-q="2" data-depth="1" data-seed="51" style="--_color:var( --red )"><span class="pixelLabel">12 paź</span><h3>Wyniki CactuJam #4</h3><p>Wygrała gra o kaktusie, który bał się wody.</p></article>
+        <article class="field note" data-field="fill" data-palette="card" data-q="2" data-depth="1" data-seed="57" style="--_color:#e08a1e"><span class="pixelLabel">3 paź</span><h3>Nowa postać: Ranfisz</h3><p>Pustynny wędrowiec, który kocha rośliny, dołącza do ekipy.</p></article>
+        <article class="field note" data-field="fill" data-palette="card" data-q="2" data-depth="1" data-seed="63" style="--_color:var( --purple )"><span class="pixelLabel">28 wrz</span><h3>Wieczór na Discordzie</h3><p>Pokazujemy projekty i planujemy jam.</p></article>
+        <article class="field note" data-field="fill" data-palette="card" data-q="2" data-depth="1" data-seed="69" style="--_color:var( --green )"><span class="pixelLabel">20 wrz</span><h3>Ruszają prace nad CactuWiki</h3><p>Poradniki pisane przez ekipę.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sectionHead"><h2><span class="brace">{</span> gdzie nas znaleźć <span class="brace">}</span></h2></div>
+
+    <div class="portals">
+      <a class="portal" href="#" style="--_color:#7a9cff">
+        <div class="field portalField" data-field="window" data-portal="evolveye" data-q="3" data-depth="3" data-seed="31"><div class="world"></div></div>
+        <h3>discord</h3><p>Rozmowy o wszystkim, wspólne granie i ogłoszenia jamów.</p><span class="pixelLabel">128 osób online</span>
+      </a>
+      <a class="portal" href="#" style="--_color:#7ee08a">
+        <div class="field portalField" data-field="window" data-portal="zabek" data-q="3" data-depth="3" data-seed="37"><div class="world"></div></div>
+        <h3>nasze rzeczy</h3><p>Gry, muzyka, rysunki i inne rzeczy robione przez członków Cactu.</p><span class="pixelLabel">34 projekty</span>
+      </a>
+      <a class="portal" href="#" style="--_color:#f0a64a">
+        <div class="field portalField" data-field="window" data-portal="ranfisz" data-q="3" data-depth="3" data-seed="41"><div class="world"></div></div>
+        <h3>poprzednie jamy</h3><p>Archiwum tematów, gier i wyników.</p><span class="pixelLabel">4 edycje</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="field footerField" id="footer" data-field="earth" data-edges="top" data-q="2" data-depth="3" data-surface="22" data-seed="3" data-walker="evolveye">
+    <span><b>cactu</b>© CodeCactu</span>
+    <nav aria-label="Społeczność"><a href="#">Discord</a><a href="#">GitHub</a><a href="#">YouTube</a></nav>
+    <nav aria-label="Język"><a href="#" aria-current="true">Polski</a><a href="#" lang="en">English</a></nav>
+  </footer>
+</main>
+
+<script src="cactu-font.js"></script>
+<script src="world.js"></script>
+<script src="brand.js"></script>
+<script src="utils.js"></script>
+<script src="cast.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

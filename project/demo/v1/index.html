@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cactu demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Silkscreen&display=block">
+<link rel="stylesheet" href="tokens.css">
+<script>
+  // Set before the first layout, so the page inside a frame never reserves space for a scrollbar
+  document.documentElement.classList.toggle( `isFramed`, window !== top )
+</script>
+<style>
+  /* Views: ?view=desktop | desktopAccount | mobile | mobileMenu | mobileJam, and &character=evolveye | ranfisz */
+
+  /* Inside the phone frames scrollbars overlay the page, like on a real phone */
+  .isFramed { scrollbar-width:none }
+
+  /* ---- Characters: flat rows tinted with the character's own colour ---- */
+
+  .portrait { position:relative; display:grid; place-items:center; width:var( --_size, 48px ); height:var( --_size, 48px ); flex-shrink:0; border-radius:var( --radius ); background:var( --character-tint ) }
+  .portrait img { width:76%; image-rendering:pixelated }
+  .portrait.isUnknown { border:2px dashed var( --line ); background:none; color:var( --ink-faint ); font:var( --font-display ); font-size:20px }
+
+  .rosterItem {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-radius: var( --radius );
+    transition: background 0.3s;
+  }
+
+  .rosterItem b { display:block; font:var( --font-ui ); font-size:17px }
+  .rosterItem small { color:var( --ink-soft ); font-size:13px }
+  .rosterItem[data-character] { cursor:pointer }
+  .rosterItem[data-character]:not( .isSelected ):hover { background:color-mix( in srgb, var( --character-tint ) 50%, transparent ) }
+  .rosterItem.isLocked b { color:var( --ink-faint ) }
+  .rosterItem .tag { margin-left:6px; padding:2px 4px; border-radius:var( --radius-small ); background:var( --paper-deep ); font-size:8px; vertical-align:2px }
+  .rosterItem.isLocked .pixelLabel { display:flex; align-items:center; gap:4px; margin-top:4px; color:var( --ink-faint ) }
+  .rosterItem.isLocked .pixelLabel svg { width:11px; height:11px }
+
+  .rosterItem.isSelected { background:var( --character-tint ) }
+  .rosterItem.isSelected b { color:var( --character-ink ) }
+  .rosterItem.isSelected .portrait { background:var( --card ) }
+
+  /* ================= DESKTOP ================= */
+
+  .rail {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 96px;
+    padding: 20px 0;
+    border-right: 1px solid var( --line );
+    background: var( --card );
+  }
+
+  .railLogo { margin-bottom:24px }
+  .railLogo canvas { display:block }
+  .railLinks { display:flex; flex-direction:column; gap:18px }
+
+  .railLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 80px;
+    color: var( --ink-soft );
+    font: var( --font-ui );
+    font-size: 12px;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .railIcon { position:relative; display:grid; place-items:center; width:48px; height:40px; border-radius:var( --radius ); color:var( --accent ) }
+  .railLink:hover:not( .isDisabled ) .railIcon { background:var( --accent-tint ) }
+  .railLink.isActive { color:var( --ink ) }
+  .railLink.isActive .railIcon { background:var( --accent ); color:white }
+  .railLink.isDisabled { color:var( --ink-faint ); cursor:default }
+  .railLink.isDisabled .railIcon { color:var( --ink-faint ); border:2px dashed var( --line ) }
+  .railLink small { margin-top:-4px; font:var( --font-pixel ); font-size:8px; text-transform:uppercase }
+
+  .railAccount { display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:auto; padding:10px 8px; border:0; border-radius:var( --radius ); background:none; cursor:pointer }
+  .railAccount:hover, .isAccountOpen .railAccount { background:var( --paper ) }
+  .railAccount .xpBar { width:56px; --_height:6px }
+  .railAccount .xpBar i { border-radius:1px }
+
+  .accountPopover {
+    position: fixed;
+    left: 108px;
+    bottom: 16px;
+    z-index: 21;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 360px;
+    padding: 20px;
+    box-shadow: 0 24px 48px -16px #3a301a40;
+  }
+
+  .who { display:flex; align-items:center; gap:14px }
+  .who b { display:block; font:var( --font-display ); font-size:20px }
+  .who small { color:var( --ink-soft ); font-size:13px }
+
+  .levelBox { display:flex; flex-direction:column; gap:8px }
+  .levelBox .row { display:flex; justify-content:space-between; align-items:baseline }
+  .levelBox .row b { font:var( --font-ui ) }
+  .levelBox .xpBar { --_height:12px }
+  .levelBox .next { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var( --radius ); background:var( --paper ); font-size:13px }
+  .levelBox .next .portrait { --_size:30px }
+
+  .streak { display:flex; align-items:center; justify-content:space-between }
+  .streak b { display:flex; align-items:center; gap:6px; font:var( --font-ui ) }
+  .streak b svg { color:#e0662e }
+  .streakDays { display:flex; gap:4px }
+  .streakDays span { display:grid; place-items:center; width:24px; height:24px; border-radius:var( --radius-small ); background:var( --paper-deep ); font:var( --font-pixel ); font-size:8px; color:var( --ink-faint ) }
+  .streakDays span.isDone { background:#f3c9a8; color:#7a3412 }
+  .streakDays span.isToday { background:#e0662e; color:white }
+
+  .quests h4 { margin-bottom:8px }
+  .quest { display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var( --line ); font-size:14px }
+  .quest .check { display:grid; place-items:center; width:20px; height:20px; border-radius:var( --radius-small ); border:2px solid var( --line ); flex-shrink:0 }
+  .quest.isDone .check { border-color:var( --green ); background:var( --green ); color:white }
+  .quest.isDone span:nth-child( 2 ) { color:var( --ink-faint ); text-decoration:line-through }
+  .quest span:nth-child( 2 ) { flex:1 }
+  .quest .pixelLabel { color:var( --green ) }
+
+  .accountActions { display:flex; flex-direction:column; gap:10px; padding-top:14px; border-top:1px solid var( --line ) }
+  .accountActions .row { display:flex; gap:10px }
+  .accountActions .segmented { flex:1 }
+  .menuButton { display:flex; align-items:center; gap:8px; padding:0 10px; background:var( --paper ); color:var( --ink ); font:var( --font-ui ); font-size:14px; text-decoration:none; cursor:pointer }
+  .menuButton.isDanger { background:var( --red-tint ); color:var( --red ) }
+
+  /* Hero: characters on the left, the world flush with the top and right edges */
+  .desktop .hero {
+    display: grid;
+    background: var( --paper );
+    grid-template-columns: 330px 1fr;
+    height: min( 74vh, 780px );
+    margin-left: 96px;
+  }
+
+  .roster { display:flex; flex-direction:column; padding:32px 0 24px 24px; min-height:0 }
+  .roster > header { display:flex; align-items:baseline; justify-content:space-between; padding:0 24px 16px 12px }
+  .roster > header h2 { font-size:26px }
+  .rosterList { display:flex; flex-direction:column; gap:4px; overflow:hidden; list-style:none; mask-image:linear-gradient( #000 85%, #0000 ) }
+  .roster .hint { display:flex; align-items:center; gap:10px; margin:12px 24px 0 12px; color:var( --ink-soft ); font-size:13px }
+
+  /* Every row runs into the world, like tabs joining their panel */
+  .desktop .rosterItem { padding-right:36px; border-radius:var( --radius ) 0 0 var( --radius ) }
+
+  .desktop .heroHole { --_radius:0 0 0 10px }
+
+  /* The footer sits at the bottom of the window even when the page is short */
+  .desktop:not( [hidden] ) { display:flex; flex-direction:column; min-height:100dvh }
+  .desktop .content { flex:1; display:flex; flex-direction:column; margin:56px 56px 0 calc( 96px + 36px ) }
+  .jamCard { padding:28px }
+  .jamCard header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px }
+  .jamCard h3 { font-size:26px }
+  .phaseSteps { display:flex; gap:6px; margin-top:22px }
+  .phaseSteps span { flex:1; height:8px; background:var( --paper-deep ) }
+  .phaseSteps span.isDone { background:var( --yellow ) }
+  .phaseSteps span.isNow { background:linear-gradient( 90deg, var( --yellow ) 60%, var( --paper-deep ) 60% ) }
+  .phaseNames { display:flex; justify-content:space-between; margin-top:8px }
+  .jamCard .thumbs { display:flex; gap:10px; margin-top:22px }
+  .jamCard footer { display:flex; align-items:center; justify-content:space-between; margin-top:24px }
+
+  .newsCard { padding:28px }
+  .newsCard h3 { font-size:22px }
+  .newsCard ul { list-style:none; margin-top:10px }
+  .newsCard li { display:flex; justify-content:space-between; gap:12px; padding:13px 0; border-bottom:1px solid var( --line ) }
+  .newsCard li:last-child { border:0 }
+
+  /* ---- Desktop content: places in a world rather than panels in a dashboard ---- */
+
+  .content > section { margin-top:96px }
+  .content > section > h2 { font-size:34px; margin-bottom:28px }
+
+  /* CactuJam is a poster on a raised piece of land, stepped at both edges */
+  .jamBand { --_surface:var( --yellow-tint ); margin:48px -56px 0 -36px; padding:40px 56px 48px 36px }
+  .jamBand::after { content:""; position:absolute; inset:100% 0 auto; height:40px; background:var( --_surface ); mask:var( --skyline ) 0 100% / 200px 40px repeat-x; scale:1 -1 }
+
+  /* Evolveye peeks over the edge from behind the land */
+  .peeker { position:absolute; right:12%; bottom:calc( 100% - 44px ); z-index:-1; width:105px; image-rendering:pixelated; animation:peek 4s ease-in-out infinite }
+  @keyframes peek { 0%, 100% { translate:0 18px } 40%, 70% { translate:0 0 } }
+
+  .jamPoster { display:grid; grid-template-columns:minmax( 0, 1fr ) minmax( 0, 1.1fr ); gap:56px; align-items:center }
+  .jamHeadline { font-size:72px; line-height:0.95; letter-spacing:-0.03em }
+  .jamHeadline span { color:var( --yellow ); -webkit-text-stroke:2px var( --ink ); paint-order:stroke fill }
+  .jamTheme { margin:14px 0 26px; font:var( --font-display ); font-size:26px; color:var( --yellow-ink ) }
+  .jamIntro .phaseSteps span { background:#00000014 }
+  .jamIntro .phaseSteps span.isNow { background:linear-gradient( 90deg, var( --yellow ) 60%, #00000014 60% ) }
+  .jamIntro .button { margin-top:28px }
+  .jamIntro > .pixelLabel { color:var( --yellow-ink ) }
+
+  /* Games are cartridges scattered on the poster; hovering one picks it up */
+  .cartridges { display:grid; grid-template-columns:repeat( 3, 132px ); gap:22px 18px; justify-content:center }
+  .cartridge { display:flex; flex-direction:column; gap:6px; padding:8px 8px 6px; background:#3b3846; rotate:var( --_tilt ); transition:rotate 0.2s, translate 0.2s; cursor:pointer }
+  .cartridge:hover { rotate:0deg; translate:0 -6px }
+  .cartridge .thumb { width:100%; height:auto; aspect-ratio:1 }
+  .cartridge .pixelLabel { color:#c9c3d9 }
+
+  /* News is a board of pinned notes */
+  .notes { display:grid; grid-template-columns:repeat( 4, 1fr ); gap:28px }
+  .note { position:relative; padding:26px 20px 22px; background:#fffdf6; rotate:var( --_tilt ); transition:rotate 0.2s, scale 0.2s }
+  .note:hover { rotate:0deg; scale:1.03 }
+  .note::before { content:""; position:absolute; left:calc( 50% - 6px ); top:-6px; width:12px; height:12px; background:var( --_pin ); box-shadow:2px 2px 0 #00000040 }
+  .note h3 { margin:8px 0 6px; font-size:21px }
+
+  /* Community places are portals: small windows into their own worlds */
+  .portals { display:grid; grid-template-columns:repeat( 3, 1fr ); gap:28px; margin-bottom:120px }
+  .portal { color:var( --ink ); text-decoration:none }
+  .portalHole { height:180px; transition:translate 0.2s }
+  .portal:hover .portalHole { translate:0 -6px }
+  .portal h3 { display:flex; align-items:center; gap:8px; margin-top:16px; font-size:22px }
+  .portal h3::after { content:"→"; transition:translate 0.2s }
+  .portal:hover h3::after { translate:6px 0 }
+  .portal .pixelLabel { display:block; margin-top:10px; color:var( --green ) }
+
+  /* Ranfisz walks along the top of the footer, behind its stepped edge */
+  .walker { position:absolute; bottom:100%; left:0; z-index:-1; image-rendering:pixelated }
+
+  .footer { display:flex; justify-content:space-between; margin:auto -56px 0 -36px; padding:16px 56px 40px 36px; color:var( --ink-soft ) }
+
+  /* ================= MOBILE ================= */
+
+  .mobile main { padding:0 16px 116px }
+  .mobile .heroHole { height:320px; --_radius:0 0 9px 9px }
+
+  .strip { padding:18px 0 4px }
+  .strip header { display:flex; justify-content:space-between; align-items:baseline; padding:0 16px 10px }
+  .strip header h2 { font-size:20px }
+  .stripList { display:flex; gap:8px; padding:0 16px; overflow-x:auto; scrollbar-width:none; mask-image:linear-gradient( 90deg, #000 85%, #0000 ) }
+
+  .stripItem { display:flex; align-items:center; gap:8px; padding:2px 10px 2px 2px; background:var( --card ); font:var( --font-ui ); font-size:14px; white-space:nowrap }
+  .stripItem .portrait { --_size:36px }
+  .stripItem.isSelected { background:var( --character-tint ); color:var( --character-ink ) }
+  .stripItem.isSelected .portrait { background:var( --card ) }
+  .stripItem.isLocked { color:var( --ink-faint ) }
+  .stripItem[data-character] { cursor:pointer }
+
+  .mobile .card { margin-top:16px; padding:20px }
+  .mobile .jamCard h3 { font-size:22px }
+  .mobile .jamCard .thumb { --_size:48px }
+  .mobile .jamCard footer .button { flex:1; justify-content:center }
+
+  .appBar {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc( 12px + env( safe-area-inset-bottom ) );
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 64px;
+    padding: 0 10px;
+    border: 1px solid var( --line );
+    border-radius: var( --radius-large );
+    background: var( --card );
+    box-shadow: 0 16px 32px -16px #3a301a40;
+  }
+
+  .appBar .burger { display:grid; place-items:center; width:44px; height:44px; border:0; border-radius:var( --radius ); background:var( --ink ); color:var( --card ); cursor:pointer }
+  .appBar .brand { flex:1; display:flex; align-items:flex-end; gap:8px; padding-left:2px }
+  .appBar .level { display:flex; flex-direction:column; align-items:flex-end; gap:5px }
+  .appBar .level .xpBar { width:64px; --_height:6px }
+  .appBar .avatar { --_size:40px }
+
+  .appBar .tray { flex:1; display:flex; gap:8px; overflow:hidden; mask-image:linear-gradient( 90deg, #000 80%, #0000 ) }
+  .appBar .tray .thumb { --_size:44px }
+  .appBar .left { display:flex; flex-direction:column; align-items:center; gap:4px; padding-right:4px; font:var( --font-display ); font-size:20px; color:var( --yellow-ink ) }
+
+  .backdrop { position:fixed; inset:0; z-index:30; background:#2a241640 }
+
+  .sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 31;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 92dvh;
+    overflow: auto;
+    padding: 10px 16px calc( 20px + env( safe-area-inset-bottom ) );
+    border-radius: 10px 10px 0 0;
+    background: var( --card );
+  }
+
+  .sheet .handle { width:40px; height:4px; margin:0 auto; background:var( --line ) }
+  .sheetLinks { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+  .sheetLink { display:flex; flex-direction:column; gap:10px; padding:12px; background:var( --accent-tint ); color:var( --ink ); font:var( --font-ui ); text-decoration:none }
+  .sheetLink .icon { color:var( --accent ) }
+  .sheetLink.isActive { background:var( --accent ); color:white }
+  .sheetLink.isActive .icon { color:white }
+  .sheetLink.isDisabled { background:none; border:2px dashed var( --line ); border-radius:var( --radius ); color:var( --ink-faint ) }
+  .sheetLink.isDisabled .icon { color:var( --ink-faint ) }
+  .sheetLink .pixelLabel { font-size:8px; color:inherit }
+  .sheet .accountCard { display:flex; flex-direction:column; gap:14px; padding:16px; border-radius:var( --radius-large ); background:var( --paper ) }
+  .sheet .quest { border-color:var( --line ) }
+
+  /* CactuJam on a phone */
+  .jamBannerWrap { position:relative }
+  .jamBanner { height:150px; --_radius:0 0 9px 9px }
+  .jamTitle { position:absolute; left:16px; bottom:16px; z-index:5; padding:6px 12px 8px; border-radius:var( --radius ); background:var( --card ); font-size:26px }
+  .jamStatus { display:flex; align-items:center; justify-content:space-between; margin:18px 0 12px }
+  .progress { margin-bottom:22px; color:var( --ink-soft ); font-size:13px }
+  .progress .phaseSteps { margin-top:8px }
+
+  .category h3 { font-size:20px }
+  .category p { color:var( --ink-soft ); font-size:13px; margin:2px 0 12px }
+
+  .dropRow { display:flex; align-items:center; gap:10px; min-height:72px; margin-bottom:8px; padding:10px 12px; border-radius:var( --radius-large ); background:var( --paper-deep ) }
+  .dropRow .score { width:22px; color:var( --ink-faint ); font:var( --font-display ); font-size:24px }
+  .dropRow .thumb { --_size:50px }
+  .dropRow.isTarget { background:var( --yellow-tint ) }
+  .dropRow .ghost { width:50px; height:50px; border-radius:var( --radius ); background:#dcaa1240 }
+
+  .dragging { position:absolute; z-index:25; --_size:58px; rotate:-6deg; scale:1.08; box-shadow:0 14px 24px #3a301a55 }
+  .finger { position:absolute; z-index:26; width:44px; height:44px; border-radius:50%; corner-shape:round; background:#23211c26; border:2px solid #23211c55 }
+</style>
+</head>
+<body>
+
+<!-- ================= DESKTOP ================= -->
+<div class="desktop" id="desktop" hidden>
+  <nav class="rail">
+    <a class="railLogo" href="#" aria-label="Cactu"><canvas class="pixelArt" data-pixel-art="cactus" data-scale="2"></canvas></a>
+
+    <div class="railLinks">
+      <a class="railLink isActive" href="#" style="--accent:var( --purple ); --accent-tint:var( --purple-tint )"><span class="railIcon" data-icon="home"></span>Start</a>
+      <a class="railLink" href="#" style="--accent:var( --yellow ); --accent-tint:var( --yellow-tint )"><span class="railIcon" data-icon="gamepad"></span>CactuJam</a>
+      <span class="railLink isDisabled"><span class="railIcon" data-icon="book"></span>CactuWiki<small>wkrótce</small></span>
+      <span class="railLink isDisabled"><span class="railIcon" data-icon="cube"></span>Minecraft<small>wkrótce</small></span>
+    </div>
+
+    <button class="railAccount" id="railAccount">
+      <span class="avatar"><canvas data-avatar></canvas><b class="level">3</b></span>
+      <span class="xpBar" data-xp="6"></span>
+    </button>
+  </nav>
+
+  <div class="accountPopover card" id="accountPopover" hidden>
+    <div class="who">
+      <span class="avatar" style="--_size:56px"><canvas data-avatar></canvas></span>
+      <div><b>evolveye</b><small>Poziom 3 · Kaktusiak</small></div>
+    </div>
+
+    <div class="levelBox">
+      <div class="row"><b>240 / 400 XP</b><span class="pixelLabel">Poziom 4</span></div>
+      <span class="xpBar" data-xp="6"></span>
+      <div class="next"><span class="portrait isUnknown">?</span><span>Na poziomie 4 odblokujesz <b>nową postać</b></span></div>
+    </div>
+
+    <div class="streak">
+      <b><span data-icon="flame"></span>Seria: 5 dni</b>
+      <div class="streakDays"><span class="isDone">P</span><span class="isDone">W</span><span class="isDone">Ś</span><span class="isDone">C</span><span class="isDone isToday">P</span><span>S</span><span>N</span></div>
+    </div>
+
+    <div class="quests">
+      <h4 class="pixelLabel">Zadania na dziś</h4>
+      <div class="quest isDone"><span class="check" data-icon="check"></span><span>Zagłosuj w kategorii „Temat”</span><span class="pixelLabel">+60 XP</span></div>
+      <div class="quest"><span class="check"></span><span>Zagraj w 2 gry z CactuJam #5 <span class="muted">(1/2)</span></span><span class="pixelLabel">+40 XP</span></div>
+      <div class="quest"><span class="check"></span><span>Odwiedź świat Ranfisza</span><span class="pixelLabel">+10 XP</span></div>
+    </div>
+
+    <div class="accountActions">
+      <div class="row">
+        <a class="menuButton bevel" href="#"><span data-icon="user"></span>Profil</a>
+        <div class="segmented"><span class="isOn">PL</span><span>EN</span></div>
+      </div>
+      <a class="menuButton bevel isDanger" href="#" style="height:40px"><span data-icon="logout"></span>Wyloguj</a>
+    </div>
+  </div>
+
+  <header class="hero">
+    <aside class="roster">
+      <header><h2 class="accented">Postacie</h2><span class="pixelLabel">6 / 8</span></header>
+      <ul class="rosterList" id="roster"></ul>
+      <p class="hint"><span data-icon="lock"></span>Zdobywaj XP, żeby odblokować kolejne</p>
+    </aside>
+    <div class="hole heroHole" id="desktopWorld"><figure class="banner" role="img" aria-label="Cactu"></figure></div>
+  </header>
+
+  <div class="content">
+    <section class="jamBand skyline">
+      <img class="peeker" src="../../characters/evolveye/idle_right.png" alt="">
+      <div class="jamPoster">
+        <div class="jamIntro">
+          <span class="pixelLabel">Trwa głosowanie · jeszcze 2 dni</span>
+          <h2 class="jamHeadline">CactuJam <span>#5</span></h2>
+          <p class="jamTheme">„Wszystko się powtarza”</p>
+          <div class="phaseSteps"><span class="isDone"></span><span class="isDone"></span><span class="isNow"></span><span></span></div>
+          <div class="phaseNames pixelLabel"><span>Zgłoszenia</span><span>Granie</span><span>Głosowanie</span><span>Wyniki</span></div>
+          <a class="button isYellow" href="#">Graj i oceniaj <span class="xpReward">+40 XP</span></a>
+        </div>
+        <div class="cartridges" data-cartridges="6"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="accented">Tablica ogłoszeń</h2>
+      <div class="notes">
+        <article class="note bevel" style="--_tilt:-1.5deg; --_pin:var( --red )"><span class="pixelLabel">12 paź</span><h3>Wyniki CactuJam #4</h3><p class="muted">Wygrała gra o kaktusie, który bał się wody.</p></article>
+        <article class="note bevel" style="--_tilt:1deg; --_pin:var( --purple )"><span class="pixelLabel">3 paź</span><h3>Nowa postać: Ranfisz</h3><p class="muted">Wędrowiec z pustyni dołącza do ekipy.</p></article>
+        <article class="note bevel" style="--_tilt:-0.5deg; --_pin:var( --green )"><span class="pixelLabel">28 wrz</span><h3>Spotkanie na Discordzie</h3><p class="muted">Pokazujemy projekty i planujemy jam.</p></article>
+        <article class="note bevel" style="--_tilt:1.5deg; --_pin:var( --yellow )"><span class="pixelLabel">20 wrz</span><h3>Ruszają prace nad CactuWiki</h3><p class="muted">Poradniki pisane przez społeczność.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="accented">Społeczność</h2>
+      <div class="portals">
+        <a class="portal" href="#"><div class="hole portalHole" data-portal="evolveye"></div><h3>Discord</h3><p class="muted">Rozmowy o wszystkim, wspólne granie i ogłoszenia jamów.</p><span class="pixelLabel">128 osób online</span></a>
+        <a class="portal" href="#"><div class="hole portalHole" data-portal="zabek"></div><h3>Projekty</h3><p class="muted">Gry, muzyka, rysunki i inne rzeczy robione przez członków Cactu.</p><span class="pixelLabel">34 projekty</span></a>
+        <a class="portal" href="#"><div class="hole portalHole" data-portal="ranfisz"></div><h3>Poprzednie jamy</h3><p class="muted">Archiwum tematów, gier i wyników.</p><span class="pixelLabel">4 edycje</span></a>
+      </div>
+    </section>
+
+    <footer class="footer skyline"><canvas class="walker" id="walker"></canvas><span>© CodeCactu</span><span>Discord · GitHub · YouTube</span><span>Polski · English</span></footer>
+  </div>
+</div>
+
+<!-- ================= MOBILE: HOME ================= -->
+<div class="mobile" id="mobile" hidden>
+  <div class="hole heroHole" id="mobileWorld"><figure class="banner" role="img" aria-label="Cactu"></figure></div>
+
+  <section class="strip">
+    <header><h2>Postacie</h2><span class="pixelLabel">6 / 8</span></header>
+    <div class="stripList" id="strip"></div>
+  </section>
+
+  <main>
+    <section class="card jamCard">
+      <header><h3>CactuJam #5</h3><span class="chip">2 dni</span></header>
+      <div class="phaseSteps"><span class="isDone"></span><span class="isDone"></span><span class="isNow"></span><span></span></div>
+      <div class="phaseNames pixelLabel"><span>Zgłoszenia</span><span>Granie</span><span>Głos</span><span>Wyniki</span></div>
+      <div class="thumbs" data-thumbs="5"></div>
+      <footer><a class="button isYellow" href="#">Graj i oceniaj <span class="xpReward">+40 XP</span></a></footer>
+    </section>
+
+    <section class="card newsCard">
+      <h3>Aktualności</h3>
+      <ul>
+        <li><span>Wyniki CactuJam #4</span><span class="muted">12 paź</span></li>
+        <li><span>Nowa postać: Ranfisz</span><span class="muted">3 paź</span></li>
+        <li><span>Spotkanie na Discordzie</span><span class="muted">28 wrz</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <nav class="appBar">
+    <button class="burger" data-open-menu><span data-icon="menu"></span></button>
+    <span class="brand"><canvas class="pixelArt" data-pixel-art="logo" data-scale="1" role="img" aria-label="Cactu"></canvas></span>
+    <span class="level"><span class="pixelLabel">Poz. 3</span><span class="xpBar" data-xp="6"></span></span>
+    <span class="avatar"><canvas data-avatar></canvas></span>
+  </nav>
+</div>
+
+<!-- ================= MOBILE: CACTUJAM ================= -->
+<div class="mobile" id="mobileJam" hidden>
+  <div class="jamBannerWrap">
+    <div class="hole jamBanner" id="jamWorld"></div>
+    <h1 class="jamTitle">CactuJam #5</h1>
+  </div>
+
+  <main>
+    <div class="jamStatus"><span class="muted">Temat: „Wszystko się powtarza”</span><span class="chip">2 dni</span></div>
+    <div class="progress">Twój głos: 2 z 4 kategorii gotowe<div class="phaseSteps"><span class="isDone"></span><span class="isDone"></span><span class="isNow"></span><span></span></div></div>
+
+    <section class="category">
+      <h3>Temat</h3>
+      <p>Zgodność z tematem, w tym tematami dodatkowymi</p>
+      <div class="dropRow"><span class="score">2</span><span data-game="1"></span><span data-game="3"></span></div>
+      <div class="dropRow isTarget"><span class="score">1</span><span data-game="0"></span><span data-game="4"></span><span class="ghost"></span></div>
+      <div class="dropRow"><span class="score">0</span><span data-game="2"></span></div>
+    </section>
+
+    <section class="category" style="margin-top:22px">
+      <h3>Czytelność</h3>
+      <p>Czy wiadomo, co robić?</p>
+      <div class="dropRow"><span class="score">2</span></div>
+    </section>
+  </main>
+
+  <span class="dragging" data-game="5" style="left:262px; top:430px"></span>
+  <span class="finger" style="left:292px; top:470px"></span>
+
+  <nav class="appBar">
+    <button class="burger" data-open-menu><span data-icon="menu"></span></button>
+    <div class="tray"><span data-game="6"></span><span data-game="5" style="opacity:0.25"></span><span data-game="0"></span></div>
+    <span class="left">3<small class="pixelLabel">zostały</small></span>
+  </nav>
+</div>
+
+<!-- ================= MOBILE: MENU SHEET ================= -->
+<div id="menu" hidden>
+  <div class="backdrop" data-close-menu></div>
+  <div class="sheet">
+    <div class="handle"></div>
+
+    <div class="sheetLinks">
+      <a class="sheetLink bevel isActive" href="#" style="--accent:var( --purple ); --accent-tint:var( --purple-tint )"><span data-icon="home"></span>Start</a>
+      <a class="sheetLink bevel" href="#" style="--accent:var( --yellow ); --accent-tint:var( --yellow-tint )"><span data-icon="gamepad"></span>CactuJam</a>
+      <span class="sheetLink isDisabled"><span data-icon="book"></span><span>CactuWiki <span class="pixelLabel">wkrótce</span></span></span>
+      <span class="sheetLink isDisabled"><span data-icon="cube"></span><span>Minecraft <span class="pixelLabel">wkrótce</span></span></span>
+    </div>
+
+    <div class="accountCard">
+      <div class="who">
+        <span class="avatar" style="--_size:48px"><canvas data-avatar></canvas><b class="level">3</b></span>
+        <div><b>evolveye</b><small>240 / 400 XP do poziomu 4</small></div>
+      </div>
+      <span class="xpBar" data-xp="6" style="--_height:10px"></span>
+      <div class="streak">
+        <b><span data-icon="flame"></span>Seria: 5 dni</b>
+        <div class="streakDays"><span class="isDone">P</span><span class="isDone">W</span><span class="isDone">Ś</span><span class="isDone">C</span><span class="isDone isToday">P</span><span>S</span><span>N</span></div>
+      </div>
+      <div class="quests">
+        <div class="quest"><span class="check"></span><span>Zagraj w 2 gry <span class="muted">(1/2)</span></span><span class="pixelLabel">+40 XP</span></div>
+        <div class="quest"><span class="check"></span><span>Odwiedź świat Ranfisza</span><span class="pixelLabel">+10 XP</span></div>
+      </div>
+    </div>
+
+    <div class="accountActions">
+      <div class="row">
+        <a class="menuButton bevel" href="#"><span data-icon="user"></span>Profil</a>
+        <div class="segmented"><span class="isOn">PL</span><span>EN</span></div>
+        <a class="menuButton bevel isDanger" href="#" style="height:40px"><span data-icon="logout"></span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="cactu-font.js"></script>
+<script src="world.js"></script>
+<script src="islands.js"></script>
+<script src="brand.js"></script>
+<script src="trail.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
