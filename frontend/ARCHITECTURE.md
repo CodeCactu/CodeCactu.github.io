@@ -23,7 +23,9 @@ product. Every change leaves the structure a little better than it found it.
   the simpler one.
 - **Comments describe what and why**, at the level of the interface; the code describes how. Keep them up to date with
   the code they describe.
-- **Code style** is enforced by `eslint-config-eye` (`bunx eslint .`); the rules are also in the Serena memory `conventions`.
+- **Code style** is enforced by Oxlint with the rules of `eslint-config-eye` (`../oxlint.eye.ts`, shared with the backend):
+  `bun run lint` (`lint:fix` to fix). Types: `bun run check` (`astro check` and `svelte-check`). The rules are also in the
+  Serena memory `conventions`.
 
 ## Directory layout
 
@@ -84,6 +86,7 @@ features/<slice>/
   <Thing>.module.css       its styles (same name as the component)
   <thing>.svelte.ts        shared reactive state (Svelte runes)
   <thing>.ts               logic without UI
+  _translation/            the slice's texts: <name>.<language>.yml, and the generated index.ts
   <subfolder>/             a larger part of the slice, same rules
 ```
 
@@ -105,7 +108,7 @@ features/<slice>/
 | `theme/` | The design system's semantic tokens: colours, typography, spacing, radii, motion, as CSS custom properties; fonts (`theme/font/`); the per-character tint (setting the tokens from the shown character). Components use only semantic tokens, never raw values |
 | `controls/` | Things you act on: `Button`, `Link`, `IconButton`, `Chip`, `SegmentedChoice`, nav items |
 | `flow/` | Things that arrange content: `Row`, `Column(s)`, `Stack`, `Popover`, `Sheet`, `Accordion`, `Loader` |
-| `translation/` | Supported languages, dictionaries, the markdown processor for long translated texts, the language switch, helpers to get a text |
+| `translation/` | The translation utilities, no texts: supported languages, `createTranslator`, the markdown processor for long translated texts, the language switch |
 | `backends/` | One folder per API (`backends/cactu/`): typed fetch functions and TanStack queries mapping the API, nothing else |
 | `serverOnly/` | Import it to make a module throw when bundled for the browser |
 
@@ -124,8 +127,8 @@ The app's other slices (`auth`, `cast`, `pixelWorld`, ...) are listed in `REDESI
 
 - A page's `index.astro` loads its data on the server (`await loadThings()` in the frontmatter), sets caching with
   `Astro.cache.set(...)` and composes the page from features and its own components.
-- Code meant only for that page (components, their styles, logic, data) sits beside its `index.astro`, under the same rules
-  as a slice: `.svelte` components, `.module.css` styles, logic in `.ts`. A larger page groups it in subfolders.
+- Code meant only for that page (components, their styles, logic, data, texts) sits beside its `index.astro`, under the same
+  rules as a slice (texts in `_translation/`): `.svelte` components, `.module.css` styles, logic in `.ts`. A larger page groups it in subfolders.
 - Astro turns every `.astro`, `.md`, `.ts` and `.js` file in `pages/` into a route. Page code that is not a route is
   therefore named with a leading `_` (`_boardRules.ts`) or kept in a `_` folder; `.svelte` and `.css` files are never
   routes and need no prefix.
@@ -141,9 +144,24 @@ The app's other slices (`auth`, `cast`, `pixelWorld`, ...) are listed in `REDESI
 
 ## Translation
 
-- Languages and dictionaries live in `features/translation/`; Polish is the default and, for now, the only complete language.
-- New UI text goes into a dictionary, never hard-coded in a component, so a second language needs no component changes.
-- Long texts (rules, descriptions) are markdown in the dictionaries, rendered by the slice's markdown processor.
+- Texts are vertical too: each slice or page owns its texts in `_translation/<name>.<language>.yml` (the `_` keeps the
+  folder out of Astro's routes). `features/translation/` holds only the utilities: the languages (`languages.ts`; Polish
+  is the default and, for now, the only one) and `createTranslator`.
+- The files have the shape POEditor imports and exports (checked by importing one): nested keys, `{{name}}` placeholders,
+  and a plural as a key holding its CLDR forms (`gameCount: { one, few, many, other }` in Polish; `other` required), the
+  form chosen by the `count` parameter. No language root key (`pl:`).
+  No i18n library: `Intl.PluralRules` and `Intl.NumberFormat` do the language rules.
+- `bun run translations:generate` (also run by `bun run check`) writes `_translation/index.ts` beside the YAML files: their
+  texts in every language and one type for all languages, from the default language's file. Generated: do not edit,
+  commit it. A slice uses it as `const t = createTranslator( translation )`; keys are typed, a key with plural forms
+  requires `count`, and a missing language falls back to the default one.
+- Exchange with POEditor (`frontend/translations/translations.ts`): `translations:collect` merges the slices of each group
+  (`GROUPS` in the script) into `translations/<group>.<language>.yml` to upload; `translations:update` splits the files
+  downloaded from POEditor (same names) back into the slices, comments kept. Add a new slice's path to a group.
+- YAML imports go through `tools/yaml.ts` (a Vite plugin, wired in `astro.config.mjs`); `bun test` imports YAML natively.
+- New UI text goes into its slice's `_translation/`, never hard-coded in a component, so a second language needs no
+  component changes.
+- Long texts (rules, descriptions) are markdown in the YAML files, rendered by the translation slice's markdown processor.
 
 ## Backends
 
@@ -155,8 +173,11 @@ The app's other slices (`auth`, `cast`, `pixelWorld`, ...) are listed in `REDESI
 
 ## Bun
 
-- Install and run with Bun: `bun install`, `bun run dev`, `bun run build`; production runs `bun dist/server/entry.mjs`
+- Install and run with Bun: `bun install`, `bun run dev`, `bun run build`, `bun run check`, `bun run lint`, `bun test`;
+  production runs `bun dist/server/entry.mjs`
   (see `Dockerfile`).
 - Scripts call Astro through Bun's runtime (`bunx --bun astro dev`), not Node.
 - Tests use `bun test` (`*.test.ts` next to the code).
-- `bun.lock` is the lockfile; `package-lock.json` is a leftover to remove.
+- `bun.lock` is the lockfile.
+- `overrides` in `package.json` pins `@emnapi/runtime` to the 1.x that `@astrojs/check`'s wasm `astro2tsx` needs (rolldown's
+  optional wasm binding would otherwise hoist a 2.0 beta and crash `astro check`); drop it once the two agree.

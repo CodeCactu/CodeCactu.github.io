@@ -1,10 +1,11 @@
-@layer reset, lib, layout;
+/* The cascade layers, lowest first (frontend/ARCHITECTURE.md, "Styling"); declared once, here */
+@layer reset, theme, lib, features, layout;
 
 @import "./normalize.css" layer( reset );
 @import "./prose.css" layer( lib );
 @import "./row.css" layer( lib );
 @import "@lib/core/flow/flow.css" layer( lib );
-@import "@fet/theme/font/cactu.css";
+@import "@fet/theme/font/cactu.css" layer( theme );
 
 @layer layout {
   :root {

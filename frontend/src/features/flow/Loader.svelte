@@ -1,7 +1,7 @@
 <script lang="ts">
   import classes from "./Loader.module.css"
 
-  const {size}:{
+  const { size }:{
     size?: number
   } = $props()
 </script>

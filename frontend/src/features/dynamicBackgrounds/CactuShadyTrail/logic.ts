@@ -20,7 +20,7 @@ export default class CactuShadyTrail {
   loop = new Loop()
 
   constructor( canvas:HTMLCanvasElement ) {
-    const ctx = canvas.getContext(`2d`)
+    const ctx = canvas.getContext( `2d` )
     if (!ctx) throw new Error( `Cannot create canvas 2D context` )
 
     const onResize = () => {

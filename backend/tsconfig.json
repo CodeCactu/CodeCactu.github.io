@@ -5,10 +5,13 @@
     "moduleResolution": "bundler",
     "target": "esnext",
     "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "paths": {
       "@fet/*": [ "./src/features/*" ],
       "@lib/*": [ "./src/lib/*" ],
       "@/*": [ "./src/*" ]
-    },
-  }
+    }
+  },
+  "exclude": [ "node_modules", "_*" ]
 }

@@ -1,12 +1,12 @@
 <script lang="ts">
   import cn from '@lib/core/functions/createClassName'
-  import { auth } from './authRune.svelte'
-  import defaultAvatar from "./default-avatar.webp"
-  import classes from "./UserPanel.module.css"
+  import Popover from '@fet/flow/Popover.svelte'
+  import Loader from '@fet/flow/Loader.svelte'
   import LogoutIcon from "@/icons/LogoutIcon.svelte"
   import LoginIcon from "@/icons/LoginIcon.svelte"
-  import Loader from '@fet/flow/Loader.svelte'
-  import Popover from '@fet/flow/Popover.svelte'
+  import defaultAvatar from "./default-avatar.webp"
+  import { auth } from './authRune.svelte'
+  import classes from "./UserPanel.module.css"
 
   $effect( () => {
     const url = new URL( window.location.href )
@@ -14,7 +14,7 @@
 
     if (code) {
       url.searchParams.delete( `code` )
-      window.history.replaceState( {}, '', url.pathname + url.search )
+      window.history.replaceState( {}, ``, url.pathname + url.search )
       auth.login( code )
     } else if (auth.session === undefined) {
       auth.loadSession()

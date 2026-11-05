@@ -67,12 +67,17 @@ If a piece of a page is later needed elsewhere (say the game card on a results p
 
 ## Steps
 
-Each step ends with `bunx eslint .` clean, `bun run build` passing, and the result compared with the prototype at 1920,
+Each step ends with `bun run lint` and `bun run check` clean, `bun test` and `bun run build` passing, and the result compared with the prototype at 1920,
 1417, 1100 and 390 px wide.
 
-1. **Groundwork.** Scripts through Bun (`bunx --bun astro ...`); remove `package-lock.json`; decide on unused dependencies
+1. [x] **Groundwork.** Scripts through Bun (`bunx --bun astro ...`); remove `package-lock.json`; decide on unused dependencies
    (`nanostores`, `vanjs-core`); cascade layers; `translation/` with the Polish dictionary and a `t()` helper. Library
    versions are updated in a separate pass, not here.
+   Done: scripts run on Bun (Astro 7 needs Node 22.22+, Bun avoids that), `package-lock.json` removed, `nanostores` and
+   `vanjs-core` removed (unused), dead React/Next leftovers removed; the layers `reset, theme, lib, features, layout` declared
+   in `RootLayout.css` (move to `AppLayout` in step 5); `features/translation/` with the utilities (`createTranslator`,
+   languages), texts owned by slices in `_translation/<name>.<language>.yml` (POEditor's YAML shape, plurals as nested forms),
+   types and POEditor exchange by `translations/translations.ts`; plurals by `Intl.PluralRules`; markdown for long texts comes with the first long text. Tooling: Oxlint replaced ESLint; `bun run check`.
 2. **Theme.** Tokens from the prototype's `style.css` and `jam.css` (`--void`, `--glow`, `--edge`, `--earth`, ink colours,
    `--card`, radii, `--column-gap:28px`, fonts); the character tint with `@property`; the inline script in the layout's
    `<head>` that applies the shown character's tint before the first paint (SSR does not know `sessionStorage`).

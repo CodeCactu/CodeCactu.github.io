@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# translation exchange files (bun run translations:collect / update)
+translations/*.yml

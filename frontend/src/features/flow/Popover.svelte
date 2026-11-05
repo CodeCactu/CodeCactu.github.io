@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Snippet } from "svelte"
-  import classes from "./Popover.module.css"
   import cn from "@lib/core/functions/createClassName"
+  import classes from "./Popover.module.css"
+  import type { Snippet } from "svelte"
 
   let { children }:{
     children: Snippet

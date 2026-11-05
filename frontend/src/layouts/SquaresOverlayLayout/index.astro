@@ -1,17 +1,17 @@
 ---
+import cn from "@lib/core/functions/createClassName"
+import Popover from "@fet/flow/Popover.svelte"
+import Button from "@fet/controls/Button.svelte"
+import UserPanel from "@fet/auth/UserPanel.svelte"
+import HomeIcon from "@/icons/HomeIcon.svelte"
+import GameIcon from "@/icons/GameIcon.svelte"
+import CubeIcon from "@/icons/CubeIcon.svelte"
+import BookIcon from "@/icons/BookIcon.svelte"
 import RootLayout from "../RootLayout/index.astro"
+import classes from "./SquaresOverlayLayout.module.css"
 import SquaresOverlay from "./SquaresOverlay.astro"
 import SquaresLeft from "./SquaresLeft.astro"
 import MenuSwitch from "./MenuSwitch.svelte"
-import Button from "@fet/controls/Button.svelte"
-import classes from "./SquaresOverlayLayout.module.css"
-import cn from "@lib/core/functions/createClassName"
-import Popover from "@fet/flow/Popover.svelte"
-import GameIcon from "@/icons/GameIcon.svelte"
-import CubeIcon from "@/icons/CubeIcon.svelte"
-import HomeIcon from "@/icons/HomeIcon.svelte"
-import BookIcon from "@/icons/BookIcon.svelte"
-import UserPanel from "@fet/auth/UserPanel.svelte"
 
 interface Props {
   compact?: boolean

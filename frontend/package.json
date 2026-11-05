@@ -2,33 +2,43 @@
   "name": "frontend",
   "type": "module",
   "version": "2.0.0",
-  "engines": {
-    "node": ">=22.12.0"
-  },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "bunx --bun astro dev",
+    "build": "bunx --bun astro build",
+    "preview": "bunx --bun astro preview",
+    "astro": "bunx --bun astro",
+    "check": "bun translations/translations.ts generate && bunx --bun astro check && bunx --bun svelte-check --tsconfig ./tsconfig.json --output human",
+    "lint": "bunx --bun oxlint",
+    "lint:fix": "bunx --bun oxlint --fix",
+    "test": "bun test",
+    "translations:generate": "bun translations/translations.ts generate",
+    "translations:collect": "bun translations/translations.ts collect",
+    "translations:update": "bun translations/translations.ts update"
   },
   "dependencies": {
-    "@astrojs/node": "^11.1.8",
-    "@astrojs/svelte": "^9.1.0",
-    "@tanstack/query-core": "^5.104.4",
-    "astro": "^7.4.0",
-    "nanostores": "^1.5.5",
+    "@astrojs/node": "^11.1.10",
+    "@astrojs/svelte": "^9.1.2",
+    "@tanstack/query-core": "^5.106.1",
+    "astro": "^7.4.6",
     "sharp": "^0.35.5",
-    "svelte": "^5.57.2",
-    "typescript": "^6.0.3",
-    "vanjs-core": "^1.6.1"
+    "svelte": "^5.57.3",
+    "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.5",
-    "@types/bun": "^1.4.3",
+    "@astrojs/check": "^0.9.12",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "@types/bun": "^1.4.4",
+    "@typescript-eslint/utils": "^8.72.1",
     "csstype": "^3.2.3",
-    "eslint": "9.39.5",
-    "eslint-config-eye": "^2.1.1",
-    "eslint-plugin-astro": "1.7.0",
-    "typescript-eslint": "^8.71.2"
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-sonarjs": "^4.2.2",
+    "eslint-plugin-spaces": "^2.1.1",
+    "oxlint": "^1.91.0",
+    "svelte-check": "^4.7.8",
+    "yaml": "^2.9.1"
+  },
+  "overrides": {
+    "@emnapi/runtime": "1.11.3"
   }
 }

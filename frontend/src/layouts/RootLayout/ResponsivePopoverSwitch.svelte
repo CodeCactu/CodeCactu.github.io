@@ -11,13 +11,13 @@
 
     const initialPopoverValues = new WeakMap<HTMLElement, string | null>()
 
-    elements.forEach( ( el ) => {
+    elements.forEach( el => {
       initialPopoverValues.set( el, el.getAttribute( `popover` ) )
     } )
 
-    const handleMediaQueryChange = ( matches: boolean ) => {
-      elements.forEach( ( el ) => {
-        if ( matches ) {
+    const handleMediaQueryChange = (matches:boolean) => {
+      elements.forEach( el => {
+        if (matches) {
           const originalVal = initialPopoverValues.get( el )
           el.setAttribute( `popover`, originalVal !== null ? ( originalVal || `auto` ) : `auto` )
         } else {
@@ -28,7 +28,7 @@
 
     handleMediaQueryChange( mediaQueryList.matches )
 
-    const listener = ( e: MediaQueryListEvent ) => handleMediaQueryChange( e.matches )
+    const listener = (e:MediaQueryListEvent) => handleMediaQueryChange( e.matches )
     mediaQueryList.addEventListener( `change`, listener )
 
     return () => {

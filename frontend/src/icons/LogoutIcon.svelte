@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { width, height }: {
+  let { width, height }:{
     width: number | string
     height: number | string
   } = $props()

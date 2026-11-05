@@ -7,26 +7,26 @@
   const isPlaceholderClass = `isPlaceholder`
   const isDraggingOverSourceClass = `isOverSource`
 
-  const animationOptions: KeyframeAnimationOptions = {
+  const animationOptions:KeyframeAnimationOptions = {
     duration: 200,
     easing: `cubic-bezier( 0.2, 0, 0, 1 )`,
   }
 
-  let draggingItem: null | HTMLElement = null
-  let draggingOriginal: null | HTMLElement = null
-  let draggingClone: null | HTMLElement = null
+  let draggingItem:null | HTMLElement = null
+  let draggingOriginal:null | HTMLElement = null
+  let draggingClone:null | HTMLElement = null
 
-  let draggingTable: null | HTMLElement = null
-  let draggingTableId: string | undefined
-  let draggingDropArea: null | HTMLElement = null
+  let draggingTable:null | HTMLElement = null
+  let draggingTableId:string | undefined
+  let draggingDropArea:null | HTMLElement = null
   let draggingFromSource = false
   let draggingOverSource = false
-  let draggingItemAnimation: Animation | null = null
+  let draggingItemAnimation:Animation | null = null
 
-  let draggingPointerId: number | null = null
-  let draggingOverElement: null | HTMLElement = null
+  let draggingPointerId:number | null = null
+  let draggingOverElement:null | HTMLElement = null
 
-  let draggingPlaceholder: null | HTMLElement = null
+  let draggingPlaceholder:null | HTMLElement = null
   let draggingPointerOffsetX = 0
   let draggingPointerOffsetY = 0
   let pointerDownX = 0
@@ -59,7 +59,7 @@
   }
 
   function getTable( element:Element | null ) {
-    return element?.closest<HTMLElement>( "[data-tier-table]" ) || null
+    return element?.closest<HTMLElement>( `[data-tier-table]` ) || null
   }
 
   function getTableId( element:Element | null ) {
@@ -101,7 +101,7 @@
       ele.style.transition = `none`
       ele.style.transform = `translate(${deltaX}px, ${deltaY}px)`
 
-      ele.offsetWidth;
+      ele.offsetWidth // oxlint-disable-line no-unused-expressions -- reading the size forces a reflow
 
       requestAnimationFrame( () => {
         ele.classList.add( isDraggingClass )
@@ -109,7 +109,7 @@
         ele.style.transform = `translate(0, 0)`
       } )
 
-      ele.addEventListener( `transitionend`, (event) => {
+      ele.addEventListener( `transitionend`, event => {
         if (event.propertyName !== `transform`) return
 
         ele.classList.remove( isDraggingClass )
@@ -123,14 +123,14 @@
   }
 
   function getDragAreasListsFromTable( table:HTMLElement ) {
-    const dropAreas = Array.from( table.querySelectorAll<HTMLElement>( "[data-drop-area]" ) )
+    const dropAreas = Array.from( table.querySelectorAll<HTMLElement>( `[data-drop-area]` ) )
     const dragAreas:LadderValues = {}
 
     for (const area of dropAreas) {
       const id = area.dataset.dropArea
       if (!id) continue
 
-      dragAreas[id] = Array.from( area.querySelectorAll<HTMLElement>( "[data-drag-id]" ) )
+      dragAreas[ id ] = Array.from( area.querySelectorAll<HTMLElement>( `[data-drag-id]` ) )
         .map( item => item.dataset.dragId! )
     }
 
@@ -138,7 +138,7 @@
   }
 
   export function getDragAreasLists() {
-    const dropAreas = Array.from( document.querySelectorAll<HTMLElement>( "[data-tier-table]" ) )
+    const dropAreas = Array.from( document.querySelectorAll<HTMLElement>( `[data-tier-table]` ) )
     const ladders:Record<string, LadderValues> = {}
 
     for (const table of dropAreas) {
@@ -151,7 +151,7 @@
     return ladders
   }
 
-  function getContainerItem( container:HTMLElement, itemId:DragItem["id"] ) {
+  function getContainerItem( container:HTMLElement, itemId:DragItem[`id`] ) {
     return container.querySelector( `[data-drag-id="${itemId}"]:not( .${isPreviewClass}, .${isPlaceholderClass} )` )
   }
 
@@ -175,7 +175,7 @@
     element.style.transition = `none`
     element.style.transform = `translate(${x}px, ${y}px)`
 
-    element.offsetWidth
+    element.offsetWidth // oxlint-disable-line no-unused-expressions -- reading the size forces a reflow
 
     requestAnimationFrame( () => {
       element.classList.add( isDraggingClass )
@@ -203,7 +203,7 @@
   }
 
   function animateMovedSiblings( container:HTMLElement, movingElement:HTMLElement, cb:() => void ) {
-    const oldPositions = new Map<HTMLElement,DOMRect>()
+    const oldPositions = new Map<HTMLElement, DOMRect>()
 
     for (const child of container.children) {
       if (!(child instanceof HTMLElement) || child === movingElement) continue
@@ -212,7 +212,7 @@
 
     cb()
 
-    for (const [child, oldRect] of oldPositions.entries().toArray()) {
+    for (const [ child, oldRect ] of oldPositions.entries().toArray()) {
       const newRect = child.getBoundingClientRect()
 
       const dx = oldRect.left - newRect.left
@@ -224,18 +224,18 @@
       child.style.transform = `translate(${dx}px, ${dy}px)`
     }
 
-    container.offsetWidth
+    container.offsetWidth // oxlint-disable-line no-unused-expressions -- reading the size forces a reflow
 
     for (const child of oldPositions.keys()) {
       child.classList.add( isDraggingClass )
       child.style.transition = `transform ${animationOptions.duration}ms cubic-bezier(.2, .8, .2, 1)`
-      child.style.transform = "translate(0, 0)"
+      child.style.transform = `translate(0, 0)`
 
       child.addEventListener( `transitionend`, () => {
         child.classList.remove( isDraggingClass )
         child.style.transition = ``
         child.style.transform = ``
-      }, { once: true } )
+      }, { once:true } )
     }
   }
 
@@ -248,14 +248,14 @@
     draggingPointerOffsetX = x - rect.left
     draggingPointerOffsetY = y - rect.top
 
-    clone.style.position = "fixed"
+    clone.style.position = `fixed`
     clone.style.left = `${x - draggingPointerOffsetX}px`
     clone.style.top = `${y - draggingPointerOffsetY}px`
     clone.style.width = `${rect.width}px`
     clone.style.height = `${rect.height}px`
-    clone.style.margin = "0"
-    clone.style.zIndex = "999999"
-    clone.style.pointerEvents = "none"
+    clone.style.margin = `0`
+    clone.style.zIndex = `999999`
+    clone.style.pointerEvents = `none`
 
     document.body.appendChild( clone )
 
@@ -275,7 +275,7 @@
     removePlaceholder()
 
     const rect = element.getBoundingClientRect()
-    const placeholder = document.createElement( "div" )
+    const placeholder = document.createElement( `div` )
 
     placeholder.style.width = `${rect.width}px`
     placeholder.style.height = `${rect.height}px`
@@ -364,7 +364,7 @@
     const placeholder = createPlaceholder( element )
 
     animateMovedSiblings( dropArea, placeholder, () => {
-      dropArea.insertAdjacentElement( "afterbegin", placeholder )
+      dropArea.insertAdjacentElement( `afterbegin`, placeholder )
     } )
   }
 
@@ -386,7 +386,7 @@
     if (!(event.target instanceof HTMLElement)) return
     if (event.button !== 0) return
 
-    const target = event.target.closest<HTMLElement>( "[data-drag-id]" )
+    const target = event.target.closest<HTMLElement>( `[data-drag-id]` )
     if (!target) return
 
     pointerDownX = event.clientX
@@ -421,7 +421,7 @@
       draggingItem = pointerDownElement
       draggingClone = null
 
-      draggingDropArea = pointerDownElement.closest<HTMLElement>( "[data-drop-area]" )
+      draggingDropArea = pointerDownElement.closest<HTMLElement>( `[data-drop-area]` )
 
       draggingTable = getTable( pointerDownElement )
       draggingTableId = draggingTable?.dataset.tierTable
@@ -457,7 +457,7 @@
     const element = document.elementFromPoint( event.clientX, event.clientY )
     if (!(element instanceof HTMLElement)) return
 
-    const source = element.closest<HTMLElement>( "[data-source-area]" )
+    const source = element.closest<HTMLElement>( `[data-source-area]` )
     if (source) {
       if (draggingOverElement === source) return
       console.log( `D&D`, `Entering drag source` )
@@ -478,8 +478,8 @@
     if (element.dataset.dragId === draggingItem.dataset.dragId) return
 
     const tableId = getTableId( element )
-    const dragItem = element.closest<HTMLElement>( "[data-drag-id]" )
-    const dropArea = element.closest<HTMLElement>( "[data-drop-area]" )
+    const dragItem = element.closest<HTMLElement>( `[data-drag-id]` )
+    const dropArea = element.closest<HTMLElement>( `[data-drop-area]` )
 
     if (draggingFromSource) {
       if (tableId) {
@@ -512,7 +512,7 @@
       if (draggingOverElement === dropArea) return
       console.log( `D&D`, `Entering drag area` )
 
-      const nearesDragArea = draggingOverElement?.closest<HTMLElement>( "[data-drop-area]" )
+      const nearesDragArea = draggingOverElement?.closest<HTMLElement>( `[data-drop-area]` )
       if (draggingOverElement && nearesDragArea !== dropArea) removePlaceholder()
 
       draggingOverElement = dropArea
@@ -531,7 +531,9 @@
         draggingOverSource = false
         handleDragLeaveSource( draggingItem )
       }
-    } if (draggingOverElement?.dataset.dragId) {
+    }
+
+    if (draggingOverElement?.dataset.dragId) {
       console.log( `D&D`, `Leaving drop item` )
     } else if (draggingOverElement?.dataset.dropArea) {
       console.log( `D&D`, `Leaving drop area` )
@@ -552,7 +554,7 @@
 
     if (!draggingItem || draggingPointerId !== event.pointerId) return
 
-    const removeClassName = async () => {
+    const removeClassName = async() => {
       if (!draggingItem) return
 
       console.log( `D&D`, `End` )
@@ -579,7 +581,7 @@
           const orgRect = draggingOriginal.getBoundingClientRect()
           const dragRect = draggindItemRef.getBoundingClientRect()
 
-          draggindItemRef.addEventListener( `transitionend`, () => draggindItemRef.remove(), { once: true } )
+          draggindItemRef.addEventListener( `transitionend`, () => draggindItemRef.remove(), { once:true } )
 
           await flyElementTo( draggindItemRef, orgRect.left - dragRect.left, orgRect.top - dragRect.top )
         }
@@ -591,7 +593,7 @@
     }
 
     if (!draggingItemAnimation) return removeClassName()
-    draggingItemAnimation.addEventListener( `finish`, removeClassName, { once: true } )
+    draggingItemAnimation.addEventListener( `finish`, removeClassName, { once:true } )
   }
 
   function handlePointerCancel( event:PointerEvent ) {
@@ -608,13 +610,13 @@
 
 <script lang="ts">
   import { onMount } from "svelte"
-  import classes from "./TierLadder.module.css"
   import cn from "@lib/core/functions/createClassName"
   import TierLadderItem from "./TierLadderItem.svelte"
+  import classes from "./TierLadder.module.css"
 
   export type DragItem = {
     id: string
-    description: null | string,
+    description: null | string
     tiers: TierLadderTier[]
   }
 
@@ -640,28 +642,28 @@
   export type LadderValues = Record<string, string[]>
   export type LaddersValues = Record<string, LadderValues>
 
-  let { name, label, description, tiers, onDragEnd }: {
-    name: string,
-    label: string,
-    description: null | string,
+  let { name, label, description, tiers, onDragEnd }:{
+    name: string
+    label: string
+    description: null | string
     tiers: TierLadderTier[]
     onDragEnd?: (ladder:LadderValues) => void
   } = $props()
 
-  let container: HTMLElement | undefined
+  let container:HTMLElement | undefined
 
-  onMount(() => {
+  onMount( () => {
     if (!container) return
 
     const abortController = new AbortController()
 
-    document.addEventListener( `pointerdown`, handlePointerDown, { signal: abortController.signal } )
-    document.addEventListener( `pointermove`, handlePointerMove, { signal: abortController.signal } )
-    document.addEventListener( `pointerup`, event => handlePointerUp( event, onDragEnd ), { signal: abortController.signal } )
-    document.addEventListener( `pointercancel`, handlePointerCancel, { signal: abortController.signal } )
+    document.addEventListener( `pointerdown`, handlePointerDown, { signal:abortController.signal } )
+    document.addEventListener( `pointermove`, handlePointerMove, { signal:abortController.signal } )
+    document.addEventListener( `pointerup`, event => handlePointerUp( event, onDragEnd ), { signal:abortController.signal } )
+    document.addEventListener( `pointercancel`, handlePointerCancel, { signal:abortController.signal } )
 
     return () => abortController.abort()
-  })
+  } )
 </script>
 
 <article bind:this={container} class={classes.ladder} data-tier-table={name}>

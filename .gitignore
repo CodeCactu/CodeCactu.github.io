@@ -1,5 +1,6 @@
 # Docker
 docker-compose.yml
 
-# Private files
-_*
+# Private files: `_` files at the root and at a module's root (backend/_release.sh); deeper `_` folders are code
+/_*
+/*/_*

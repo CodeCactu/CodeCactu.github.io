@@ -1,6 +1,7 @@
 import { defineConfig, fontProviders, memoryCache } from 'astro/config'
 import svelte from "@astrojs/svelte"
 import node from '@astrojs/node'
+import yaml from "./tools/yaml.ts"
 
 export default defineConfig({
   output: `server`,
@@ -26,6 +27,8 @@ export default defineConfig({
   },
 
   vite: {
+    plugins: [ yaml() ],
+
     css: {
       modules: {
         generateScopedName: `_[hash:base64:5]-[local]`,

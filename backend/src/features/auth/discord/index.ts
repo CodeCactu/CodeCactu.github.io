@@ -3,12 +3,12 @@ import { getApiError } from "@fet/server"
 import { logColorInfo } from "@fet/loggers/logInfo"
 import { logColorDimmed, logColorPositive } from "@fet/loggers/log"
 import loadDiscordUserOAuth from "@fet/discord/loadDiscordUserOAuth"
+import config from "@/config"
 import { User } from "../user"
 import { Session } from "../session"
 import logAuth from "../logAuth"
 import { getUserSession } from "../endpoints"
 import { getSessionCreationHeadersInit } from ".."
-import config from "@/config"
 
 const createSessionBodyScheme = z.object({ code:z.string() })
 

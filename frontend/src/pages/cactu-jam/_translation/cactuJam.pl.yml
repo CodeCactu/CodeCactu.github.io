@@ -1,0 +1,60 @@
+# The source list's header: "22 gry"
+gameCount:
+  one: "{{count}} gra"
+  few: "{{count}} gry"
+  many: "{{count}} gier"
+  other: "{{count}} gry"
+
+# The phase under the title: "głosowanie jeszcze 2 dni"
+votingLeft:
+  one: głosowanie jeszcze {{count}} dzień
+  few: głosowanie jeszcze {{count}} dni
+  many: głosowanie jeszcze {{count}} dni
+  other: głosowanie jeszcze {{count}} dnia
+
+# The voting categories (ids from the backend, /api/games/categories): their label, description and the text of every
+# rating, keyed by the rating as votes store it (t0 the lowest)
+categories:
+  theme:
+    name: Temat
+    description: Zgodność z tematem, w tym tematami dodatkowymi
+    tiers:
+      t2: Temat został zaimplementowany w mechanikach dzieła, mechaniki są spójne z tematem a ich podmiana zupełnie by zmieniła produkt.
+      t1: Temat występuje przykładowo w tle, okala produkcję, gra jakoś nawiązuje do tematu.
+      t0: Temat nie jest dostrzegalny, lub jest niezwykle szczątkowy
+  readability:
+    name: Czytelność
+    description: Czytelność i jasność zasad. Czy wiadomo co robić (jeśli błądzisz, czy wiesz o tym ze czegoś szukasz)
+    tiers:
+      t2: Nikt nic nie musi dopowiadać. Jeśli tak się dzieje, to tylko w sytuacji gdy z gry nie wynika że powinno się do czegoś dojść samemu.
+      t1: Autor musi wyjaśnić drobne kwestie ale poza prostymi dopowiedzeniami produkt względnie się tłumaczy
+      t0: Niczego nie zrozumiałeś. Produkt niczego nie tłumaczy i bez pomocy autora nic nie zrobisz.
+  impressions:
+    name: Ogólne wrażenie
+    tiers:
+      t4: Chcesz więcej, nawet jeśli było coś nie tak to nie ma to zestawienia z plusami. Bardzo przyjemna gra.
+      t3: Sympatyczna produkcja, wywołała przyjemne odczucia lub zachęciła do ponownej gry. Być może zagrałbyś w kontynuację lub wersję 2.0.
+      t2: Nic dodać nic ująć -- wartość domyślna, zaznacz jeśli nic szczególnie nie wpłynęło na Twoje wrażenia.
+      t1: Powiewa delikatną nudą, fajne ale nie rób więcej.
+      t0: Monotonia, nuda, brak zaciekawienia odbiorcy, niechęć do przejścia całości lub przejście z trudem.
+  rules:
+    name: Zgodność z zasadami
+    tiers:
+      t2: Produkcja jest zdaje się być w zgodzie z ustalonymi zasadami -- wartość domyślna.
+      t1: Praca budzi wątpliwości pod kątem ustalonych zasad.
+      t0: Praca ewidentnie naruszyła zasady konkursu. Nadanie tej oceny to istotny zarzut konieczny do zweryfikowania.
+  realisation:
+    name: Ogólna realizacja
+    description: Spójność produktu, dobrze dobrane wizualia.
+    tiers:
+      t4: Wszystko świetnie ze sobą współgra razem tworząc jedność.
+      t3: Dobrze dobrane elementy
+      t2: Nic dodać nic ująć -- wartość domyślna, zaznacz jeśli nic szczególnie nie wpłynęło na Twoje wrażenia
+      t1: Niektóre elementy do siebie nie pasują, całość nie współgra najlepiej.
+      t0: Bez składu i ładu -- mało co do siebie pasuje.
+  bonus:
+    name: Wyróżnienie
+    description: Okazja na docenienie/wyróżenienie czyjejś pracy/gry, możliwość przyznania osobistego bonusu
+    tiers:
+      t1: Wyraz uznania dla danej produkcji. Można docenić grę lub autora za wykonaną pracę (zaleca się przydzielenie bonusów z oszczędnością; standardowo może 1, góra 2 wyróżnienia)
+      t0: Brak bonusu, wartość domyślna.

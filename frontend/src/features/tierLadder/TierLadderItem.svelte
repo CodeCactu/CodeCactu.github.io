@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { queryCactuJamComments, saveCactuJamUserComment } from "@fet/backends/cactu/cactuJamComments"
+  import { auth } from "@fet/auth/authRune.svelte"
+  import { clientConfig } from "@/config.client"
   import classes from "./TierLadderItem.module.css"
   import type { Assignement, AssignementSummary } from "./TierLadder.svelte"
-  import { clientConfig } from "@/config.client"
-  import { queryCactuJamComments, saveCactuJamUserComment } from "@fet/backends/cactu/cactuJamComments"
-    import { auth } from "@fet/auth/authRune.svelte";
 
-  let { assignment }: {
+  let { assignment }:{
     assignment: AssignementSummary | Assignement
   } = $props()
 
@@ -13,7 +13,7 @@
   let isLoaded = false
   const isWithPopover = $derived( `name` in assignment )
 
-  $effect(() => {
+  $effect( () => {
     if (!isWithPopover || !auth.session) return
 
     isLoaded = false
@@ -24,10 +24,10 @@
 
       comment = c[ assignment.id ] ?? ``
       queueMicrotask( () => isLoaded = true )
-    })
+    } )
 
     return () => active = false
-  })
+  } )
 
   $effect( () => {
     if (!isWithPopover) return
@@ -36,12 +36,12 @@
 
     if (!isLoaded) return
 
-    const timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout( () => {
       saveCactuJamUserComment( assignment.id, currentComment )
     }, 1000 )
 
     return () => clearTimeout( timeoutId )
-  })
+  } )
 </script>
 
 
