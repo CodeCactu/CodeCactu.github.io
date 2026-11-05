@@ -1,54 +1,14 @@
 /*
- * Evolveye's code style for Oxlint: the rules of eslint-config-eye, shared by frontend/ and backend/.
- * Each module's oxlint.config.ts spreads it and passes its own copy of the SonarJS plugin, so the JS plugins below resolve
- * from that module's node_modules. Plain data, no imports: it could move into a package (oxlint-config-eye) unchanged.
+ * Oxlint for the whole repository (frontend/ and backend/): Evolveye's code style, the rules of eslint-config-eye.
+ * One config and one copy of the JS plugins at the root, so the editor's single Oxlint process can lint both modules.
+ * Run from here: `bun run lint` (`lint:fix` to fix).
  */
 
-// The parts of Oxlint's config this file uses (Oxlint's own types live in each module's node_modules)
+import { defineConfig } from "oxlint"
+import sonarjs from "eslint-plugin-sonarjs"
+
 type Severity = `off` | `warn` | `error`
 type Rules = Record<string, Severity | [Severity, ...unknown[]]>
-type EyeConfig = {
-  plugins: (`eslint` | `typescript` | `unicorn` | `oxc` | `import`)[]
-  jsPlugins: (string | { name:string, specifier:string })[]
-  settings: Record<string, unknown>
-  rules: Rules
-  overrides: { files:string[], rules:Rules }[]
-}
-
-/** The SonarJS plugin as its package exports it: its recommended rules come from there */
-type SonarPlugin = { configs?:Record<string, unknown> }
-
-export default function createEyeConfig( sonarjs:SonarPlugin ):EyeConfig {
-  const sonarRecommended = sonarjs.configs?.recommended as { rules:Rules } | undefined
-
-  return {
-    plugins: [ `eslint`, `typescript`, `unicorn`, `oxc`, `import` ],
-    jsPlugins: [
-      `@stylistic/eslint-plugin`,
-      { name:`stylistic-js`, specifier:`@stylistic/eslint-plugin-js` },
-      `eslint-plugin-spaces`,
-      `eslint-plugin-sonarjs`,
-      // The name "import" belongs to Oxlint's native plugin, which has no "order" rule
-      { name:`import-order`, specifier:`eslint-plugin-import-x` },
-    ],
-    settings: {
-      // The path aliases (tsconfig.json) are this project's code, not packages
-      "import-x/internal-regex": `^@(fet|lib)?/`,
-    },
-    rules: {
-      ...correctnessRules,
-      ...jsStylisticRules,
-      ...stylisticRules,
-      ...spacesRules,
-      ...sonarRecommended?.rules,
-      ...sonarRules,
-    },
-    overrides: [
-      // Their script blocks are indented inside <script>, which the indent rule cannot offset
-      { files:[ `**/*.svelte`, `**/*.astro` ], rules:{ "@stylistic/indent":`off` } },
-    ],
-  }
-}
 
 const correctnessRules:Rules = {
   "no-async-promise-executor": `off`,
@@ -163,3 +123,42 @@ const sonarRules:Rules = {
   "sonarjs/super-linear-regex": `off`,
   "sonarjs/no-redundant-optional": `off`,
 }
+
+const sonarRecommended = sonarjs.configs?.recommended as { rules: Rules } | undefined
+
+export default defineConfig({
+  plugins: [ `eslint`, `typescript`, `unicorn`, `oxc`, `import` ],
+  jsPlugins: [
+    `@stylistic/eslint-plugin`,
+    { name:`stylistic-js`, specifier:`@stylistic/eslint-plugin-js` },
+    `eslint-plugin-spaces`,
+    `eslint-plugin-sonarjs`,
+    // The name "import" belongs to Oxlint's native plugin, which has no "order" rule
+    { name:`import-order`, specifier:`eslint-plugin-import-x` },
+  ],
+  settings: {
+    // The path aliases (tsconfig.json) are this project's code, not packages
+    "import-x/internal-regex": `^@(fet|lib)?/`,
+  },
+  rules: {
+    ...correctnessRules,
+    ...jsStylisticRules,
+    ...stylisticRules,
+    ...spacesRules,
+    ...sonarRecommended?.rules,
+    ...sonarRules,
+  },
+  overrides: [
+    // Their script blocks are indented inside <script>, which the indent rule cannot offset
+    { files:[ `**/*.svelte`, `**/*.astro` ], rules:{ "@stylistic/indent":`off` } },
+  ],
+  ignorePatterns: [
+    `**/node_modules/`,
+    // The prototypes of the redesign: plain browser scripts, not held to the code style
+    `project/`,
+    `frontend/dist/`,
+    `frontend/.astro/`,
+    `backend/uploads/`,
+    `backend/data/`,
+  ],
+})

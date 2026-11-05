@@ -6,9 +6,7 @@
   "main": "app.ts",
   "scripts": {
     "dev": "bun --watch app.ts",
-    "check": "bunx tsc --noEmit",
-    "lint": "bunx --bun oxlint",
-    "lint:fix": "bunx --bun oxlint --fix"
+    "check": "bunx tsc --noEmit"
   },
   "author": "",
   "license": "ISC",
@@ -16,14 +14,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.10.0",
-    "@stylistic/eslint-plugin-js": "^4.4.1",
     "@types/bun": "^1.4.4",
-    "@typescript-eslint/utils": "^8.72.1",
-    "eslint-plugin-import-x": "^4.17.1",
-    "eslint-plugin-sonarjs": "^4.2.2",
-    "eslint-plugin-spaces": "^2.1.1",
-    "oxlint": "^1.91.0",
     "typescript": "^6"
   }
 }

@@ -4,3 +4,6 @@ docker-compose.yml
 # Private files: `_` files at the root and at a module's root (backend/_release.sh); deeper `_` folders are code
 /_*
 /*/_*
+
+# Dependencies (the lint tools; each module has its own)
+/node_modules/

@@ -1,6 +1,6 @@
 # Conventions
 
-User-enforced style (also in `eslint-config-eye`, run by Oxlint through `oxlint.eye.ts`); apply to all TS/JS/Svelte/Astro:
+User-enforced style (also in `eslint-config-eye`, run by Oxlint through the root `oxlint.config.ts`); apply to all TS/JS/Svelte/Astro:
 - Spaces inside call/definition/index parens & brackets: `fn( a, b )`, `arr[ i ]`; sole object/array arg hugs: `fn({ a:1 })`.
 - Dense inline objects `{ a:1, b:2 }`; destructuring with inner spaces `const { a } = x`.
 - Param types without space after colon: `fn( req:Bun.BunRequest )`.

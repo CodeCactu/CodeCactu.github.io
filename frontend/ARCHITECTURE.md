@@ -23,8 +23,8 @@ product. Every change leaves the structure a little better than it found it.
   the simpler one.
 - **Comments describe what and why**, at the level of the interface; the code describes how. Keep them up to date with
   the code they describe.
-- **Code style** is enforced by Oxlint with the rules of `eslint-config-eye` (`../oxlint.eye.ts`, shared with the backend):
-  `bun run lint` (`lint:fix` to fix). Types: `bun run check` (`astro check` and `svelte-check`). The rules are also in the
+- **Code style** is enforced by Oxlint with the rules of `eslint-config-eye` (`../oxlint.config.ts`, one config for
+  the whole repository): `bun run lint` from the repository root (`lint:fix` to fix). Types: `bun run check` (`astro check` and `svelte-check`). The rules are also in the
   Serena memory `conventions`.
 
 ## Directory layout
@@ -173,7 +173,7 @@ The app's other slices (`auth`, `cast`, `pixelWorld`, ...) are listed in `REDESI
 
 ## Bun
 
-- Install and run with Bun: `bun install`, `bun run dev`, `bun run build`, `bun run check`, `bun run lint`, `bun test`;
+- Install and run with Bun: `bun install`, `bun run dev`, `bun run build`, `bun run check`, `bun test` (lint from the root);
   production runs `bun dist/server/entry.mjs`
   (see `Dockerfile`).
 - Scripts call Astro through Bun's runtime (`bunx --bun astro dev`), not Node.
